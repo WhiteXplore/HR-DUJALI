@@ -6,7 +6,7 @@
       <div class="text-text1 text-[13px] rounded-xl">
         <!-- Header -->
         <div
-          class="w-full p-5 py-3 bg-green-600 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
+          class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
         >
           <div class="flex gap-1 items-center">
             <icon :name="'add-account'" />

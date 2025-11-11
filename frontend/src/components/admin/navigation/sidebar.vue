@@ -14,7 +14,7 @@
         />
       </div>
 
-      <!-- Logo and user info -->
+      <!-- Logo & User -->
       <div class="flex flex-col items-center justify-center w-full">
         <img
           src="../../../assets/img/dujali-logo.png"
@@ -43,331 +43,87 @@
 
       <!-- Dynamic Menu -->
       <div class="flex flex-col mt-6 gap-2 tracking-wide text-[12px] w-full">
-        <!-- Home Section -->
-        <div v-if="isExpanded" class="text-md text-white mt-2 text-left">
-          Home
-        </div>
-        <div v-for="item in homeItems" :key="item.name" class="w-full">
-          <router-link
-            v-if="!item.children"
-            :to="item.route"
-            @click="handleDashboardClick"
-            class="flex items-center w-full gap-5 p-2 rounded-md transition-all duration-200"
-            :class="[
-              $route.path === item.route
-                ? 'bg-white text-green-700'
-                : 'text-white hover:bg-white hover:text-green-800',
-              !isExpanded ? 'justify-center' : 'justify-start',
-            ]"
-          >
-            <icon :name="item.icon" />
-            <span v-show="isExpanded">{{ item.name }}</span>
-          </router-link>
-        </div>
+        <template v-for="section in sections" :key="section.name">
+          <div v-if="isExpanded" class="text-md text-white mt-2 text-left">
+            {{ section.name }}
+          </div>
 
-        <!-- Records Section  -->
-        <div v-if="isExpanded" class="text-md text-white text-left">
-          Records
-        </div>
-
-        <div v-for="item in recordsItems" :key="item.name" class="w-full">
-          <!-- Non-children router-link -->
-          <router-link
-            v-if="!item.children"
-            :to="item.route"
-            class="flex items-center w-full gap-5 p-2 rounded-md transition-all duration-200"
-            :class="[
-              $route.path.startsWith(item.route) // Match parent route for child paths
-                ? 'bg-white text-green-700'
-                : 'text-white hover:bg-white hover:text-green-800',
-              !isExpanded ? 'justify-center' : 'justify-start',
-            ]"
-          >
-            <icon :name="item.icon" />
-            <span v-show="isExpanded">{{ item.name }}</span>
-          </router-link>
-
-          <!-- Collapsible Parent -->
-          <div v-else>
-            <div
-              @click="toggleDropdown(item.name)"
-              class="flex items-center justify-between w-full p-2 cursor-pointer transition-all duration-200"
+          <div v-for="item in section.items" :key="item.name" class="w-full">
+            <!-- Single Link -->
+            <router-link
+              v-if="!item.children"
+              :to="item.route"
+              class="flex items-center w-full p-2 rounded-md transition-all duration-200"
               :class="[
-                isDropdownOpen === item.name
-                  ? `bg-white text-green-800 ${
-                      !isExpanded ? 'rounded-md' : 'rounded-t-md'
-                    }`
-                  : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
+                $route.path === item.route
+                  ? 'bg-white text-green-700'
+                  : 'text-white hover:bg-white hover:text-green-800',
+                !isExpanded ? 'justify-center' : 'justify-start gap-5',
               ]"
             >
-              <!-- Icon + Label -->
+              <icon :name="item.icon" />
+              <span v-show="isExpanded">{{ item.name }}</span>
+            </router-link>
+
+            <!-- Collapsible Parent -->
+            <div v-else>
               <div
+                @click="toggleDropdown(item.name)"
+                class="flex items-center justify-between w-full p-2 cursor-pointer transition-all duration-200"
                 :class="[
-                  !isExpanded ? 'justify-center w-full' : 'justify-start gap-5',
+                  isDropdownOpen === item.name
+                    ? `bg-white text-green-800 ${
+                        !isExpanded ? 'rounded-md' : 'rounded-t-md'
+                      }`
+                    : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
                 ]"
-                class="flex items-center"
               >
-                <icon :name="item.icon" />
-                <span v-show="isExpanded">{{ item.name }}</span>
-              </div>
-              <!-- Arrow icon (only show when expanded) -->
-              <icon
-                name="arrow-down"
-                v-show="isExpanded"
-                class="transition-transform"
-                :class="{ 'rotate-180': isDropdownOpen === item.name }"
-              />
-            </div>
-
-            <!-- Dropdown children -->
-            <transition name="slide">
-              <div v-show="isDropdownOpen === item.name && isExpanded">
-                <router-link
-                  v-for="(sub, index) in item.children"
-                  :key="sub.name"
-                  :to="sub.route"
-                  class="block w-full py-2 px-[60px] text-[11px] transition-all duration-200 text-left"
+                <div
                   :class="[
-                    $route.path.startsWith(sub.route) // This ensures the parent is active when on a child route
-                      ? 'bg-blue-950 text-white'
-                      : 'bg-white text-green-950 hover:bg-gray-200',
-                    index === item.children.length - 1 ? 'rounded-b-md' : '',
+                    !isExpanded
+                      ? 'justify-center w-full'
+                      : 'justify-start gap-5',
                   ]"
+                  class="flex items-center"
                 >
-                  {{ sub.name }}
-                </router-link>
+                  <icon :name="item.icon" />
+                  <span v-show="isExpanded">{{ item.name }}</span>
+                </div>
+                <icon
+                  name="arrow-down"
+                  v-show="isExpanded"
+                  class="transition-transform"
+                  :class="{ 'rotate-180': isDropdownOpen === item.name }"
+                />
               </div>
-            </transition>
-          </div>
-        </div>
 
-        <!-- Utilities Section -->
-        <div v-if="isExpanded" class="text-md text-white text-left">
-          Utilities
-        </div>
-
-        <div v-for="item in utilityItems" :key="item.name" class="w-full">
-          <!-- Non-children router-link -->
-          <router-link
-            v-if="!item.children"
-            :to="item.route"
-            class="flex items-center w-full p-2 transition-all duration-200"
-            :class="[
-              $route.path === item.route
-                ? `bg-white text-green-700 ${
-                    !isExpanded ? 'rounded-md' : 'rounded-md'
-                  }`
-                : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
-              !isExpanded ? 'justify-center gap-0' : 'justify-start gap-5',
-            ]"
-          >
-            <icon :name="item.icon" />
-            <span v-show="isExpanded">{{ item.name }}</span>
-          </router-link>
-
-          <!-- Collapsible Parent -->
-          <div v-else>
-            <div
-              @click="toggleDropdown(item.name)"
-              class="flex items-center justify-between w-full p-2 cursor-pointer transition-all duration-200"
-              :class="[
-                isDropdownOpen === item.name
-                  ? `bg-white text-green-800 ${
-                      !isExpanded ? 'rounded-md' : 'rounded-t-md'
-                    }`
-                  : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
-              ]"
-            >
-              <div
-                :class="[
-                  !isExpanded ? 'justify-center w-full' : 'justify-start gap-5',
-                ]"
-                class="flex items-center"
-              >
-                <icon :name="item.icon" />
-                <span v-show="isExpanded">{{ item.name }}</span>
-              </div>
-              <icon
-                name="arrow-down"
-                v-show="isExpanded"
-                class="transition-transform"
-                :class="{ 'rotate-180': isDropdownOpen === item.name }"
-              />
+              <transition name="slide">
+                <div v-show="isDropdownOpen === item.name && isExpanded">
+                  <router-link
+                    v-for="(sub, index) in item.children"
+                    :key="sub.name"
+                    :to="sub.route"
+                    class="block w-full py-2 px-[60px] text-[11px] transition-all duration-200 text-left"
+                    :class="[
+                      $route.path.startsWith(sub.route)
+                        ? 'bg-blue-950 text-white'
+                        : 'bg-white text-green-950 hover:bg-gray-200',
+                      index === item.children.length - 1 ? 'rounded-b-md' : '',
+                    ]"
+                  >
+                    {{ sub.name }}
+                  </router-link>
+                </div>
+              </transition>
             </div>
-
-            <transition name="slide">
-              <div v-show="isDropdownOpen === item.name && isExpanded">
-                <router-link
-                  v-for="(sub, index) in item.children"
-                  :key="sub.name"
-                  :to="sub.route"
-                  class="block w-full py-2 px-[60px] text-[11px] transition-all duration-200 text-left"
-                  :class="[
-                    $route.path.startsWith(sub.route) // This ensures the parent is active when on a child route
-                      ? 'bg-blue-950 text-white'
-                      : 'bg-white text-green-950 hover:bg-gray-200',
-                    index === item.children.length - 1 ? 'rounded-b-md' : '',
-                  ]"
-                >
-                  {{ sub.name }}
-                </router-link>
-              </div>
-            </transition>
           </div>
-        </div>
-
-        <!-- Predictive Analysis Section -->
-        <div v-if="isExpanded" class="text-md text-white text-left">
-          Analysis
-        </div>
-
-        <div v-for="item in predictiveItems" :key="item.name" class="w-full">
-          <!-- Single router-link when no children -->
-          <router-link
-            v-if="!item.children"
-            :to="item.route"
-            class="flex items-center w-full p-2 transition-all duration-200"
-            :class="[
-              $route.path === item.route
-                ? `bg-white text-green-700 rounded-md`
-                : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
-              !isExpanded ? 'justify-center gap-0' : 'justify-start gap-5',
-            ]"
-          >
-            <icon :name="item.icon" />
-            <span v-show="isExpanded">{{ item.name }}</span>
-          </router-link>
-
-          <!-- Collapsible parent with children -->
-          <div v-else>
-            <div
-              @click="toggleDropdown(item.name)"
-              class="flex items-center justify-between w-full p-2 cursor-pointer transition-all duration-200"
-              :class="[
-                isDropdownOpen === item.name
-                  ? `bg-white text-green-800 ${
-                      !isExpanded ? 'rounded-md' : 'rounded-t-md'
-                    }`
-                  : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
-              ]"
-            >
-              <div
-                class="flex items-center"
-                :class="
-                  !isExpanded ? 'justify-center w-full' : 'justify-start gap-5'
-                "
-              >
-                <icon :name="item.icon" />
-                <span v-show="isExpanded">{{ item.name }}</span>
-              </div>
-              <icon
-                name="arrow-down"
-                v-show="isExpanded"
-                class="transition-transform"
-                :class="{ 'rotate-180': isDropdownOpen === item.name }"
-              />
-            </div>
-
-            <transition name="slide">
-              <div v-show="isDropdownOpen === item.name && isExpanded">
-                <router-link
-                  v-for="(sub, index) in item.children"
-                  :key="sub.name"
-                  :to="sub.route"
-                  class="block w-full py-2 px-[60px] text-[11px] transition-all duration-200 text-left"
-                  :class="[
-                    $route.path === sub.route
-                      ? 'bg-blue-950 text-white'
-                      : 'bg-white text-green-950 hover:bg-gray-200',
-                    index === item.children.length - 1 ? 'rounded-b-md' : '',
-                  ]"
-                >
-                  {{ sub.name }}
-                </router-link>
-              </div>
-            </transition>
-          </div>
-        </div>
-
-        <!-- Monthly Report Section -->
-        <div v-if="isExpanded" class="text-md text-white text-left">Report</div>
-
-        <div v-for="item in monthlyreportItems" :key="item.name" class="w-full">
-          <!-- Single router-link when no children -->
-          <router-link
-            v-if="!item.children"
-            :to="item.route"
-            class="flex items-center w-full p-2 transition-all duration-200"
-            :class="[
-              $route.path === item.route
-                ? `bg-white text-green-700 rounded-md`
-                : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
-              !isExpanded ? 'justify-center gap-0' : 'justify-start gap-5',
-            ]"
-          >
-            <icon :name="item.icon" />
-            <span v-show="isExpanded">{{ item.name }}</span>
-          </router-link>
-
-          <!-- Collapsible parent with children -->
-          <div v-else>
-            <div
-              @click="toggleDropdown(item.name)"
-              class="flex items-center justify-between w-full p-2 cursor-pointer transition-all duration-200"
-              :class="[
-                isDropdownOpen === item.name
-                  ? `bg-white text-green-800 ${
-                      !isExpanded ? 'rounded-md' : 'rounded-t-md'
-                    }`
-                  : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
-              ]"
-            >
-              <div
-                class="flex items-center"
-                :class="
-                  !isExpanded ? 'justify-center w-full' : 'justify-start gap-5'
-                "
-              >
-                <icon :name="item.icon" />
-                <span v-show="isExpanded">{{ item.name }}</span>
-              </div>
-              <icon
-                name="arrow-down"
-                v-show="isExpanded"
-                class="transition-transform"
-                :class="{ 'rotate-180': isDropdownOpen === item.name }"
-              />
-            </div>
-
-            <transition name="slide">
-              <div v-show="isDropdownOpen === item.name && isExpanded">
-                <router-link
-                  v-for="(sub, index) in item.children"
-                  :key="sub.name"
-                  :to="sub.route"
-                  class="block w-full py-2 px-[60px] text-[11px] transition-all duration-200 text-left"
-                  :class="[
-                    $route.path === sub.route
-                      ? 'bg-blue-950 text-white'
-                      : 'bg-white text-green-950 hover:bg-gray-200',
-                    index === item.children.length - 1 ? 'rounded-b-md' : '',
-                  ]"
-                >
-                  {{ sub.name }}
-                </router-link>
-              </div>
-            </transition>
-          </div>
-        </div>
+        </template>
       </div>
     </div>
 
     <!-- Main Content -->
     <div
-      :class="{
-        'ml-16': !isExpanded,
-        'ml-64': isExpanded,
-      }"
+      :class="{ 'ml-16': !isExpanded, 'ml-64': isExpanded }"
       class="flex-grow transition-all pt-2 pb-0 min-h-screen rounded-t-lg overflow-hidden z-50"
     >
       <slot>
@@ -386,225 +142,102 @@
 import icon from "@/assets/icon.vue";
 import adminTopbar from "../../../components/admin/navigation/topbar.vue";
 import axios from "axios";
+
 export default {
   name: "AdminSidebar",
-  components: {
-    icon,
-    adminTopbar,
-  },
+  components: { icon, adminTopbar },
   data() {
     return {
       isExpanded: false,
       isDropdownOpen: null,
       user: {},
-      // Define sections
-      homeItems: [
+      sections: [
         {
-          name: "Dashboard",
-          icon: "dashboard",
-          route: "/dashboard",
-        },
-      ],
-      recordsItems: [
-        {
-          name: "Employee Records",
-          icon: "users",
-          route: "/employement-records",
-          children: [
-            {
-              name: "Employee Profile",
-              route: "/employement-records",
-            },
-            {
-              name: "Service Record",
-              route: "/service-of-records",
-            },
-            {
-              name: "Attendance Record",
-              route: "/attendance-records",
-            },
+          name: "Home",
+          items: [
+            { name: "Dashboard", icon: "dashboard", route: "/dashboard" },
           ],
         },
         {
-          name: "Available Trainings",
-          icon: "users",
-          route: "/employement-records",
-          children: [
+          name: "Records",
+          items: [
             {
-              name: "Trainings",
+              name: "Employee Records",
+              icon: "users",
+              route: "/employement-records",
+              children: [
+                { name: "Employee Profile", route: "/employement-records" },
+                { name: "Service Record", route: "/service-of-records" },
+                { name: "Attendance Record", route: "/attendance-records" },
+              ],
+            },
+            {
+              name: "Available Trainings",
+              icon: "general",
               route: "/available-trainings",
             },
           ],
         },
-      ],
-      utilityItems: [
         {
-          name: "HR Templates",
-          icon: "utilities",
-          route: "/certificate-of-employment",
-          children: [
+          name: "Utilities",
+          items: [
             {
-              name: "COE",
+              name: "HR Templates",
+              icon: "utilities",
               route: "/certificate-of-employment",
             },
           ],
         },
-      ],
-      predictiveItems: [
         {
-          name: "Predictive Analysis",
-          icon: "graph",
-          route: "/predictive-analysis",
-          children: [
-            // {
-            //   name: "Seminar Eligibility",
-            //   route: "/seminar-page",
-            // },
+          name: "Analysis",
+          items: [
             {
-              name: "Promotion",
-              route: "/promotion-page",
+              name: "Predictive Analysis",
+              icon: "graph",
+              route: "/predictive-analysis",
+              children: [{ name: "Promotion", route: "/promotion-page" }],
             },
-            // {
-            //   name: "Uploaded Testing",
-            //   route: "/predictive-analysis",
-            // },
           ],
         },
-      ],
-      // userItems: [
-      //   {
-      //     name: "User Records",
-      //     icon: "graph",
-      //     // route: "/predictive-analysis",
-      //     children: [
-      //       {
-      //         name: "Users",
-      //         route: "/user-management",
-      //       },
-      //     ],
-      //   },
-      // ],
-
-      monthlyreportItems: [
         {
-          name: "Monthly Report",
-          icon: "general",
-          // route: "/predictive-analysis",
-          children: [
+          name: "User Management",
+          items: [
             {
-              name: "Attendance ",
-              route: "/attendance-report",
+              name: "Users List",
+              icon: "general",
+              route: "/user-management",
             },
+          ],
+        },
+        {
+          name: "Report",
+          items: [
             {
-              name: "Customer Feedback ",
-              route: "/customer-feedback-report",
+              name: "Monthly Report",
+              icon: "general",
+              children: [
+                { name: "Attendance", route: "/attendance-report" },
+                {
+                  name: "Customer Feedback",
+                  route: "/customer-feedback-report",
+                },
+              ],
             },
           ],
         },
       ],
-
-      // uploadingItems: [
-      //   {
-      //     name: "Uploading Data",
-      //     icon: "utilities",
-      //     route: "/predictive-analysis",
-      //     children: [
-      //       {
-      //         name: "Upload Employee Pofiles",
-      //         route: "/predictive-analysis",
-      //       },
-      //       {
-      //         name: "Upload Service Record",
-      //         route: "/upload-service-page",
-      //       },
-      //     ],
-      //   },
-      // ],
     };
+  },
+  created() {
+    this.expandDropdownForCurrentRoute(this.$route.path);
+    this.fetchUser();
   },
   watch: {
     "$route.path"(newPath) {
       this.expandDropdownForCurrentRoute(newPath);
     },
   },
-
-  created() {
-    this.expandDropdownForCurrentRoute(this.$route.path);
-  },
   methods: {
-    async refreshSeminarsView() {
-      try {
-        const response = await axios.post(
-          "http://localhost:8000/predictive/refresh-seminar-view"
-        );
-        console.log(response.data.message);
-      } catch (error) {
-        console.error("Error refreshing attendance view:", error);
-      }
-    },
-    async refreshSeminarView() {
-      try {
-        const response = await axios.post(
-          "http://localhost:8000/attendance-record/refresh-seminar-view"
-        );
-        console.log(response.data.message);
-      } catch (error) {
-        console.error("Error refreshing attendance view:", error);
-      }
-    },
-    // Refresh the normal attendance view
-    async refreshAttendanceView() {
-      try {
-        const response = await axios.post(
-          "http://localhost:8000/attendance-record/refresh-attendance-view"
-        );
-        console.log(response.data.message);
-      } catch (error) {
-        console.error("Error refreshing attendance view:", error);
-      }
-    },
-
-    // Refresh the final attendance view
-    async refreshFinalAttendanceView() {
-      try {
-        const response = await axios.post(
-          "http://localhost:8000/attendance-record/refresh-attendance-final-view"
-        );
-        console.log(response.data.message);
-      } catch (error) {
-        console.error("Error refreshing final attendance view:", error);
-      }
-    },
-
-    async refreshPromotionView() {
-      try {
-        const response = await axios.post(
-          "http://localhost:8000/attendance-record/refresh-promotion-view"
-        );
-        console.log(response.data.message);
-      } catch (error) {
-        console.error("Error refreshing promotion view:", error);
-      }
-    },
-    async fetchUser() {
-      try {
-        const response = await axios.get("http://localhost:8000/auth/me", {
-          withCredentials: true,
-        });
-
-        if (response.data) {
-          this.user = response.data;
-          console.log("Sidebar Authenticated User:", this.user);
-        } else {
-          // If no user data is returned, redirect to home
-          this.$router.push("/");
-          location.reload();
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-        this.$router.push("/"); // Redirect on error
-      }
-    },
     toggleSidebar() {
       this.isExpanded = !this.isExpanded;
     },
@@ -613,52 +246,33 @@ export default {
       this.isDropdownOpen = this.isDropdownOpen === name ? null : name;
     },
     expandDropdownForCurrentRoute(path) {
-      for (const item of [
-        ...this.recordsItems,
-        ...this.utilityItems,
-        ...this.predictiveItems,
-        // ...this.userItems,
-        ...this.monthlyreportItems,
-      ]) {
-        if (item.children) {
-          const match = item.children.find((child) =>
-            path.startsWith(child.route)
-          );
-          if (match || path.startsWith(item.route)) {
-            this.isExpanded = true;
-            this.isDropdownOpen = item.name;
-            break;
+      for (const section of this.sections) {
+        for (const item of section.items) {
+          if (item.children) {
+            if (
+              item.children.some((child) => path.startsWith(child.route)) ||
+              path.startsWith(item.route)
+            ) {
+              this.isExpanded = true;
+              this.isDropdownOpen = item.name;
+              return;
+            }
           }
         }
       }
     },
-    handleDashboardClick() {
-      this.isDropdownOpen = null;
-      this.isExpanded = false;
+    async fetchUser() {
+      try {
+        const response = await axios.get("http://localhost:8000/auth/me", {
+          withCredentials: true,
+        });
+        if (response.data) this.user = response.data;
+        else this.$router.push("/");
+      } catch (err) {
+        console.error(err);
+        this.$router.push("/");
+      }
     },
-  },
-  mounted() {
-    this.fetchUser();
   },
 };
 </script>
-
-<style scoped>
-.transition-transform {
-  transition: transform 0.1s ease;
-}
-.slide-enter-active,
-.slide-leave-active {
-  transition: all 0.1s ease;
-}
-.slide-enter-from,
-.slide-leave-to {
-  transform: translateY(-10px);
-  opacity: 0;
-}
-.slide-enter-to,
-.slide-leave-from {
-  transform: translateY(0);
-  opacity: 1;
-}
-</style>

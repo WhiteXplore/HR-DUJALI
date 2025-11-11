@@ -35,7 +35,7 @@
 
         <!-- Right Panel -->
         <div
-          class="w-full md:w-1/2 bg-white text-gray-900 flex items-start justify-center px-5 py-5"
+          class="w-full md:w-1/2 bg-white text-gray-900 flex items-start justify-center px-5 py-10"
         >
           <div class="w-full max-w-[400px] space-y-6">
             <!-- Logo and Title -->
@@ -54,10 +54,10 @@
             <!-- Login or Register Form -->
             <form
               @submit.prevent="showLogin ? login() : register()"
-              class="space-y-5 text-left"
+              class="space-y-7 text-left"
             >
               <!-- Login Form -->
-              <div v-if="showLogin" class="space-y-4 text-left">
+              <div v-if="showLogin" class="space-y-5 text-left">
                 <div class="space-y-1">
                   <label class="block text-sm font-medium">Email</label>
                   <input
@@ -207,7 +207,7 @@
               </div>
 
               <!-- Toggle Form -->
-              <div class="text-sm text-center">
+              <!-- <div class="text-sm text-center">
                 <span>
                   {{
                     showLogin
@@ -222,7 +222,7 @@
                 >
                   {{ showLogin ? "Register here!" : "Login here!" }}
                 </button>
-              </div>
+              </div> -->
             </form>
           </div>
         </div>

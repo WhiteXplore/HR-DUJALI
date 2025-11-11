@@ -1,178 +1,142 @@
 <template>
   <div v-if="isTable">
+    <!-- Header -->
     <div class="text-sm flex justify-between">
       <div class="text-[13px] text-text mt-4 font-regular">
         Pages / User Management
       </div>
       <div class="flex gap-2">
         <div
-          @click="toggleUploadData"
-          class="cursor-pointer flex gap-2 items-center tracking-wider bg-green-500 text-white hover:text-blue-700 p-3 py-2 rounded-md hover:bg-blue-300 hover:shadow-lg"
-        >
-          <icon :name="'download'"></icon>
-          <button>Upload Service</button>
-        </div>
-        <div
-          @click="toggleAddSR"
+          @click="toggleAddUsers"
           class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-900 text-white hover:text-blue-700 p-3 py-2 rounded-md hover:bg-blue-300 hover:shadow-lg"
         >
-          <icon :name="'add-account'"></icon>
-          <button>Add Service Record</button>
+          <icon name="add-account" />
+          <button>Add User</button>
         </div>
       </div>
     </div>
 
-    <div class="text-[14px] bg-white rounded-xl">
-      <div class="mt-4 overflow-x-auto border p-2 rounded-xl">
-        <!-- Top controls -->
-        <div class="text-gray-700 flex justify-between items-start mt-1">
-          <!-- Items Per Page -->
-          <div class="flex items-center">
-            <select
-              v-model="itemsPerPage"
-              class="px-1 py-1 border rounded-md"
-              @change="changePage(1)"
-            >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-              <option value="20">20</option>
-            </select>
-            <span class="ml-2">Per page</span>
-          </div>
-
-          <!-- Search -->
-          <div class="flex items-center">
-            <input
-              v-model="searchQuery"
-              type="text"
-              class="px-3 w-[300px] py-3 border rounded-md"
-              placeholder="Search..."
-              @input="changePage(1)"
-            />
-          </div>
+    <!-- Table -->
+    <div class="text-[14px] bg-white rounded-xl mt-4 p-2 border">
+      <!-- Controls -->
+      <div class="flex justify-between items-center mb-2">
+        <div class="flex items-center gap-2">
+          <select
+            v-model="itemsPerPage"
+            @change="changePage(1)"
+            class="px-2 py-1 border rounded-md"
+          >
+            <option v-for="n in [5, 10, 15, 20]" :key="n" :value="n">
+              {{ n }}
+            </option>
+          </select>
+          <span>Per page</span>
         </div>
 
-        <!-- Table -->
-        <div class="w-full mt-3 rounded-t-lg overflow-x-auto">
-          <div class="overflow-y-auto max-h-[550px]">
-            <table
-              class="min-w-full table-fixed border-collapse text-text text-[13px]"
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search..."
+          @input="changePage(1)"
+          class="px-3 py-2 border rounded-md w-[300px]"
+        />
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto max-h-[550px] rounded-t-lg">
+        <table
+          class="min-w-full table-fixed border-collapse text-[13px] text-text"
+        >
+          <thead class="sticky top-0 z-10">
+            <tr>
+              <th class="w-[50px] px-5 py-3 text-center border-b">ID</th>
+              <th class="px-2 py-3 text-left border-b">Full Name</th>
+              <th class="px-2 py-3 text-left border-b">Email</th>
+              <th class="px-2 py-3 text-left border-b">Role</th>
+              <th class="px-2 py-3 text-left border-b">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(user, index) in paginatedData"
+              :key="user.id"
+              :class="{ 'bg-blue-50 border-b': (index + 1) % 2 === 0 }"
             >
-              <thead
-                class="bg-Green text-gray-700 tracking-wider font-regular sticky top-0 z-10"
-              >
-                <tr>
-                  <th class="w-[50px] px-5 py-3 text-center border-b">ID</th>
-                  <th class="px-2 py-3 text-left border-b">Full Name</th>
-                  <th class="px-2 py-3 text-left border-b">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(data_service_records, index) in paginatedData"
-                  :key="data_service_records.service_id"
-                  :class="{ 'bg-blue-50 border-b': (index + 1) % 2 === 0 }"
-                >
-                  <td class="px-2 py-1 border-b">{{ startIndex + index }}</td>
+              <td class="px-2 py-1 border-b text-center">
+                {{ startIndex + index }}
+              </td>
+              <td class="px-2 py-1 border-b text-left">
+                {{ user.first_name }} {{ user.last_name }}
+              </td>
+              <td class="px-2 py-1 border-b text-left">{{ user.email }}</td>
+              <td class="px-2 py-1 border-b text-left">{{ user.role }}</td>
+              <td class="px-2 py-1 border-b text-left">
+                <div class="flex gap-1">
+                  <button
+                    class="p-2 py-1 h-8 border-2 border-green-200 hover:bg-green-300 text-green-700 rounded-lg flex gap-1"
+                    @click="toggleEdit(user)"
+                  >
+                    <icon name="edit" /> Edit
+                  </button>
+                  <button
+                    class="p-2 py-1 h-8 border-2 border-red-200 hover:bg-red-300 text-red-700 rounded-lg flex gap-1"
+                    @click="toggleDelete(user)"
+                  >
+                    <icon name="delete" /> Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="paginatedData.length === 0">
+              <td colspan="5" class="text-center py-4">No records found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-                  <td class="px-2 py-1 border-b text-left">
-                    {{ data_service_records.first_name }}
-                    {{ data_service_records.middle_name }}
-                    {{ data_service_records.last_name }}
-                  </td>
-                  <td class="px-2 py-2 border-b">
-                    <div class="flex gap-1">
-                      <router-link
-                        to="/service-of-records/view-service-records"
-                        class="p-2 py-1 h-8 border-2 border-blue-200 hover:bg-blue-300 text-blue-700 rounded-lg flex gap-1"
-                        @click="toggleViewOpen(data_service_records)"
-                      >
-                        <icon name="eye" />View
-                      </router-link>
-
-                      <button
-                        class="p-2 py-1 h-8 border-2 border-green-200 hover:bg-green-300 text-green-700 rounded-lg flex gap-1"
-                        @click="toggleEdit(data_service_records)"
-                      >
-                        <icon name="edit" /> Edit
-                      </button>
-
-                      <button
-                        class="p-2 py-1 h-8 border-2 border-red-200 hover:bg-red-300 text-red-700 rounded-lg flex gap-1"
-                        @click="toggleDelete(data_service_records)"
-                      >
-                        <icon name="delete" /> Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-if="paginatedData.length === 0">
-                  <td colspan="5" class="text-center py-4">No records found</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <!-- Pagination -->
+      <div class="flex justify-between items-center mt-4">
+        <div class="text-gray-700">
+          Showing {{ startIndex }} to {{ endIndex }} of
+          {{ filteredData.length }} entries
         </div>
-
-        <!-- Pagination -->
-        <div class="flex justify-between items-center mt-4">
-          <div class="text-gray-700">
-            <span
-              >Showing {{ startIndex }} to {{ endIndex }} of
-              {{ filteredData.length }} entries</span
-            >
-          </div>
-          <div class="flex items-center">
-            <button
-              @click="changePage(currentPage - 1)"
-              :disabled="currentPage === 1"
-              class="px-3 py-1 bg-gray-300 text-gray-700 rounded-l-md hover:bg-gray-400"
-            >
-              &lt;
-            </button>
-            <span v-for="page in pageNumbers" :key="'page-' + page">
-              <button
-                @click="changePage(page)"
-                :class="{
-                  'bg-blue-900 text-white': currentPage === page,
-                  'bg-gray-200 text-gray-700': currentPage !== page,
-                }"
-                class="px-3 py-1 mx-1 rounded-md hover:bg-green-300"
-              >
-                {{ page }}
-              </button>
-            </span>
-            <button
-              @click="changePage(currentPage + 1)"
-              :disabled="currentPage === totalPages"
-              class="px-3 py-1 bg-gray-300 text-gray-700 rounded-r-md hover:bg-gray-400"
-            >
-              &gt;
-            </button>
-          </div>
+        <div class="flex items-center">
+          <button
+            @click="changePage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3 py-1 bg-gray-300 rounded-l-md"
+          >
+            &lt;
+          </button>
+          <button
+            v-for="page in pageNumbers"
+            :key="page"
+            @click="changePage(page)"
+            :class="
+              currentPage === page
+                ? 'bg-blue-900 text-white'
+                : 'bg-gray-200 text-gray-700'
+            "
+            class="px-3 py-1 mx-1 rounded-md"
+          >
+            {{ page }}
+          </button>
+          <button
+            @click="changePage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="px-3 py-1 bg-gray-300 rounded-r-md"
+          >
+            &gt;
+          </button>
         </div>
       </div>
     </div>
   </div>
-  <div v-if="isAddSR"><AddServiceRecords @close="closeView" /></div>
-  <div v-if="isUploadData">
-    <uploadServiceRecord
-      @close="closeView"
-      @back-to-table-service="handleBackToTable"
-    />
-  </div>
-  <view-service-records
-    v-if="isRecordVisible"
-    :serviceId="selectedServiceRecord?.service_id"
-    @back-to-table-service="handleBackToTable"
-  />
 
-  <EditServiceRecords
-    v-if="isEditSR"
-    :serviceId="selectedServiceRecord?.service_id"
-    @back-to-table-service="handleBackToTable"
-  />
+  <!-- Add/Edit Modals -->
+  <div v-if="isAddSR">
+    <AddUsers :user="selectedUser" @close="closeView" @refresh="fetchUsers" />
+  </div>
   <!-- Delete Confirmation Modal -->
   <div
     v-if="showDeleteModal"
@@ -222,51 +186,37 @@
 </template>
 
 <script>
-import AddServiceRecords from "./../modals/add-service-records.vue";
-import viewServiceRecords from "../modals/view-service-records.vue";
-import EditServiceRecords from "../modals/edit-service-records.vue";
-import uploadServiceRecord from "../modals/upload-service-record.vue";
+import AddUsers from "../modals/add-users.vue";
 import icon from "@/assets/icon.vue";
 import axios from "axios";
 import { toast } from "vue3-toastify";
 
 export default {
   name: "TableUserManagement",
-  components: {
-    AddServiceRecords,
-    icon,
-    viewServiceRecords,
-    EditServiceRecords,
-    uploadServiceRecord,
-  },
+  components: { AddUsers, icon },
   data() {
     return {
-      data_service_records: [], // Initialize this as an empty array
+      users: [],
       currentPage: 1,
       itemsPerPage: 10,
       searchQuery: "",
       isAddSR: false,
-      selectedServiceRecord: null, // Store selected service record data
-      showCancellationModal: false,
-      isRecordVisible: false,
-      isEditSR: false,
-      isTable: true,
       showDeleteModal: false,
       recordToDelete: null,
-      isUploadData: false,
+      isTable: true,
+      selectedUser: null,
     };
   },
   computed: {
     filteredData() {
-      if (!this.data_service_records) return [];
-      if (!this.searchQuery.trim()) return this.data_service_records;
+      if (!this.searchQuery.trim()) return this.users;
       const query = this.searchQuery.toLowerCase();
-      return this.data_service_records.filter(
-        (item) =>
-          item.student_id?.toLowerCase().includes(query) ||
-          item.first_name?.toLowerCase().includes(query) ||
-          item.last_name?.toLowerCase().includes(query) ||
-          item.program_course?.toLowerCase().includes(query)
+      return this.users.filter(
+        (user) =>
+          user.first_name.toLowerCase().includes(query) ||
+          user.last_name.toLowerCase().includes(query) ||
+          user.email.toLowerCase().includes(query) ||
+          user.role.toLowerCase().includes(query)
       );
     },
     totalPages() {
@@ -277,9 +227,9 @@ export default {
       return this.filteredData.slice(start, start + this.itemsPerPage);
     },
     startIndex() {
-      return this.filteredData.length === 0
-        ? 0
-        : (this.currentPage - 1) * this.itemsPerPage + 1;
+      return this.filteredData.length
+        ? (this.currentPage - 1) * this.itemsPerPage + 1
+        : 0;
     },
     endIndex() {
       const end = this.currentPage * this.itemsPerPage;
@@ -290,106 +240,51 @@ export default {
     },
   },
   methods: {
-    handleBackToTable() {
-      this.isRecordVisible = false;
-      this.isEditSR = false; // 👈 reset edit flag
-      this.isAddSR = false; // (optional) reset add modal if needed
-      this.isTable = true;
-      this.selectedServiceRecord = null;
-      this.isUploadData = false;
-    },
-    fetchServiceRecords() {
+    fetchUsers() {
       axios
-        .get("http://localhost:8000/service-of-records/get-all")
-        .then((response) => {
-          this.data_service_records = response.data || [];
-        })
-        .catch((error) => {
-          console.error(
-            "There was an error fetching the service records:",
-            error
-          );
-        });
+        .get("http://localhost:8000/user")
+        .then((res) => (this.users = res.data))
+        .catch((err) => console.error("Failed to fetch users:", err));
     },
-    startAutoRefresh() {
-      this.refreshInterval = setInterval(() => {
-        this.fetchServiceRecords();
-      }, 5000); // 5 seconds is usually more reasonable
-    },
-
-    stopAutoRefresh() {
-      if (this.refreshInterval) {
-        clearInterval(this.refreshInterval);
-        this.refreshInterval = null;
-      }
-    },
-    toggleDelete(item) {
-      this.recordToDelete = item;
-      this.showDeleteModal = true;
-    },
-    confirmDelete() {
-      if (!this.recordToDelete) return;
-
-      axios
-        .delete(
-          `http://localhost:8000/service-of-records/service/${this.recordToDelete.service_id}`
-        )
-        .then((response) => {
-          console.log("Record deleted:", response.data);
-          this.showDeleteModal = false;
-          toast.success("Record deleted successfully!", { autoClose: 2000 });
-
-          // Refresh data
-          this.fetchServiceRecords(); // fix: should match fetchServiceRecords not fetchEmployeeRecords
-        })
-        .catch((error) => {
-          console.error("Delete failed:", error);
-          toast.error("Failed to delete the record.");
-          this.showDeleteModal = false;
-        });
-    },
-
     changePage(page) {
       if (page < 1) page = 1;
       if (page > this.totalPages) page = this.totalPages;
       this.currentPage = page;
     },
-
-    closeView() {
-      this.isAddSR = false;
-      this.isUploadData = false;
-    },
-    toggleAddSR() {
+    toggleAddUsers() {
       this.isAddSR = !this.isAddSR;
     },
-    toggleViewOpen(serviceRecord) {
-      // Set the selected service record to show in viewServiceRecords
-      this.selectedServiceRecord = serviceRecord;
-      this.isRecordVisible = true;
-      console.log("Selected Service ID:", serviceRecord.service_id); // Log the service_id to console
-      this.isTable = false;
+    toggleEdit(user) {
+      this.selectedUser = user;
+      this.isAddSR = true;
+      this.isTable = true;
     },
-
-    toggleEdit(serviceRecord) {
-      // Set the selected service record to show in viewServiceRecords
-      this.selectedServiceRecord = serviceRecord;
-      this.isEditSR = true;
-      console.log("Selected Service ID:", serviceRecord.service_id); // Log the service_id to console
-      this.isTable = false;
+    toggleDelete(user) {
+      this.recordToDelete = user;
+      this.showDeleteModal = true;
     },
-
-    toggleLogHistory(item) {
-      this.$emit("history-student", item);
+    confirmDelete() {
+      if (!this.recordToDelete) return;
+      axios
+        .delete(`http://localhost:8000/user/${this.recordToDelete.id}`)
+        .then(() => {
+          toast.success("User deleted successfully!", { autoClose: 2000 });
+          this.showDeleteModal = false;
+          this.fetchUsers();
+        })
+        .catch(() => {
+          toast.error("Failed to delete user.");
+          this.showDeleteModal = false;
+        });
+    },
+    closeView() {
+      this.isAddSR = false;
+      this.isTable = true;
+      this.selectedUser = null;
     },
   },
-
   mounted() {
-    this.fetchServiceRecords();
-
-    this.startAutoRefresh();
-  },
-  beforeUnmount() {
-    this.stopAutoRefresh();
+    this.fetchUsers();
   },
 };
 </script>

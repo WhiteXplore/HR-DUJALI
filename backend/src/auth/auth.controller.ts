@@ -6,6 +6,8 @@ import {
   Res,
   Req,
   UseGuards,
+  Param,
+  Put,
   BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -32,18 +34,10 @@ export class AuthController {
     @Body('password') password: string,
     @Body('first_name') first_name: string,
     @Body('last_name') last_name: string,
-    @Body('position') position: string,
-    @Body('office') office: string,
+    @Body('role') role: string,
     @Res() res: Response,
   ) {
-    if (
-      !email ||
-      !password ||
-      !first_name ||
-      !last_name ||
-      !position ||
-      !office
-    ) {
+    if (!email || !password || !first_name || !last_name || !role) {
       throw new BadRequestException('All fields are required');
     }
 
@@ -52,9 +46,27 @@ export class AuthController {
       password,
       first_name,
       last_name,
-      position,
-      office,
+      role,
       res,
+    );
+  }
+
+  @Put('user/:id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body('first_name') first_name: string,
+    @Body('last_name') last_name: string,
+    @Body('email') email: string,
+    @Body('role') role: string,
+    @Body('password') password?: string,
+  ) {
+    return this.authService.updateUser(
+      +id,
+      first_name,
+      last_name,
+      email,
+      role,
+      password,
     );
   }
 

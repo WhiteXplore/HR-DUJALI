@@ -25,14 +25,11 @@ export class AuthService {
   async validateUser(email: string, password: string) {
     const user = await this.userRepository.findOne({ where: { email } });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
+    if (!user) throw new UnauthorizedException('Invalid email or password');
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    if (!isPasswordValid)
       throw new UnauthorizedException('Invalid email or password');
-    }
 
     return user;
   }
@@ -45,8 +42,6 @@ export class AuthService {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
-      position: user.position,
-      office: user.office,
     };
 
     const token = this.jwtService.sign(payload, { expiresIn: '1h' });
@@ -58,10 +53,7 @@ export class AuthService {
       maxAge: 3600000,
     });
 
-    return res.json({
-      message: 'Login successful',
-      role: user.role,
-    });
+    return res.json({ message: 'Login successful', role: user.role });
   }
 
   async logout(res: Response) {
@@ -72,18 +64,13 @@ export class AuthService {
   async getProfile(req: Request) {
     try {
       const token = req.cookies['jwt'];
-      if (!token) {
-        throw new UnauthorizedException('Not authenticated');
-      }
+      if (!token) throw new UnauthorizedException('Not authenticated');
 
       const decoded = this.jwtService.verify(token);
       const user = await this.userRepository.findOne({
         where: { id: decoded.sub },
       });
-
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
+      if (!user) throw new UnauthorizedException('User not found');
 
       return {
         id: user.id,
@@ -97,20 +84,17 @@ export class AuthService {
     }
   }
 
-  // ✅ New Registration Method
+  // ✅ Registration / Add User
   async register(
     email: string,
     password: string,
     first_name: string,
     last_name: string,
-    position: string,
-    office: string,
+    role: string,
     res: Response,
   ) {
     const existingUser = await this.findUserByEmail(email);
-    if (existingUser) {
-      throw new BadRequestException('Email already in use');
-    }
+    if (existingUser) throw new BadRequestException('Email already in use');
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -119,9 +103,7 @@ export class AuthService {
       password: hashedPassword,
       first_name,
       last_name,
-      role: 'Admin',
-      position: 'Admin', // or some default like 'Employee' or 'Unknown'
-      office,
+      role: role || 'User', // default to 'User' if not provided
     });
 
     await this.userRepository.save(newUser);
@@ -130,10 +112,8 @@ export class AuthService {
       sub: newUser.id,
       email: newUser.email,
       role: newUser.role,
-      position: newUser.position,
       first_name: newUser.first_name,
       last_name: newUser.last_name,
-      office: newUser.office,
     };
 
     const token = this.jwtService.sign(payload, { expiresIn: '1h' });
@@ -145,9 +125,32 @@ export class AuthService {
       maxAge: 3600000,
     });
 
-    return res.status(201).json({
-      message: 'Registration successful',
-      role: newUser.role,
-    });
+    return res
+      .status(201)
+      .json({ message: 'User created successfully', role: newUser.role });
+  }
+
+  // ✅ Update User
+  async updateUser(
+    id: number,
+    first_name: string,
+    last_name: string,
+    email: string,
+    role: string,
+    password?: string,
+  ) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) throw new BadRequestException('User not found');
+
+    user.first_name = first_name;
+    user.last_name = last_name;
+    user.email = email;
+    user.role = role;
+
+    if (password) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+
+    return this.userRepository.save(user);
   }
 }

@@ -12,12 +12,6 @@ export class User_Accounts {
   last_name: string;
 
   @Column()
-  position: string;
-
-  @Column()
-  office: string;
-
-  @Column()
   email: string;
 
   @Column()
