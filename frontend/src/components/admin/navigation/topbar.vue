@@ -90,7 +90,7 @@
           <h1 class="text-[13px] font-semibold">
             {{ user.last_name }}, {{ user.first_name || "Guest" }}
           </h1>
-          <h2 class="text-[12px]">{{ user.position || "No Position" }}</h2>
+          <h2 class="text-[12px]">{{ user.role || "No Role" }}</h2>
         </div>
 
         <!-- Profile Dropdown -->
