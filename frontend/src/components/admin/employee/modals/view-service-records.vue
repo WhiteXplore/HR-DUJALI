@@ -11,12 +11,12 @@
         >
           Back
         </div>
-        <div
+        <!-- <div
           class="px-2 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition flex gap-1 text-sm"
         >
           <icon name="download1" />
           <button @click="showDownloadAlert">Download PDF</button>
-        </div>
+        </div> -->
       </div>
       <div class="max-h-screen h-[80vh] overflow-auto">
         <!-- <img

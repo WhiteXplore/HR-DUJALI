@@ -1080,6 +1080,7 @@
 import icon from "@/assets/icon.vue";
 import axios from "axios";
 import { toast } from "vue3-toastify";
+
 export default {
   name: "EditEmployeeProfile",
   components: {
@@ -1142,8 +1143,6 @@ export default {
         employment_status: "",
         employee_id: "",
       },
-      validationErrors: [],
-      showValidationModal: false,
       user: {},
     };
   },
@@ -1164,300 +1163,56 @@ export default {
     },
 
     async submitData() {
-      if (this.validateForm()) {
-        const formData = { ...this.form };
+      const formData = { ...this.form };
 
-        // Replace empty strings with undefined (so backend ignores them)
-        Object.keys(formData).forEach((key) => {
-          if (
-            formData[key] === "" &&
-            typeof formData[key] !== "boolean" &&
-            !Array.isArray(formData[key])
-          ) {
-            formData[key] = undefined;
-          }
-        });
+      // Replace empty strings with undefined (so backend ignores them)
+      Object.keys(formData).forEach((key) => {
+        if (
+          formData[key] === "" &&
+          typeof formData[key] !== "boolean" &&
+          !Array.isArray(formData[key])
+        ) {
+          formData[key] = undefined;
+        }
+      });
 
-        // Format birthdate
-        formData.birthdate = this.formatBirthdate(this.form.birthdate);
+      // Format birthdate
+      formData.birthdate = this.formatBirthdate(this.form.birthdate);
 
-        // 🔹 Log the exact payload being sent
-        console.log(
-          "🟦 UPDATE PAYLOAD SENT TO BACKEND:",
-          JSON.parse(JSON.stringify(formData))
+      console.log(
+        "🟦 UPDATE PAYLOAD SENT TO BACKEND:",
+        JSON.parse(JSON.stringify(formData))
+      );
+
+      try {
+        const response = await axios.patch(
+          `http://localhost:8000/upload/${this.employeeId}`,
+          formData
         );
 
-        try {
-          const response = await axios.patch(
-            `http://localhost:8000/upload/${this.employeeId}`,
-            formData
-          );
+        console.log("🟩 BACKEND RESPONSE:", response.data);
+        toast.success("Employee updated successfully!");
+        this.$emit("refresh");
 
-          // 🔹 Log backend response for confirmation
-          console.log("🟩 BACKEND RESPONSE:", response.data);
-
-          toast.success("Employee updated successfully!");
-          this.$emit("refresh");
-
-          if (response.status === 200) {
-            this.resetForm();
-            this.closeAdd();
-          }
-
-          this.isOpen = false;
-        } catch (error) {
-          console.error(
-            "❌ Error during form submission:",
-            error.response || error
-          );
-          if (error.response?.data?.message) {
-            alert("Server Error: " + error.response.data.message);
-          } else {
-            alert("There was an error submitting the form.");
-          }
+        if (response.status === 200) {
+          this.resetForm();
+          this.closeAdd();
         }
-      } else {
-        this.showValidationModal = true;
-        console.warn("⚠️ Validation Errors:", this.validationErrors);
-      }
-    },
-    validateForm() {
-      this.validationErrors = [];
 
-      // Helper function to check empty string or falsy (except false boolean)
-      const isEmpty = (value) =>
-        value === "" || value === null || value === undefined;
-
-      // Validate top-level required fields
-      if (isEmpty(this.form.first_name)) {
-        this.validationErrors.push("First Name is required.");
-      }
-      if (isEmpty(this.form.middle_name)) {
-        this.validationErrors.push("Middle Name is required.");
-      }
-      if (isEmpty(this.form.last_name)) {
-        this.validationErrors.push("Last Name is required.");
-      }
-      if (isEmpty(this.form.birthdate)) {
-        this.validationErrors.push("Birthdate is required.");
-      }
-      if (isEmpty(this.form.place_of_birth)) {
-        this.validationErrors.push("Place of Birth is required.");
-      }
-      if (isEmpty(this.form.gender)) {
-        this.validationErrors.push("Gender is required.");
-      }
-      if (isEmpty(this.form.civil_status)) {
-        this.validationErrors.push("Civil Status is required.");
-      }
-      if (isEmpty(this.form.blood_type)) {
-        this.validationErrors.push("Blood Type is required.");
-      }
-      if (isEmpty(this.form.height)) {
-        this.validationErrors.push("Height is required.");
-      }
-      if (isEmpty(this.form.weight)) {
-        this.validationErrors.push("Weight is required.");
-      }
-      if (this.form.is_dual_citizen && isEmpty(this.form.citizenship)) {
-        this.validationErrors.push(
-          "Citizenship is required when dual citizen is checked."
+        this.isOpen = false;
+      } catch (error) {
+        console.error(
+          "❌ Error during form submission:",
+          error.response || error
         );
-      }
-      if (isEmpty(this.form.gsis_id)) {
-        this.validationErrors.push("GSIS ID is required.");
-      }
-      if (isEmpty(this.form.pagibig_id)) {
-        this.validationErrors.push("Pagibig ID is required.");
-      }
-      if (isEmpty(this.form.philhealth)) {
-        this.validationErrors.push("PhilHealth number is required.");
-      }
-      if (isEmpty(this.form.sss_number)) {
-        this.validationErrors.push("SSS Number is required.");
-      }
-      if (isEmpty(this.form.tin_number)) {
-        this.validationErrors.push("TIN Number is required.");
-      }
-      if (isEmpty(this.form.telephone_number)) {
-        this.validationErrors.push("Telephone Number is required.");
-      }
-      if (isEmpty(this.form.mobile_number)) {
-        this.validationErrors.push("Mobile Number is required.");
-      }
-      if (isEmpty(this.form.agency)) {
-        this.validationErrors.push("Agency is required.");
-      }
-
-      // Validate address fields
-      if (isEmpty(this.form.house_number)) {
-        this.validationErrors.push("House Number is required.");
-      }
-      if (isEmpty(this.form.street)) {
-        this.validationErrors.push("Street is required.");
-      }
-      if (isEmpty(this.form.subdivision)) {
-        this.validationErrors.push("Subdivision is required.");
-      }
-      if (isEmpty(this.form.barangay)) {
-        this.validationErrors.push("Barangay is required.");
-      }
-      if (isEmpty(this.form.municipality)) {
-        this.validationErrors.push("Municipality is required.");
-      }
-      if (isEmpty(this.form.province)) {
-        this.validationErrors.push("Province is required.");
-      }
-      if (isEmpty(this.form.zip_code)) {
-        this.validationErrors.push("Zip Code is required.");
-      }
-
-      // If sameAddress is true, validate same address fields too
-      if (this.sameAddress) {
-        if (isEmpty(this.form.same_house_number)) {
-          this.validationErrors.push("Same House Number is required.");
-        }
-        if (isEmpty(this.form.same_street)) {
-          this.validationErrors.push("Same Street is required.");
-        }
-        if (isEmpty(this.form.same_subdivision)) {
-          this.validationErrors.push("Same Subdivision is required.");
-        }
-        if (isEmpty(this.form.same_barangay)) {
-          this.validationErrors.push("Same Barangay is required.");
-        }
-        if (isEmpty(this.form.same_municipality)) {
-          this.validationErrors.push("Same Municipality is required.");
-        }
-        if (isEmpty(this.form.same_province)) {
-          this.validationErrors.push("Same Province is required.");
-        }
-        if (isEmpty(this.form.same_zip_code)) {
-          this.validationErrors.push("Same Zip Code is required.");
+        if (error.response?.data?.message) {
+          alert("Server Error: " + error.response.data.message);
+        } else {
+          alert("There was an error submitting the form.");
         }
       }
-
-      // Validate educationalRecords array
-      this.form.educationalRecords.forEach((record, index) => {
-        if (isEmpty(record.level)) {
-          this.validationErrors.push(
-            `Educational record #${index + 1}: Level is required.`
-          );
-        }
-        if (isEmpty(record.name_of_school)) {
-          this.validationErrors.push(
-            `Educational record #${index + 1}: Name of School is required.`
-          );
-        }
-        if (isEmpty(record.basic_education)) {
-          this.validationErrors.push(
-            `Educational record #${index + 1}: Basic Education is required.`
-          );
-        }
-        // Add more fields if needed
-      });
-
-      // Validate civilRecords array
-      this.form.civilRecords.forEach((record, index) => {
-        if (isEmpty(record.career_service)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: Career Service is required.`
-          );
-        }
-        if (isEmpty(record.rating)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: Rating is required.`
-          );
-        }
-        if (isEmpty(record.date_of_exam)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: Date of Exam is required.`
-          );
-        }
-        if (isEmpty(record.place_of_exam)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: Place of Exam is required.`
-          );
-        }
-        if (isEmpty(record.license_number)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: License Number is required.`
-          );
-        }
-        if (isEmpty(record.license_validity)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: License Validity is required.`
-          );
-        }
-      });
-
-      // Validate learningRecords array
-      this.form.learningRecords.forEach((record, index) => {
-        if (isEmpty(record.title_learning_development)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: Title is required.`
-          );
-        }
-        if (isEmpty(record.ld_from)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: From date is required.`
-          );
-        }
-        if (isEmpty(record.ld_to)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: To date is required.`
-          );
-        }
-        if (isEmpty(record.ld_number_of_hours)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: Number of hours is required.`
-          );
-        }
-        if (isEmpty(record.type_of_ld)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: Type is required.`
-          );
-        }
-        if (isEmpty(record.ld_conducted_sponsor)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: Conducted/Sponsor is required.`
-          );
-        }
-      });
-
-      // Validate specialSkillsRecords array
-      this.form.specialSkillsRecords.forEach((record, index) => {
-        if (isEmpty(record.special_skills)) {
-          this.validationErrors.push(
-            `Special skills record #${index + 1}: Skill is required.`
-          );
-        }
-      });
-
-      // Validate nonAcadRecords array
-      this.form.nonAcadRecords.forEach((record, index) => {
-        if (isEmpty(record.non_academic)) {
-          this.validationErrors.push(
-            `Non-academic record #${index + 1}: Field is required.`
-          );
-        }
-      });
-
-      // Validate membershipRecords array
-      this.form.membershipRecords.forEach((record, index) => {
-        if (isEmpty(record.membership)) {
-          this.validationErrors.push(
-            `Membership record #${index + 1}: Membership is required.`
-          );
-        }
-      });
-
-      return this.validationErrors.length === 0;
     },
 
-    closeValidationModal() {
-      this.showValidationModal = false;
-    },
     resetForm() {
       Object.keys(this.form).forEach((key) => {
         if (Array.isArray(this.form[key])) {
@@ -1469,23 +1224,21 @@ export default {
         }
       });
     },
+
     removeRow(index, type) {
-      if (type === "level") {
-        this.form.educationalRecords.splice(index, 1);
-      } else if (type === "civil") {
-        this.form.civilRecords.splice(index, 1);
-      } else if (type === "title_learning_development") {
+      if (type === "level") this.form.educationalRecords.splice(index, 1);
+      else if (type === "civil") this.form.civilRecords.splice(index, 1);
+      else if (type === "title_learning_development")
         this.form.learningRecords.splice(index, 1);
-      } else if (type === "others") {
-        this.form.otherRecords.splice(index, 1);
-      } else if (type === "special_skills") {
+      else if (type === "others") this.form.otherRecords.splice(index, 1);
+      else if (type === "special_skills")
         this.form.specialSkillsRecords.splice(index, 1);
-      } else if (type === "non_academic") {
+      else if (type === "non_academic")
         this.form.nonAcadRecords.splice(index, 1);
-      } else if (type === "membership") {
+      else if (type === "membership")
         this.form.membershipRecords.splice(index, 1);
-      }
     },
+
     addRowEducation() {
       this.form.educationalRecords.push({
         level: "",
@@ -1508,7 +1261,6 @@ export default {
         license_validity: "",
       });
     },
-
     addRowLearning() {
       this.form.learningRecords.push({
         title_learning_development: "",
@@ -1519,23 +1271,16 @@ export default {
         ld_conducted_sponsor: "",
       });
     },
-
     addRowSpecial() {
-      this.form.specialSkillsRecords.push({
-        special_skills: "",
-      });
+      this.form.specialSkillsRecords.push({ special_skills: "" });
     },
-
     addRowNonAcad() {
-      this.form.nonAcadRecords.push({
-        non_academic: "",
-      });
+      this.form.nonAcadRecords.push({ non_academic: "" });
     },
     addRowMembership() {
-      this.form.membershipRecords.push({
-        membership: "",
-      });
+      this.form.membershipRecords.push({ membership: "" });
     },
+
     handleSameAddress() {
       if (this.sameAddress) {
         this.form.same_house_number = this.form.house_number;
@@ -1555,6 +1300,7 @@ export default {
         this.form.same_zip_code = "";
       }
     },
+
     async fetchEmployeeRecords() {
       try {
         const response = await axios.get(
@@ -1564,13 +1310,14 @@ export default {
           this.form = {
             ...this.form,
             ...response.data,
-            educationalRecords: response.data.educationalRecords || [],
-            civilRecords: response.data.civilRecords || [],
-            learningRecords: response.data.learningRecords || [],
-            specialSkillsRecords: response.data.specialSkillsRecords || [],
-            nonAcadRecords: response.data.nonAcadRecords || [],
-            membershipRecords: response.data.membershipRecords || [],
+            educationalRecords: response.data.secondTable || [],
+            civilRecords: response.data.forthTable || [],
+            learningRecords: response.data.fifthTable || [],
+            specialSkillsRecords: response.data.thirdTable || [],
+            nonAcadRecords: response.data.sixthTable || [],
+            membershipRecords: response.data.seventhTable || [],
           };
+          console.log("FORM DATA", this.form);
         }
       } catch (error) {
         console.error("Error fetching employee records:", error);
