@@ -171,13 +171,13 @@ export default {
 
         if (this.isEditMode) {
           await axios.put(
-            `http://localhost:8000/user/${this.user.id}`,
+            process.env.VUE_APP_API_BASE_URL + `/user/${this.user.id}`,
             payload
           );
           toast.success("User updated successfully!");
           this.$emit("refresh");
         } else {
-          await axios.post("http://localhost:8000/user", payload);
+          await axios.post(process.env.VUE_APP_API_BASE_URL + "/user", payload);
           toast.success("User added successfully!");
         }
 

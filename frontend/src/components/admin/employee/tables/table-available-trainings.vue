@@ -201,7 +201,9 @@ export default {
     },
     fetchTrainings() {
       axios
-        .get("http://localhost:8000/available-trainings/get-training")
+        .get(
+          process.env.VUE_APP_API_BASE_URL + "/available-trainings/get-training"
+        )
         .then((response) => {
           this.trainings = response.data || [];
         })
@@ -234,7 +236,8 @@ export default {
       if (!this.recordToDelete) return;
       axios
         .delete(
-          `http://localhost:8000/available-trainings/${this.recordToDelete.training_id}`
+          process.env.VUE_APP_API_BASE_URL +
+            `/available-trainings/${this.recordToDelete.training_id}`
         )
         .then(() => {
           this.trainings = this.trainings.filter(

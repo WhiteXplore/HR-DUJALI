@@ -283,7 +283,7 @@ export default {
 
       try {
         const response = await axios.get(
-          "http://localhost:8000/predictive/fetch-and-predict"
+          process.env.VUE_APP_API_BASE_URL + "/predictive/fetch-and-predict"
         );
 
         console.log("Full API response:", response.data);

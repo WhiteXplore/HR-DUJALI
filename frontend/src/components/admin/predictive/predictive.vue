@@ -300,11 +300,15 @@ export default {
         });
 
         axios
-          .post("http://localhost:8000/upload/add-data", formData, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
+          .post(
+            process.env.VUE_APP_API_BASE_URL + "/upload/add-data",
+            formData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
           .then((response) => {
             toast.success("Employee data added successfully!");
             this.isSuccessfulAdd = true;

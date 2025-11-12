@@ -366,7 +366,8 @@ export default {
         // Make an API call to delete the record from the database
         axios
           .delete(
-            `http://localhost:8000/service-of-records/${this.serviceId}/record/${recordToDelete.record_id}`
+            process.env.VUE_APP_API_BASE_URL +
+              `/service-of-records/${this.serviceId}/record/${recordToDelete.record_id}`
           )
           .then((response) => {
             console.log("Record deleted successfully:", response.data);
@@ -390,7 +391,8 @@ export default {
     submitData() {
       axios
         .patch(
-          `http://localhost:8000/service-of-records/${this.serviceId}`,
+          process.env.VUE_APP_API_BASE_URL +
+            `/service-of-records/${this.serviceId}`,
           this.form
         )
         .then((response) => {
@@ -409,7 +411,8 @@ export default {
     async fetchServiceRecords() {
       try {
         const response = await axios.get(
-          `http://localhost:8000/service-of-records/${this.serviceId}`
+          process.env.VUE_APP_API_BASE_URL +
+            `/service-of-records/${this.serviceId}`
         );
         if (response.data) {
           this.form = {

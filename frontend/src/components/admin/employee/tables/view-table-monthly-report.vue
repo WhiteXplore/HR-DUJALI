@@ -389,7 +389,8 @@ export default {
     fetchAttendanceRecords() {
       return axios
         .get(
-          "http://localhost:8000/attendance-record/monthly-attendance-report"
+          process.env.VUE_APP_API_BASE_URL +
+            "/attendance-record/monthly-attendance-report"
         )
         .then((res) => (this.data_attendance_records = res.data || []))
         .catch((err) =>
@@ -399,7 +400,7 @@ export default {
 
     fetchEmployeeRecords() {
       return axios
-        .get("http://localhost:8000/upload/get-all")
+        .get(process.env.VUE_APP_API_BASE_URL + "/upload/get-all")
         .then((res) => (this.data_employee_profile = res.data || []))
         .catch((err) => console.error("Error fetching employee records:", err));
     },

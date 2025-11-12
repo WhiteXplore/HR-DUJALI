@@ -1178,7 +1178,7 @@ export default {
 
         try {
           const response = await axios.post(
-            "http://localhost:8000/upload/add-data",
+            process.env.VUE_APP_API_BASE_URL + "/upload/add-data",
             formData
           );
           toast.success("Employee added successfully!");

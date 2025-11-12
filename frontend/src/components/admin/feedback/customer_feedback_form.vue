@@ -859,7 +859,7 @@ export default {
 
       console.log("Submitting payload:", payload);
 
-      fetch("http://localhost:8000/customer-feedback", {
+      fetch(process.env.VUE_APP_API_BASE_URL + "/customer-feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

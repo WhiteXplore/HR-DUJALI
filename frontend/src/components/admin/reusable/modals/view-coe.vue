@@ -18,7 +18,6 @@
             <icon name="download1" />
             <button @click="showDownloadAlert">Download PDF</button>
           </div>
-
         </div>
       </div>
 
@@ -220,7 +219,10 @@ export default {
     },
     fetchServiceRecords() {
       axios
-        .get(`http://localhost:8000/service-of-records/${this.serviceId}`)
+        .get(
+          process.env.VUE_APP_API_BASE_URL +
+            `/service-of-records/${this.serviceId}`
+        )
         .then((response) => {
           this.matchingRecord = response.data || null;
         })
@@ -250,33 +252,32 @@ export default {
     cancelDownload() {
       this.isDownloadAlertOpen = false;
     },
-   confirmDownload() {
-  const certificateElement = this.$refs.certificate;
-  const images = certificateElement.querySelectorAll("img");
+    confirmDownload() {
+      const certificateElement = this.$refs.certificate;
+      const images = certificateElement.querySelectorAll("img");
 
-  const promises = Array.from(images).map((img) => {
-    return new Promise((resolve) => {
-      if (img.complete) resolve();
-      else img.onload = resolve;
-    });
-  });
+      const promises = Array.from(images).map((img) => {
+        return new Promise((resolve) => {
+          if (img.complete) resolve();
+          else img.onload = resolve;
+        });
+      });
 
-  Promise.all(promises).then(() => {
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
-    doc.html(certificateElement, {
-      callback: () => {
-     const fileName = `Certificate_of_Employment_of_${this.matchingRecord.first_name}_${this.matchingRecord.last_name}.pdf`;
-        doc.save(fileName);
-        this.isDownloadAlertOpen = false;
-      },
-      x: 0,
-      y: 0,
-      width: 210,
-      windowWidth: 800,
-    });
-  });
-},
-
+      Promise.all(promises).then(() => {
+        const doc = new jsPDF({ unit: "mm", format: "a4" });
+        doc.html(certificateElement, {
+          callback: () => {
+            const fileName = `Certificate_of_Employment_of_${this.matchingRecord.first_name}_${this.matchingRecord.last_name}.pdf`;
+            doc.save(fileName);
+            this.isDownloadAlertOpen = false;
+          },
+          x: 0,
+          y: 0,
+          width: 210,
+          windowWidth: 800,
+        });
+      });
+    },
   },
   mounted() {
     this.fetchServiceRecords();

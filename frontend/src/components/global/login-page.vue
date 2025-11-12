@@ -270,7 +270,7 @@ export default {
     async login() {
       try {
         const response = await axios.post(
-          "http://localhost:8000/auth/login",
+          process.env.VUE_APP_API_BASE_URL + "/auth/login",
           {
             email: this.email,
             password: this.password,
@@ -296,7 +296,7 @@ export default {
         const lastName = names.slice(1).join(" ") || "";
 
         await axios.post(
-          "http://localhost:8000/auth/register",
+          process.env.VUE_APP_API_BASE_URL + "/auth/register",
           {
             email: this.email,
             password: this.password,

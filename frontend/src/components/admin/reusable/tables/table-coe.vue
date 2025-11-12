@@ -223,7 +223,7 @@ export default {
     },
     fetchServiceRecords() {
       axios
-        .get("http://localhost:8000/service-of-records/get-all")
+        .get(process.env.VUE_APP_API_BASE_URL + "/service-of-records/get-all")
         .then((response) => {
           this.data_service_records = response.data || [];
         })
@@ -236,7 +236,7 @@ export default {
     },
     fetchEmployeeRecords() {
       axios
-        .get("http://localhost:8000/upload/get-all")
+        .get(process.env.VUE_APP_API_BASE_URL + "/upload/get-all")
         .then((response) => {
           this.data_employee_profile = response.data || [];
         })

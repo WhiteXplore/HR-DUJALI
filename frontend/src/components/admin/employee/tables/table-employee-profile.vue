@@ -337,7 +337,7 @@ export default {
     },
     fetchEmployeeRecords() {
       axios
-        .get("http://localhost:8000/upload/get-all")
+        .get(process.env.VUE_APP_API_BASE_URL + "/upload/get-all")
         .then((response) => {
           this.data_employee_profile = response.data || [];
         })
@@ -358,7 +358,8 @@ export default {
 
       axios
         .delete(
-          `http://localhost:8000/upload/delete-record/${this.recordToDelete.first_table_id}`
+          process.env.VUE_APP_API_BASE_URL +
+            `/upload/delete-record/${this.recordToDelete.first_table_id}`
         )
         .then((response) => {
           console.log("Record deleted:", response.data);

@@ -497,7 +497,10 @@ export default {
       const [year, month] = selectedMonth.split("-").map(Number);
 
       axios
-        .get(`http://localhost:8000/attendance-record/${this.attendanceId}`)
+        .get(
+          process.env.VUE_APP_API_BASE_URL +
+            `/attendance-record/${this.attendanceId}`
+        )
         .then((res) => {
           let data = Array.isArray(res.data) ? res.data : [res.data];
           this.matchingRecord = data

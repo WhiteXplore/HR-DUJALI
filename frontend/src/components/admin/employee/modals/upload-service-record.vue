@@ -215,7 +215,8 @@ export default {
 
           try {
             await axios.post(
-              "http://localhost:8000/service-of-records/bulk-import",
+              process.env.VUE_APP_API_BASE_URL +
+                "/service-of-records/bulk-import",
               employees
             );
             toast.success("Employees uploaded successfully!");

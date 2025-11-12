@@ -439,7 +439,7 @@ export default {
     },
     fetchattendanceRecords() {
       axios
-        .get("http://localhost:8000/attendance-record/get-all")
+        .get(process.env.VUE_APP_API_BASE_URL + "/attendance-record/get-all")
         .then((response) => {
           this.data_attendance_records = response.data || [];
         })
@@ -449,7 +449,7 @@ export default {
     },
     fetchEmployeeRecords() {
       axios
-        .get("http://localhost:8000/upload/get-all")
+        .get(process.env.VUE_APP_API_BASE_URL + "/upload/get-all")
         .then((response) => {
           this.data_employee_profile = response.data || [];
         })
@@ -470,7 +470,8 @@ export default {
 
       axios
         .delete(
-          `http://localhost:8000/attendance-record/${this.recordToDelete.attendance_id}`
+          process.env.VUE_APP_API_BASE_URL +
+            `/attendance-record/${this.recordToDelete.attendance_id}`
         )
         .then((response) => {
           console.log("Record deleted:", response.data);

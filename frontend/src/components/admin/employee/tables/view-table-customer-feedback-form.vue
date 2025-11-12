@@ -526,7 +526,9 @@ export default {
     },
     async fetchFeedbacks() {
       try {
-        const res = await fetch("http://localhost:8000/customer-feedback");
+        const res = await fetch(
+          process.env.VUE_APP_API_BASE_URL + "/customer-feedback"
+        );
         this.feedbacks = await res.json();
       } catch (err) {
         console.error(err);

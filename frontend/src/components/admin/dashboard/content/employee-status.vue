@@ -234,8 +234,10 @@ export default {
     async fetchData() {
       try {
         const [employeeRes, serviceRes] = await Promise.all([
-          axios.get("http://localhost:8000/upload/get-all"),
-          axios.get("http://localhost:8000/service-of-records/get-all"),
+          axios.get(process.env.VUE_APP_API_BASE_URL + "/upload/get-all"),
+          axios.get(
+            process.env.VUE_APP_API_BASE_URL + "/service-of-records/get-all"
+          ),
         ]);
         this.data_employee_profile = employeeRes.data;
         this.data_service_records = serviceRes.data;

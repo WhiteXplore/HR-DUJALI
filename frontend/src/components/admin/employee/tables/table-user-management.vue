@@ -242,7 +242,7 @@ export default {
   methods: {
     fetchUsers() {
       axios
-        .get("http://localhost:8000/user")
+        .get(process.env.VUE_APP_API_BASE_URL + "/user")
         .then((res) => (this.users = res.data))
         .catch((err) => console.error("Failed to fetch users:", err));
     },
@@ -266,7 +266,9 @@ export default {
     confirmDelete() {
       if (!this.recordToDelete) return;
       axios
-        .delete(`http://localhost:8000/user/${this.recordToDelete.id}`)
+        .delete(
+          process.env.VUE_APP_API_BASE_URL + `/user/${this.recordToDelete.id}`
+        )
         .then(() => {
           toast.success("User deleted successfully!", { autoClose: 2000 });
           this.showDeleteModal = false;

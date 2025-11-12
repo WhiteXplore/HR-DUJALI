@@ -299,7 +299,7 @@ export default {
       try {
         const id = this.$route.query.id;
         const response = await axios.get(
-          `http://localhost:8000/available-trainings/${id}`
+          process.env.VUE_APP_API_BASE_URL + `/available-trainings/${id}`
         );
         this.training = response.data || null;
       } catch (error) {
@@ -312,7 +312,8 @@ export default {
 
       try {
         const res = await axios.get(
-          "http://localhost:8000/upload/get-eligible-employees-trainings"
+          process.env.VUE_APP_API_BASE_URL +
+            "/upload/get-eligible-employees-trainings"
         );
         const employees = res.data || [];
 
@@ -379,7 +380,8 @@ export default {
           };
 
           await axios.patch(
-            `http://localhost:8000/upload/update-fifth/${emp.first_table_id}`,
+            process.env.VUE_APP_API_BASE_URL +
+              `/upload/update-fifth/${emp.first_table_id}`,
             payload
           );
         }

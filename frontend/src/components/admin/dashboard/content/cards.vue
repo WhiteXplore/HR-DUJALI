@@ -85,7 +85,7 @@ export default {
     async getEmployeeCounts() {
       try {
         const response = await axios.get(
-          "http://localhost:8000/upload/get-all"
+          process.env.VUE_APP_API_BASE_URL + "/upload/get-all"
         );
         const employees = response.data;
 

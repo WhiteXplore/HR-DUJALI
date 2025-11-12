@@ -283,7 +283,7 @@ export default {
         // Send to API
         try {
           const response = await fetch(
-            "http://localhost:8000/attendance-record/bulk",
+            process.env.VUE_APP_API_BASE_URL + "/attendance-record/bulk",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

@@ -183,7 +183,10 @@ export default {
 
     fetchServiceRecords() {
       axios
-        .get(`http://localhost:8000/service-of-records/${this.serviceId}`)
+        .get(
+          process.env.VUE_APP_API_BASE_URL +
+            `/service-of-records/${this.serviceId}`
+        )
         .then((response) => {
           this.matchingRecord = response.data || null;
           console.log("COE", this.matchingRecord);

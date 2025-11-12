@@ -328,7 +328,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "http://localhost:8000/service-of-records/add-service", // check if this is the correct POST route!
+          process.env.VUE_APP_API_BASE_URL + "/service-of-records/add-service", // check if this is the correct POST route!
           this.form
         );
 

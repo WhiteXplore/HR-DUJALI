@@ -407,7 +407,7 @@ export default {
   methods: {
     fetchService() {
       axios
-        .get("http://localhost:8000/service-of-records/get-all")
+        .get(process.env.VUE_APP_API_BASE_URL + "/service-of-records/get-all")
         .then((response) => {
           const allRecords = response.data.flatMap((emp) => emp.serviceRecords);
           const uniquePositions = [
@@ -488,12 +488,14 @@ export default {
 
         if (this.editData && this.editData.training_id) {
           await axios.patch(
-            `http://localhost:8000/available-trainings/update-training/${this.editData.training_id}`,
+            process.env.VUE_APP_API_BASE_URL +
+              `/available-trainings/update-training/${this.editData.training_id}`,
             payload
           );
         } else {
           await axios.post(
-            "http://localhost:8000/available-trainings/add-training",
+            process.env.VUE_APP_API_BASE_URL +
+              "/available-trainings/add-training",
             payload
           );
         }

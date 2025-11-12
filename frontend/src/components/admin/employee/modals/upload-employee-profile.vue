@@ -124,11 +124,15 @@ export default {
 
           // Then send to backend
           axios
-            .post("http://localhost:8000/upload/upload-data", structured, {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            })
+            .post(
+              process.env.VUE_APP_API_BASE_URL + "/upload/upload-data",
+              structured,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            )
             .then((response) => {
               toast.success("Employee profiles uploaded successfully!");
               this.$emit("refresh-employees");

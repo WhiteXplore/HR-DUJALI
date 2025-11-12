@@ -420,7 +420,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "http://localhost:8000/service-of-records/add-service",
+          process.env.VUE_APP_API_BASE_URL + "/service-of-records/add-service",
           this.form
         );
 

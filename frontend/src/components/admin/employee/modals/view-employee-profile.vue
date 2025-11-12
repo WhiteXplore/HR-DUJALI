@@ -491,7 +491,7 @@ export default {
     },
     fetchEmployeeRecords() {
       axios
-        .get(`http://localhost:8000/upload/${this.employeeId}`)
+        .get(process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`)
         .then((response) => {
           this.matchingRecord = response.data || null;
           if (!this.matchingRecord) {

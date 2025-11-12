@@ -238,7 +238,7 @@ export default {
     },
     fetchpromotionRecords() {
       axios
-        .get("http://localhost:8000/predictive/fetch-promotion")
+        .get(process.env.VUE_APP_API_BASE_URL + "/predictive/fetch-promotion")
         .then((response) => {
           this.data_promotion = response.data || [];
         })

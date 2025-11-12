@@ -298,7 +298,7 @@ export default {
       this.loading = true;
       try {
         const res = await axios.get(
-          "http://localhost:8000/predictive/fetch-promotion"
+          process.env.VUE_APP_API_BASE_URL + "/predictive/fetch-promotion"
         );
         const matched = res.data.find(
           (emp) =>

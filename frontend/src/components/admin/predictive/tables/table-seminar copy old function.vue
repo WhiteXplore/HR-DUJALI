@@ -231,7 +231,7 @@ export default {
     },
     fetchEmployeeRecords() {
       axios
-        .get("http://localhost:8000/upload/employee-details")
+        .get(process.env.VUE_APP_API_BASE_URL + "/upload/employee-details")
         .then((response) => {
           this.data_employee_profile = response.data || [];
         })

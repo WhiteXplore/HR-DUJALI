@@ -1186,7 +1186,7 @@ export default {
 
       try {
         const response = await axios.patch(
-          `http://localhost:8000/upload/${this.employeeId}`,
+          process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`,
           formData
         );
 
@@ -1304,7 +1304,7 @@ export default {
     async fetchEmployeeRecords() {
       try {
         const response = await axios.get(
-          `http://localhost:8000/upload/${this.employeeId}`
+          process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`
         );
         if (response.data) {
           this.form = {

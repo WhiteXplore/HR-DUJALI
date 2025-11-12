@@ -137,7 +137,7 @@ export default {
     uploadJsonData() {
       axios
         .post(
-          "http://localhost:8000/upload/save-json-data",
+          process.env.VUE_APP_API_BASE_URL + "/upload/save-json-data",
           this.tableDataJson,
           {
             headers: {
