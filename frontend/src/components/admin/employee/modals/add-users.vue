@@ -164,27 +164,29 @@ export default {
       try {
         let payload = { ...this.form };
 
-        // If editing and password is empty, remove it from payload
+        // If editing and password is empty, remove it
         if (this.isEditMode && !payload.password) {
           delete payload.password;
         }
 
         if (this.isEditMode) {
           await axios.put(
-            process.env.VUE_APP_API_BASE_URL + `/user/${this.user.id}`,
+            `${process.env.VUE_APP_API_BASE_URL}/auth/user/${this.user.id}`,
             payload
           );
           toast.success("User updated successfully!");
-          this.$emit("refresh");
         } else {
-          await axios.post(process.env.VUE_APP_API_BASE_URL + "/user", payload);
+          await axios.post(
+            `${process.env.VUE_APP_API_BASE_URL}/auth/register`,
+            payload
+          );
           toast.success("User added successfully!");
         }
 
-        this.$emit("refresh"); // Refresh user list
-        this.$emit("close"); // Close modal
+        this.$emit("refresh");
+        this.$emit("close");
       } catch (err) {
-        toast.error("Failed to save user.");
+        toast.error(err.response?.data?.message || "Failed to save user.");
         console.error(err);
       }
     },

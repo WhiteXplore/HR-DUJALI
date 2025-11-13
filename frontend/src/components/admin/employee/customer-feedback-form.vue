@@ -3,7 +3,7 @@
     <!-- Headers -->
     <div class="flex justify-between items-center">
       <h1 class="font-semibold tracking-wide text-md">
-        Customer Feedback Form Reports
+        Client Feedback Form Reports
       </h1>
     </div>
 

@@ -15,25 +15,24 @@ export class PredictiveService {
 CREATE OR REPLACE VIEW hris.vw_employee_details AS
 SELECT 
     s.employee_id,
-    p.first_table_id COLLATE utf8mb4_unicode_ci AS first_table_id,           
-    s.first_name COLLATE utf8mb4_unicode_ci AS first_name,
-    s.middle_name COLLATE utf8mb4_unicode_ci AS middle_name,
-    s.last_name COLLATE utf8mb4_unicode_ci AS last_name,
-    s.department COLLATE utf8mb4_unicode_ci AS department,
-    p.gender COLLATE utf8mb4_unicode_ci AS gender,
-    p.employment_status COLLATE utf8mb4_unicode_ci AS employment_status,
+    p.first_table_id,           
+    s.first_name,
+    s.middle_name,
+    s.last_name,
+    s.department,
+    p.gender,
+    p.employment_status,
 
     -- Birthdate and age
     s.birthdate,
-    s.birth_place COLLATE utf8mb4_unicode_ci AS birth_place,
+    s.birth_place,
     TIMESTAMPDIFF(YEAR, s.birthdate, CURDATE()) AS age,
 
     -- Total years of service
     ROUND(SUM(
         DATEDIFF(
             CASE 
-                WHEN r.period_to COLLATE utf8mb4_unicode_ci = 'present' 
-                THEN CURDATE() 
+                WHEN r.period_to = 'present' THEN CURDATE()
                 ELSE STR_TO_DATE(r.period_to, '%m/%d/%Y')
             END,
             STR_TO_DATE(r.period_from, '%m/%d/%Y')
@@ -41,11 +40,11 @@ SELECT
     ) / 365, 2) AS total_years_experience,
 
     -- Highest education level
-    MAX(e.level COLLATE utf8mb4_unicode_ci) AS level,
+    MAX(e.level) AS level,
 
     -- Latest ROA designation and status
-    latest_roa.roa_designation COLLATE utf8mb4_unicode_ci AS present_designation,
-    latest_roa.roa_status COLLATE utf8mb4_unicode_ci AS current_roa_status,
+    latest_roa.roa_designation AS present_designation,
+    latest_roa.roa_status AS current_roa_status,
 
     -- Learning development info
     COALESCE(MAX(lt.ld_number_of_hours), 0) AS total_ld_hours_rendered,
@@ -63,35 +62,31 @@ LEFT JOIN hris.record_of_appointment r
 
 -- Highest education ranking
 LEFT JOIN (
-    SELECT 
-        first_table_id COLLATE utf8mb4_unicode_ci AS first_table_id, 
-        MAX(CASE 
-            WHEN level COLLATE utf8mb4_unicode_ci = 'DOCTORATE' THEN 5
-            WHEN level COLLATE utf8mb4_unicode_ci = 'MASTERAL' THEN 4
-            WHEN level COLLATE utf8mb4_unicode_ci = 'COLLEGE' THEN 3
-            WHEN level COLLATE utf8mb4_unicode_ci = 'VOCATIONAL/TRADE COURSE' THEN 2
-            WHEN level COLLATE utf8mb4_unicode_ci = 'SECONDARY' THEN 1
-            WHEN level COLLATE utf8mb4_unicode_ci = 'ELEMENTARY' THEN 0
-            ELSE -1
-        END) AS max_level_rank
+    SELECT first_table_id, 
+           MAX(CASE 
+                WHEN level = 'DOCTORATE' THEN 5
+                WHEN level = 'MASTERAL' THEN 4
+                WHEN level = 'COLLEGE' THEN 3
+                WHEN level = 'VOCATIONAL/TRADE COURSE' THEN 2
+                WHEN level = 'SECONDARY' THEN 1
+                WHEN level = 'ELEMENTARY' THEN 0
+                ELSE -1
+           END) AS max_level_rank
     FROM hris.educational_table
-    GROUP BY first_table_id COLLATE utf8mb4_unicode_ci
-) AS edu_rank 
-    ON p.first_table_id COLLATE utf8mb4_unicode_ci = edu_rank.first_table_id
+    GROUP BY first_table_id
+) AS edu_rank ON p.first_table_id = edu_rank.first_table_id
 
 LEFT JOIN hris.educational_table e
-    ON e.first_table_id COLLATE utf8mb4_unicode_ci = edu_rank.first_table_id
-    AND (
-        CASE 
-            WHEN e.level COLLATE utf8mb4_unicode_ci = 'DOCTORATE' THEN 5
-            WHEN e.level COLLATE utf8mb4_unicode_ci = 'MASTERAL' THEN 4
-            WHEN e.level COLLATE utf8mb4_unicode_ci = 'COLLEGE' THEN 3
-            WHEN e.level COLLATE utf8mb4_unicode_ci = 'VOCATIONAL/TRADE COURSE' THEN 2
-            WHEN e.level COLLATE utf8mb4_unicode_ci = 'SECONDARY' THEN 1
-            WHEN e.level COLLATE utf8mb4_unicode_ci = 'ELEMENTARY' THEN 0
+    ON e.first_table_id = edu_rank.first_table_id
+    AND (CASE 
+            WHEN e.level = 'DOCTORATE' THEN 5
+            WHEN e.level = 'MASTERAL' THEN 4
+            WHEN e.level = 'COLLEGE' THEN 3
+            WHEN e.level = 'VOCATIONAL/TRADE COURSE' THEN 2
+            WHEN e.level = 'SECONDARY' THEN 1
+            WHEN e.level = 'ELEMENTARY' THEN 0
             ELSE -1
-        END
-    ) = edu_rank.max_level_rank
+         END) = edu_rank.max_level_rank
 
 -- Latest ROA info
 LEFT JOIN (
@@ -100,39 +95,34 @@ LEFT JOIN (
     JOIN (
         SELECT service_id, MAX(
             CASE 
-                WHEN period_to COLLATE utf8mb4_unicode_ci = 'present' THEN CURDATE()
+                WHEN period_to = 'present' THEN CURDATE()
                 ELSE STR_TO_DATE(period_to, '%m/%d/%Y')
             END
         ) AS latest_period
         FROM hris.record_of_appointment
         WHERE roa_designation IS NOT NULL
-          AND (period_to REGEXP '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' OR period_to COLLATE utf8mb4_unicode_ci = 'present')
+          AND (period_to REGEXP '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' OR period_to = 'present')
         GROUP BY service_id
-    ) ra2 
-        ON ra1.service_id = ra2.service_id
-       AND (
-            CASE 
-                WHEN ra1.period_to COLLATE utf8mb4_unicode_ci = 'present' THEN CURDATE()
+    ) ra2 ON ra1.service_id = ra2.service_id
+       AND (CASE 
+                WHEN ra1.period_to = 'present' THEN CURDATE()
                 ELSE STR_TO_DATE(ra1.period_to, '%m/%d/%Y')
-            END
-       ) = ra2.latest_period
+           END) = ra2.latest_period
 ) latest_roa ON latest_roa.service_id = s.service_id
 
 -- Aggregate LD hours
 LEFT JOIN (
-    SELECT first_table_id COLLATE utf8mb4_unicode_ci AS first_table_id, 
-           SUM(ld_number_of_hours) AS ld_number_of_hours
+    SELECT first_table_id, SUM(ld_number_of_hours) AS ld_number_of_hours
     FROM hris.learning_table
-    GROUP BY first_table_id COLLATE utf8mb4_unicode_ci
-) lt ON lt.first_table_id = p.first_table_id COLLATE utf8mb4_unicode_ci
+    GROUP BY first_table_id
+) lt ON lt.first_table_id = p.first_table_id
 
 -- Count distinct LD titles
 LEFT JOIN (
-    SELECT first_table_id COLLATE utf8mb4_unicode_ci AS first_table_id, 
-           COUNT(DISTINCT title_learning_development COLLATE utf8mb4_unicode_ci) AS total_unique_ld_titles
+    SELECT first_table_id, COUNT(DISTINCT title_learning_development) AS total_unique_ld_titles
     FROM hris.learning_table
-    GROUP BY first_table_id COLLATE utf8mb4_unicode_ci
-) dld ON dld.first_table_id = p.first_table_id COLLATE utf8mb4_unicode_ci
+    GROUP BY first_table_id
+) dld ON dld.first_table_id = p.first_table_id
 
 -- Attendance hours in 24-hour format
 LEFT JOIN (
@@ -160,17 +150,18 @@ LEFT JOIN (
 
 GROUP BY 
     s.employee_id,
-    p.first_table_id COLLATE utf8mb4_unicode_ci,
-    s.first_name COLLATE utf8mb4_unicode_ci, 
-    s.middle_name COLLATE utf8mb4_unicode_ci, 
-    s.last_name COLLATE utf8mb4_unicode_ci, 
-    s.department COLLATE utf8mb4_unicode_ci,
-    p.gender COLLATE utf8mb4_unicode_ci,  
-    p.employment_status COLLATE utf8mb4_unicode_ci,
+    p.first_table_id,
+    s.first_name, 
+    s.middle_name, 
+    s.last_name, 
+    s.department,
+    p.gender,  
+    p.employment_status,
     s.birthdate,
-    s.birth_place COLLATE utf8mb4_unicode_ci,
-    latest_roa.roa_designation COLLATE utf8mb4_unicode_ci,
-    latest_roa.roa_status COLLATE utf8mb4_unicode_ci;
+    s.birth_place,
+    latest_roa.roa_designation,
+    latest_roa.roa_status;
+
 
 
 

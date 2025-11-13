@@ -308,6 +308,7 @@ export class UploadService {
   async getEligibleEmployeesFromView() {
     const rawData = await this.dataSource.query(
       `SELECT * FROM hris.vw_employee_details;
+
 `,
     );
     return rawData;

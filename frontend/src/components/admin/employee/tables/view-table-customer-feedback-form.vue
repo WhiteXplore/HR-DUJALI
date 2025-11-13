@@ -57,7 +57,7 @@
   >
     <!-- Report Header -->
     <div>
-      <h2 class="text-2xl font-bold text-gray-800">Customer Feedback Report</h2>
+      <h2 class="text-2xl font-bold text-gray-800">Client Feedback Report</h2>
       <p class="text-gray-600 mt-1">
         <span v-if="!filterApplied" class="font-normal"
           >Please select month and year</span

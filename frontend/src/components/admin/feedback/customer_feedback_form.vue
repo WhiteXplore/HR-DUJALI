@@ -56,7 +56,7 @@
             </div>
 
             <!-- Control No. -->
-            <div
+            <!-- <div
               class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3"
             >
               <label class="sm:w-28 text-sm font-medium text-gray-700"
@@ -73,7 +73,7 @@
                     : 'border-gray-300'
                 "
               />
-            </div>
+            </div> -->
 
             <!-- Time of Visit -->
             <div
@@ -120,7 +120,7 @@
         </div>
         <div>
           <p class="mb-6 text-justify">
-            This Client Satisfaction Measurement (CSM) tracks the customer
+            This Client Satisfaction Measurement (CSM) tracks the client
             experience of government offices. Your feedback on your concluded
             transaction will help this Office provide a better service. Personal
             information shared will be kept confidential.
@@ -516,7 +516,7 @@ export default {
     return {
       form: {
         office: "",
-        controlNo: "",
+        controlNo: "N/A",
         timeOfVisit: "",
         clientType: "",
         sex: "",

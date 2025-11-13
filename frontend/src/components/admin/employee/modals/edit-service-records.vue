@@ -389,42 +389,80 @@ export default {
     },
 
     submitData() {
+      const payload = {
+        first_name: this.form.first_name,
+        middle_name: this.form.middle_name,
+        last_name: this.form.last_name,
+        birthdate: this.form.birthdate,
+        birth_place: this.form.birth_place,
+        employee_id: this.form.employee_id,
+        department: this.form.department,
+        serviceRecords: this.form.serviceRecords.map((record) => ({
+          record_id: record.record_id, // optional: include if updating existing records
+          period_from: record.period_from.toString(),
+          period_to: record.period_to.toString(),
+          roa_designation: record.roa_designation.toString(),
+          roa_sg: record.roa_sg.toString(),
+          roa_step: record.roa_step.toString(),
+          roa_status: record.roa_status.toString(),
+          roa_basic_salary: record.roa_basic_salary.toString(),
+          roa_basic_salary_day: record.roa_basic_salary_day.toString(),
+          office: record.office.toString(),
+          remarks: record.remarks.toString(),
+          service_id: parseInt(this.serviceId), // ✅ required
+        })),
+      };
+
       axios
         .patch(
           process.env.VUE_APP_API_BASE_URL +
             `/service-of-records/${this.serviceId}`,
-          this.form
+          payload
         )
         .then((response) => {
           console.log("Record updated successfully:", response.data);
-          this.$emit("updated", response.data); // Optional: emit event for parent
-          toast.success("Record deleted successfully!", { autoClose: 2000 });
+          this.$emit("updated", response.data);
+          toast.success("Record updated successfully!", { autoClose: 2000 });
           this.closeModal();
           this.$emit("refresh");
         })
-
         .catch((error) => {
           console.error("Error updating the service record:", error);
         });
     },
-
     async fetchServiceRecords() {
       try {
-        const response = await axios.get(
+        const { data } = await axios.get(
           process.env.VUE_APP_API_BASE_URL +
             `/service-of-records/${this.serviceId}`
         );
-        if (response.data) {
-          this.form = {
-            ...this.form,
-            ...response.data,
-            serviceRecords: response.data.serviceRecords || [],
-          };
-        } else {
-          console.warn(`No record found with ID: ${this.serviceId}`);
+
+        if (data) {
+          this.form.first_name = data.first_name;
+          this.form.middle_name = data.middle_name;
+          this.form.last_name = data.last_name;
+          this.form.birthdate = data.birthdate;
+          this.form.birth_place = data.birth_place;
+          this.form.employee_id = data.employee_id;
+          this.form.department = data.department;
+
+          // Make sure record_id is preserved
+          this.form.serviceRecords = data.serviceRecords.map((record) => ({
+            record_id: record.record_id, // ✅ keep it
+            period_from: record.period_from,
+            period_to: record.period_to,
+            roa_designation: record.roa_designation,
+            roa_sg: record.roa_sg,
+            roa_step: record.roa_step,
+            roa_status: record.roa_status,
+            roa_basic_salary: record.roa_basic_salary,
+            roa_basic_salary_day: record.roa_basic_salary_day,
+            office: record.office,
+            remarks: record.remarks,
+          }));
         }
-      } catch (error) {
-        console.error("There was an error fetching the service record:", error);
+      } catch (err) {
+        console.error("Error fetching service records:", err);
       }
     },
   },

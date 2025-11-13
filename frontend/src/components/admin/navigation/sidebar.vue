@@ -218,8 +218,8 @@ export default {
               children: [
                 { name: "Attendance", route: "/attendance-report" },
                 {
-                  name: "Customer Feedback",
-                  route: "/customer-feedback-report",
+                  name: "Client Feedback",
+                  route: "/client-feedback-report",
                 },
               ],
             },

@@ -1,53 +1,53 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsString, MaxLength, IsOptional } from 'class-validator';
 
 export class CreateRecordOfAppointmentDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  period_from: string;
+  period_from?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  period_to: string;
+  period_to?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  roa_designation: string;
+  roa_designation?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  roa_sg: string;
+  roa_sg?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  roa_step: string;
+  roa_step?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  roa_status: string;
+  roa_status?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  roa_basic_salary: string;
+  roa_basic_salary?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  roa_basic_salary_day: string;
+  roa_basic_salary_day?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  office: string;
+  office?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  remarks: string;
+  remarks?: string;
 }

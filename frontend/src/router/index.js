@@ -10,8 +10,8 @@ const routes = [
     component: LoginView,
   },
   {
-    path: "/customer-feedback",
-    name: "customer-feedback",
+    path: "/client-feedback-form",
+    name: "client-feedback-form",
     component: () =>
       import("@/components/admin/feedback/customer_feedback_form.vue"),
   },
@@ -168,8 +168,8 @@ const routes = [
         children: [],
       },
       {
-        path: "/customer-feedback-report",
-        name: "customer-feedback-report",
+        path: "/client-feedback-report",
+        name: "client-feedback-report",
         component: () =>
           import("@/components/admin/employee/customer-feedback-form.vue"),
         children: [],

@@ -1,5 +1,4 @@
 import {
-  IsNotEmpty,
   IsString,
   MaxLength,
   ValidateNested,
@@ -11,38 +10,38 @@ import { CreateRecordOfAppointmentDto } from './create-record-of-appointment.dto
 
 export class CreateServiceOfRecordDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  first_name: string;
+  first_name?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  middle_name: string;
+  middle_name?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  last_name: string;
+  last_name?: string;
 
   @IsDateString() // Accepts ISO date string like '2024-05-07'
-  @IsNotEmpty()
-  birthdate: string;
+  @IsOptional()
+  birthdate?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  birth_place: string;
+  birth_place?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  employee_id: string;
+  employee_id?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(155)
-  department: string;
+  department?: string;
 
   @ValidateNested({ each: true })
   @Type(() => CreateRecordOfAppointmentDto)
