@@ -86,7 +86,7 @@
           >
             <option value="" disabled>Select Role</option>
             <option value="Admin">Admin</option>
-            <option value="User">User</option>
+            <option value="Employee">Employee</option>
           </select>
         </div>
 
