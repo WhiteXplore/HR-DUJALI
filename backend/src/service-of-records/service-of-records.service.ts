@@ -30,6 +30,16 @@ export class ServiceOfRecordsService {
     const createdEmployees: ServiceOfRecord[] = [];
 
     for (const empDto of employees) {
+      // Check if an employee with the same employee_id already exists
+      const existing = await this.serviceOfRecordRepository.findOne({
+        where: { employee_id: empDto.employee_id },
+      });
+
+      if (existing) {
+        // Skip this employee to avoid duplicates
+        continue;
+      }
+
       // Create the parent employee record
       const serviceOfRecord = this.serviceOfRecordRepository.create({
         ...empDto,
