@@ -125,7 +125,7 @@
                   >
                     <option disabled value="">Select Category</option>
                     <option value="General">General Training</option>
-                    <option value="Specific">Specific Training</option>
+                    <option value="Specialized">Specialized Training</option>
                   </select>
                 </div>
                 <div class="w-full space-y-2">
@@ -382,7 +382,7 @@ export default {
         this.form.training_position = [...this.service_positions];
         this.form.educational_level = [...this.educationalLevels];
         this.form.employment_status = [...this.employmentStatuses];
-      } else if (newVal === "Specific") {
+      } else if (newVal === "Specialized") {
         this.form.training_position = [];
         this.form.educational_level = [];
       }

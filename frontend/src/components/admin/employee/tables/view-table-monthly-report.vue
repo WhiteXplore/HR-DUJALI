@@ -202,7 +202,9 @@
           <div
             class="bg-white rounded-2xl border p-6 xl:col-span-2 flex flex-col items-center"
           >
-            <h4 class="text-lg font-semibold">Late Distribution Chart</h4>
+            <h4 class="text-lg font-semibold">
+              Employee Tardiness Distribution
+            </h4>
             <div class="w-full h-lg:h-[500px] flex justify-center items-center">
               <Bar :data="chartData" :options="chartOptions" />
             </div>

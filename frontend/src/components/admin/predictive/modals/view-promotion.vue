@@ -85,7 +85,7 @@
             <div
               class="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center text-white"
             >
-              <icon :name="'shield'" />
+              <icon :name="'promoted'" />
             </div>
           </div>
         </div>
@@ -106,7 +106,7 @@
             <div
               class="w-20 h-20 rounded-full bg-red-500 flex items-center justify-center text-white"
             >
-              <icon :name="'shield'" />
+              <icon :name="'not-promoted'" />
             </div>
           </div>
         </div>
@@ -209,27 +209,36 @@
     <div class="flex flex-row justify-end">
       <button
         class="px-2 py-3 bg-blue-800 rounded-lg mb-2 text-white flex items-center gap-2"
+        @click="openPrintableModal"
       >
         <icon :name="'check'" />
-        Approve promotion
+        Download
       </button>
     </div>
+    <PrintableModal
+      :show="showModal"
+      :employeeData="employeeData"
+      :predictionData="predictionData"
+      :criteria="criteria"
+      @close="showModal = false"
+    />
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import icon from "@/assets/icon.vue";
-
+import PrintableModal from "@/components/admin/predictive/modals/print-promotion.vue";
 export default {
   name: "viewSeminar",
-  components: { icon },
+  components: { icon, PrintableModal },
   props: {
     selectedFirstName: String,
     selectedLastName: String,
   },
   data() {
     return {
+      showModal: false,
       employeeData: null,
       predictionData: { eligible: 0 },
       ruleChecks: {},
@@ -290,6 +299,9 @@ export default {
     },
   },
   methods: {
+    openPrintableModal() {
+      this.showModal = true;
+    },
     toggleBack() {
       this.employeeData = null;
       this.$emit("back-to-table-seminar");
