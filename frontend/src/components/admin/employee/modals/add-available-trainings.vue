@@ -59,7 +59,10 @@
             </div>
 
             <!-- Step 2 -->
-            <div v-if="currentStep === 2" class="flex flex-col gap-4">
+            <div
+              v-if="currentStep === 2"
+              class="flex flex-col gap-4 h-[70vh] overflow-auto p-2"
+            >
               <!-- Date Range -->
               <div class="gap-2 flex">
                 <div class="w-full space-y-2">
@@ -129,47 +132,42 @@
                   </select>
                 </div>
                 <div class="w-full space-y-2">
-                  <label for="educational_level" class="font-bold"
-                    >Education:</label
-                  >
-                  <multiselect
-                    v-model="form.educational_level"
-                    :options="educationalLevels"
-                    :multiple="true"
-                    :close-on-select="false"
-                    :clear-on-select="false"
-                    :preserve-search="true"
-                    placeholder="Select one or more levels"
-                    label="name"
-                    track-by="name"
-                    :show-labels="false"
-                    class="w-full border px-2 py-2 border-gray-600 rounded-md text-md text-gray-800 bg-white"
-                  >
-                    <template #option="{ option, isSelected }">
-                      <div class="flex items-center gap-2 px-2 py-1">
-                        <input
-                          type="checkbox"
-                          :checked="isSelected"
-                          class="cursor-pointer accent-green-600"
-                        />
-                        <span>{{ option.name }}</span>
-                      </div>
-                    </template>
+                  <label class="font-bold">Education:</label>
 
-                    <template #tag="{ option, remove }">
-                      <span
-                        class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  <!-- Dropdown -->
+                  <div class="relative">
+                    <select
+                      v-model="selectedEducation"
+                      @change="addEducation"
+                      class="w-full border px-3 py-3 border-gray-600 rounded-md text-md text-gray-800 bg-white cursor-pointer"
+                    >
+                      <option disabled value="">Select education level</option>
+                      <option
+                        v-for="level in educationalLevels"
+                        :key="level.name"
+                        :value="level.name"
                       >
-                        {{ option.name }}
-                        <button
-                          class="ml-1 text-green-600 hover:text-red-600 font-bold"
-                          @click.prevent="remove(option)"
-                        >
-                          ✕
-                        </button>
-                      </span>
-                    </template>
-                  </multiselect>
+                        {{ level.name }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Selected badges -->
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <span
+                      v-for="(level, index) in form.educational_level"
+                      :key="index"
+                      class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                    >
+                      {{ level }}
+                      <button
+                        class="ml-1 text-green-600 hover:text-red-600 font-bold"
+                        @click="removeEducation(level)"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -205,89 +203,84 @@
               </div>
 
               <!-- Employment Status -->
+              <!-- Employment Status -->
               <div class="w-full space-y-2">
                 <label for="employment_status" class="font-bold"
                   >Employment Status:</label
                 >
-                <multiselect
-                  v-model="form.employment_status"
-                  :options="employmentStatuses"
-                  :multiple="true"
-                  :close-on-select="false"
-                  :clear-on-select="false"
-                  :preserve-search="true"
-                  placeholder="Select one or more statuses"
-                  label="name"
-                  track-by="name"
-                  :show-labels="false"
-                  class="w-full border px-2 py-2 border-gray-600 rounded-md text-md text-gray-800 bg-white"
-                >
-                  <template #option="{ option, isSelected }">
-                    <div class="flex items-center gap-2 px-2 py-1">
-                      <input
-                        type="checkbox"
-                        :checked="isSelected"
-                        class="cursor-pointer accent-green-600"
-                      />
-                      <span>{{ option.name }}</span>
-                    </div>
-                  </template>
-                  <template #tag="{ option, remove }">
-                    <span
-                      class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                <div class="relative">
+                  <select
+                    v-model="selectedEmploymentStatus"
+                    @change="addEmploymentStatus"
+                    class="w-full border px-3 py-3 border-gray-600 rounded-md text-md text-gray-800 bg-white cursor-pointer"
+                  >
+                    <option disabled value="">Select Employment Status</option>
+                    <option
+                      v-for="status in employmentStatuses"
+                      :key="status.name"
+                      :value="status.name"
                     >
-                      {{ option.name }}
-                      <button
-                        class="ml-1 text-green-600 hover:text-red-600 font-bold"
-                        @click.prevent="remove(option)"
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  </template>
-                </multiselect>
+                      {{ status.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Selected badges -->
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <span
+                    v-for="(status, index) in form.employment_status"
+                    :key="index"
+                    class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    {{ status }}
+                    <button
+                      class="ml-1 text-green-600 hover:text-red-600 font-bold"
+                      @click="removeEmploymentStatus(status)"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                </div>
               </div>
 
               <!-- Positions -->
               <div class="w-full space-y-2">
                 <label class="font-bold">Positions:</label>
-                <multiselect
-                  v-model="form.training_position"
-                  :options="service_positions"
-                  :multiple="true"
-                  :close-on-select="false"
-                  :clear-on-select="false"
-                  :preserve-search="true"
-                  placeholder="Select one or more positions"
-                  label="name"
-                  track-by="name"
-                  :show-labels="false"
-                  class="w-full border px-2 py-2 border-gray-600 rounded-md text-md text-gray-800 bg-white"
-                >
-                  <template #option="{ option, isSelected }">
-                    <div class="flex items-center gap-2 px-2 py-1">
-                      <input
-                        type="checkbox"
-                        :checked="isSelected"
-                        class="cursor-pointer accent-green-600"
-                      />
-                      <span>{{ option.name }}</span>
-                    </div>
-                  </template>
-                  <template #tag="{ option, remove }">
-                    <span
-                      class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+
+                <div class="relative">
+                  <select
+                    v-model="selectedPosition"
+                    @change="addPosition"
+                    class="w-full border px-3 py-3 border-gray-600 rounded-md text-md text-gray-800 bg-white cursor-pointer"
+                  >
+                    <option disabled value="">Select Position</option>
+                    <option
+                      v-for="pos in service_positions"
+                      :key="pos.name"
+                      :value="pos.name"
                     >
-                      {{ option.name }}
-                      <button
-                        class="ml-1 text-green-600 hover:text-red-600 font-bold"
-                        @click.prevent="remove(option)"
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  </template>
-                </multiselect>
+                      {{ pos.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Selected badges -->
+
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <span
+                    v-for="(pos, index) in form.training_position"
+                    :key="index"
+                    class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    {{ pos }}
+                    <button
+                      class="ml-1 text-green-600 hover:text-red-600 font-bold"
+                      @click="removePosition(pos)"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -333,11 +326,10 @@
 import icon from "@/assets/icon.vue";
 import { toast } from "vue3-toastify";
 import axios from "axios";
-import Multiselect from "vue-multiselect";
 
 export default {
   name: "AddAvailableTrainingModal",
-  components: { icon, Multiselect },
+  components: { icon },
   props: {
     editData: { type: Object, default: null },
   },
@@ -373,18 +365,25 @@ export default {
       target_groups: [],
       currentStep: 1,
       totalSteps: 2,
+      selectedEmploymentStatus: "",
+      selectedPosition: "",
     };
   },
 
   watch: {
     "form.category"(newVal) {
       if (newVal === "General") {
-        this.form.training_position = [...this.service_positions];
-        this.form.educational_level = [...this.educationalLevels];
-        this.form.employment_status = [...this.employmentStatuses];
+        // Populate arrays with string values directly
+        this.form.training_position = this.service_positions.map((p) => p.name);
+        this.form.educational_level = this.educationalLevels.map((e) => e.name);
+        this.form.employment_status = this.employmentStatuses.map(
+          (e) => e.name
+        );
       } else if (newVal === "Specialized") {
+        // Clear arrays
         this.form.training_position = [];
         this.form.educational_level = [];
+        this.form.employment_status = [];
       }
     },
   },
@@ -405,6 +404,50 @@ export default {
   },
 
   methods: {
+    addPosition() {
+      if (
+        this.selectedPosition &&
+        !this.form.training_position.includes(this.selectedPosition)
+      ) {
+        this.form.training_position.push(this.selectedPosition);
+      }
+      this.selectedPosition = "";
+    },
+    removePosition(pos) {
+      this.form.training_position = this.form.training_position.filter(
+        (p) => p !== pos
+      );
+    },
+
+    addEmploymentStatus() {
+      if (
+        this.selectedEmploymentStatus &&
+        !this.form.employment_status.includes(this.selectedEmploymentStatus)
+      ) {
+        this.form.employment_status.push(this.selectedEmploymentStatus);
+      }
+      this.selectedEmploymentStatus = "";
+    },
+    removeEmploymentStatus(status) {
+      this.form.employment_status = this.form.employment_status.filter(
+        (s) => s !== status
+      );
+    },
+
+    addEducation() {
+      if (
+        this.selectedEducation &&
+        !this.form.educational_level.includes(this.selectedEducation)
+      ) {
+        this.form.educational_level.push(this.selectedEducation);
+      }
+      this.selectedEducation = "";
+    },
+    removeEducation(level) {
+      this.form.educational_level = this.form.educational_level.filter(
+        (l) => l !== level
+      );
+    },
     fetchService() {
       axios
         .get(process.env.VUE_APP_API_BASE_URL + "/service-of-records/get-all")
@@ -476,26 +519,21 @@ export default {
           category: this.form.category,
           experience_year_from: this.form.experience_year_from,
           experience_year_to: this.form.experience_year_to,
-          training_position: this.form.training_position.map((p) => p.name),
-          employment_status: this.form.employment_status.map((e) => e.name),
-          training_educational_level: this.form.educational_level.map(
-            (l) => l.name
-          ),
+          training_position: this.form.training_position, // strings
+          employment_status: this.form.employment_status, // strings
+          training_educational_level: this.form.educational_level, // strings
         };
 
-        // ✅ Log payload before sending to database
         console.log("Final Payload:", payload);
 
         if (this.editData && this.editData.training_id) {
           await axios.patch(
-            process.env.VUE_APP_API_BASE_URL +
-              `/available-trainings/update-training/${this.editData.training_id}`,
+            `${process.env.VUE_APP_API_BASE_URL}/available-trainings/update-training/${this.editData.training_id}`,
             payload
           );
         } else {
           await axios.post(
-            process.env.VUE_APP_API_BASE_URL +
-              "/available-trainings/add-training",
+            `${process.env.VUE_APP_API_BASE_URL}/available-trainings/add-training`,
             payload
           );
         }
@@ -508,6 +546,7 @@ export default {
         console.error("Save training error:", error);
       }
     },
+
     nextStep() {
       if (this.currentStep < this.totalSteps) this.currentStep++;
     },
