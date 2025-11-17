@@ -755,23 +755,51 @@ export default {
       const sentiment = new Sentiment();
       const options = {
         extras: {
-          confusing: -2,
-          unclear: -1,
-          delay: -2,
-          rude: -3,
-          unhelpful: -2,
-          helpful: 2,
-          smooth: 2,
-          fast: 2,
-          polite: 2,
-          courteous: 2,
-          clean: 1,
-          comfortable: 1,
-          proactive: 2,
-          satisfactory: 2,
-          convenient: 2,
+          // Stronger negative weights (from earlier)
+          confusing: -4,
+          unclear: -4,
+          delay: -5,
+          rude: -6,
+          unhelpful: -5,
+          frustrating: -6,
+          slow: -4,
+          long: -3,
+          waiting: -3,
+          disorganized: -5,
+          poor: -4,
+          bad: -4,
+          worst: -6,
+          disappointed: -5,
+
+          // 🔥 Added based on your Negative Common Comments
+          "faced delays": -6,
+          delays: -5,
+          "lacked knowledge": -6,
+          "rude behavior": -7,
+
+          "waiting time": -5,
+          "too long": -4,
+          overwhelming: -5,
+
+          "did not receive": -6,
+          "no assistance": -6,
+          "poor service": -7,
+          "overall service was poor": -8,
+
+          // Positive weights
+          helpful: 3,
+          smooth: 3,
+          fast: 3,
+          polite: 3,
+          courteous: 3,
+          clean: 2,
+          comfortable: 2,
+          proactive: 3,
+          satisfactory: 3,
+          convenient: 3,
         },
       };
+
       return sentiment.analyze(text.toLowerCase(), options);
     },
     updateFeedbackFromCommonComment() {

@@ -60,6 +60,7 @@
         </div>
 
         <!-- Password -->
+        <!-- Password -->
         <div>
           <label class="text-sm font-medium">
             Password
@@ -67,13 +68,33 @@
               (Leave blank to keep current password)
             </span>
           </label>
-          <input
-            v-model="form.password"
-            type="password"
-            class="w-full px-3 py-2 border rounded-md"
-            :required="!isEditMode"
-            placeholder="Enter password"
-          />
+
+          <div class="relative">
+            <input
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
+              class="w-full px-3 py-2 border rounded-md pr-10"
+              :required="!isEditMode"
+              placeholder="Enter password"
+            />
+
+            <!-- Eye Icon Toggle -->
+            <span
+              class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600"
+              @click="showPassword = !showPassword"
+            >
+              <icon :name="showPassword ? 'eye-open' : 'eye-close'" />
+            </span>
+          </div>
+
+          <!-- Real-time Password Complexity Message -->
+          <p
+            v-if="form.password && !validatePassword(form.password)"
+            class="text-red-600 text-xs mt-1"
+          >
+            Password must be at least 8 characters long and include uppercase,
+            lowercase, number, and special character.
+          </p>
         </div>
 
         <!-- Role -->
@@ -114,9 +135,12 @@
 <script>
 import axios from "axios";
 import { toast } from "vue3-toastify";
-
+import icon from "@/assets/icon.vue";
 export default {
   name: "AddEditUserPage",
+  components: {
+    icon,
+  },
   props: {
     user: {
       type: Object,
@@ -129,9 +153,10 @@ export default {
         first_name: "",
         last_name: "",
         email: "",
-        password: "", // added password
+        password: "",
         role: "",
       },
+      showPassword: false,
     };
   },
   computed: {
@@ -144,7 +169,6 @@ export default {
       immediate: true,
       handler(newVal) {
         if (newVal) {
-          // Populate form for editing, but leave password blank
           this.form = {
             first_name: newVal.first_name || "",
             last_name: newVal.last_name || "",
@@ -160,11 +184,29 @@ export default {
     closeModal() {
       this.$emit("close");
     },
+
+    // 🔐 PASSWORD COMPLEXITY VALIDATION
+    validatePassword(password) {
+      const strongPassword =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      return strongPassword.test(password);
+    },
+
     async submitForm() {
       try {
+        // Validate password complexity (Add mode OR Edit but with new password)
+        if (!this.isEditMode || (this.isEditMode && this.form.password)) {
+          if (!this.validatePassword(this.form.password)) {
+            toast.error(
+              "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+            );
+            return;
+          }
+        }
+
         let payload = { ...this.form };
 
-        // If editing and password is empty, remove it
+        // For edit: remove password field if left empty
         if (this.isEditMode && !payload.password) {
           delete payload.password;
         }
