@@ -43,7 +43,7 @@
 
       <!-- Dynamic Menu -->
       <div class="flex flex-col mt-6 gap-2 tracking-wide text-[12px] w-full">
-        <template v-for="section in sections" :key="section.name">
+        <template v-for="section in filteredSections" :key="section.name">
           <div v-if="isExpanded" class="text-md text-white mt-2 text-left">
             {{ section.name }}
           </div>
@@ -227,6 +227,20 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    filteredSections() {
+      // If no user loaded yet
+      if (!this.user || !this.user.role) return this.sections;
+
+      // Hide "User Management" if role = Staff
+      return this.sections.filter((section) => {
+        if (section.name === "User Management" && this.user.role === "Staff") {
+          return false;
+        }
+        return true;
+      });
+    },
   },
   created() {
     this.expandDropdownForCurrentRoute(this.$route.path);

@@ -270,20 +270,22 @@ export default {
     async login() {
       try {
         const response = await axios.post(
-          process.env.VUE_APP_API_BASE_URL + "/auth/login",
+          `${process.env.VUE_APP_API_BASE_URL}/auth/login`,
           {
             email: this.email,
             password: this.password,
           },
           { withCredentials: true }
         );
+
         const role = response.data.role;
         localStorage.setItem("role", role);
 
-        if (role === "Admin") {
+        if (role === "Admin" || role === "Staff") {
           this.$router.push("/dashboard");
-        } else if (role === "Student") {
-          this.$router.push("/student-dashboard");
+        } else {
+          this.errorMessage =
+            "You don't have permission to access the dashboard.";
         }
       } catch (error) {
         this.errorMessage = error.response?.data?.message || "Login failed.";
