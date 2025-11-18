@@ -473,8 +473,7 @@ export default {
           process.env.VUE_APP_API_BASE_URL +
             `/attendance-record/${this.recordToDelete.attendance_id}`
         )
-        .then((response) => {
-          console.log("Record deleted:", response.data);
+        .then(() => {
           this.showDeleteModal = false;
           toast.success("Record deleted successfully!", { autoClose: 2000 });
 
