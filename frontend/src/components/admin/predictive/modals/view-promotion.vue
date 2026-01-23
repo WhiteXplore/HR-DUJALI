@@ -1,226 +1,319 @@
 <template>
-  <div class="w-full flex items-center justify-between mb-2">
-    <div class="text-[13px] text-text mt-4 font-regular">
-      Pages / Promotion Eligibility
+  <div class="min-h-screen bg-gray-50 p-4">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-lg font-bold text-gray-800 text-left">
+          Promotion Eligibility
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
+          View employee profile and promotion recommendations.
+        </p>
+      </div>
+      <button
+        @click="toggleBack"
+        class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-xl border border-red-500 hover:bg-white hover:text-red-500 hover:border-red-700 transition-all duration-300 shadow-sm"
+      >
+        Back
+      </button>
     </div>
+
+    <!-- Main Card -->
     <div
-      @click="toggleBack"
-      class="cursor-pointer text-red-800 hover:text-white border-red-800 border px-2 py-1 text-sm rounded-md hover:bg-red-800"
+      class="bg-white rounded-lg shadow p-4 h-[80vh] overflow-auto space-y-4"
     >
-      Back
-    </div>
-  </div>
-  <div
-    class="w-full mx-auto bg-white rounded-lg space-y-4 h-[80vh] overflow-auto"
-  >
-    <!-- Loading animation -->
-    <div v-if="loading" class="h-full flex items-center justify-center">
-      <div class="flex flex-col items-center space-y-4">
+      <!-- Loading -->
+      <div
+        v-if="loading"
+        class="flex flex-col items-center justify-center h-full space-y-4"
+      >
         <div
-          class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"
+          class="loader border-8 border-t-8 border-gray-200 rounded-full w-16 h-16"
         ></div>
         <p class="text-gray-600 text-sm">
           Analyzing profile and generating recommendations...
         </p>
       </div>
-    </div>
 
-    <!-- Content when loaded -->
-    <div v-if="!loading && employeeData" class="space-y-4">
-      <!-- Header Section -->
-      <div class="flex justify-between gap-2">
-        <!-- Profile Card -->
-        <div class="w-full h-[22vh] border rounded-lg text-[14px]">
-          <div class="flex justify-start p-4">
-            <div class="flex gap-5">
-              <img
-                src="../../../../assets/img/employee_picture.png"
-                alt="Employee"
-                class="w-[180px] bg-gray-100 rounded-md"
-              />
-              <div class="space-y-3">
-                <div class="flex">
-                  <p class="font-bold">Name:</p>
-                  &nbsp;{{ employeeData.first_name }}
-                  {{ employeeData.last_name }}
-                </div>
-                <div class="flex">
-                  <p class="font-bold">Age:</p>
-                  &nbsp;{{ employeeData.age }}
-                </div>
-                <div class="flex">
-                  <p class="font-bold">Birthdate:</p>
-                  &nbsp;{{ formattedBirthdate }}
-                </div>
+      <!-- Employee Content -->
+      <div v-else-if="employeeData" class="space-y-4">
+        <div class="flex justify-between gap-4 w-full">
+          <!-- Profile Info -->
+          <div
+            class="flex gap-6 border rounded-lg p-4 bg-white shadow-sm w-1/2"
+          >
+            <img
+              src="@/assets/img/employee_picture.png"
+              alt="Employee"
+              class="w-[180px] h-[180px] object-cover rounded-md bg-gray-100"
+            />
+            <div class="flex-1 space-y-4 text-sm">
+              <div class="flex gap-2">
+                <span class="font-semibold">Name:</span>
+                {{ employeeData.first_name }} {{ employeeData.last_name }}
+              </div>
+              <div class="flex gap-2">
+                <span class="font-semibold">Age:</span> {{ employeeData.age }}
+              </div>
+              <div class="flex gap-2">
+                <span class="font-semibold">Birthdate:</span>
+                {{ formattedBirthdate }}
+              </div>
+              <div class="flex gap-2">
+                <span class="font-semibold">Place of Birth:</span>
+                {{ employeeData.place_of_birth }}
+              </div>
+              <div class="flex gap-2">
+                <span class="font-semibold">Designation:</span>
+                {{ employeeData.present_designation }}
+              </div>
+            </div>
+          </div>
 
-                <div class="flex">
-                  <p class="font-bold">Place of Birth:</p>
-                  &nbsp;{{ employeeData.birth_place }}
-                </div>
+          <!-- Promotion Eligibility Card -->
+          <div class="flex flex-col border rounded-lg p-4 bg-white w-1/2">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold text-gray-800">
+                Promotion Eligibility
+              </h2>
+              <span
+                class="px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800"
+              >
+                Eligible for Promotion
+              </span>
+            </div>
 
-                <div class="flex">
-                  <p class="font-bold">Designation:</p>
-                  &nbsp;{{ employeeData.present_designation }}
-                </div>
+            <!-- Promotion Details -->
+            <div class="flex flex-col gap-4 text-sm text-gray-700">
+              <div class="flex justify-between">
+                <span class="font-medium">Current Designation:</span>
+                <span>{{ employeeData.present_designation }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">Current Promotion Date:</span>
+                <span>{{ formattedLastPromotionDate }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">End Promotion Date:</span>
+                <span>{{ formattedEndPromotionDate }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">Criteria Met:</span>
+                <span
+                  class="px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800"
+                >
+                  Yes
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Recommendation Card -->
-        <div
-          v-if="predictionData.eligible"
-          class="w-full h-[22vh] border rounded-lg bg-blue-50 p-4"
-        >
-          <div class="flex justify-start">
-            <h1 class="text-xl font-bold">Promotion Recommendation</h1>
-          </div>
-          <div class="mt-6 flex items-center justify-center gap-[460px]">
-            <div class="text-left space-y-2">
-              <h2 class="text-base">Recommended Promotion Title:</h2>
-              <p class="text-blue-700 text-[19px] w-[300px]">
-                <strong>{{ promotedTitle }}</strong>
-              </p>
-            </div>
-            <div
-              class="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center text-white"
-            >
-              <icon :name="'promoted'" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Not Eligible Card -->
-        <div v-else class="w-full h-[22vh] border rounded-lg bg-red-50 p-4">
-          <div class="flex justify-start">
-            <h1 class="text-xl font-bold">Promotion Recommendation</h1>
-          </div>
-          <div class="mt-6 flex items-center justify-center gap-[390px]">
-            <div class="text-left space-y-2">
-              <h2 class="text-base">Recommended Promotion Title:</h2>
-              <p class="text-red-700 text-[19px] w-[300px]">
-                <strong>{{ employeeData.first_name }}</strong> is not eligible
-                for promotion.
-              </p>
-            </div>
-            <div
-              class="w-20 h-20 rounded-full bg-red-500 flex items-center justify-center text-white"
-            >
-              <icon :name="'not-promoted'" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Description -->
-      <p class="text-gray-600 text-justify">
-        Through a thorough evaluation of {{ employeeData.first_name }}’s
-        professional profile—including age, educational qualifications, work
-        experience, current designation, commendations received, and total
-        attendance hours—the system has determined their eligibility for
-        promotion. This data-driven assessment ensures that only employees who
-        meet the established standards for advancement are recommended,
-        supporting both fairness and career progression within the organization.
-      </p>
-
-      <!-- Data Summary -->
-      <div
-        class="w-full h-[10vh] border rounded-lg flex items-center justify-between px-20 mb-6"
-      >
-        <div class="text-sm flex flex-col">
-          <span class="font-semibold text-gray-700">Age:</span
-          >{{ employeeData.age }}
-        </div>
-        <div class="text-sm flex flex-col">
-          <span class="font-semibold text-gray-700">Education Level:</span
-          >{{ employeeData.level }}
-        </div>
-        <div class="text-sm flex flex-col">
-          <span class="font-semibold text-gray-700">Experience (Years):</span
-          >{{ employeeData.total_years_experience }}
-        </div>
-        <div class="text-sm flex flex-col">
-          <span class="font-semibold text-gray-700">Designation:</span
-          >{{ employeeData.present_designation }}
-        </div>
-        <div class="text-sm flex flex-col">
-          <span class="font-semibold text-gray-700">Commendation (Count):</span
-          >{{ employeeData.total_count_of_learning_development }}
-        </div>
-        <div class="text-sm flex flex-col">
-          <span class="font-semibold text-gray-700">Commendation Hours:</span
-          >{{ employeeData.total_ld_hours_rendered }}
-        </div>
-        <div class="text-sm flex flex-col">
-          <span class="font-semibold text-gray-700">Attendance Hours:</span
-          >{{ employeeData.total_attendance_hours }}
-        </div>
-      </div>
-
-      <!-- Criteria Cards -->
-      <div>
-        <h2 class="text-xl mt-5 font-semibold text-left">
-          Promotion Eligibility Criteria
-        </h2>
-        <p class="text-sm text-left text-gray-600 mb-4">
-          The following criteria outline the standards used to evaluate an
-          employee's eligibility for promotion. Each requirement is assessed
-          individually to ensure a fair and transparent recommendation process.
+        <!-- Description -->
+        <p class="text-gray-600 text-justify text-sm">
+          After evaluating {{ employeeData.first_name }}'s profile—including
+          age, education, work experience, current designation, commendations,
+          and total attendance hours—the system recommends their promotion
+          eligibility. This ensures a fair, data-driven assessment for career
+          progression.
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <div
-            v-for="(item, key) in criteria"
-            :key="key"
-            :class="[
-              'bg-green-50 rounded-lg shadow-lg p-5 border-l-4',
-              item.met ? 'border-green-500' : 'border-red-500',
-            ]"
-          >
-            <div class="flex items-center space-x-2 mb-2">
-              <div
-                :class="[
-                  'text-white rounded-full w-6 h-6 flex items-center justify-center',
-                  item.met ? 'bg-green-500' : 'bg-red-500',
-                ]"
-              >
-                {{ item.met ? "✅" : "❌" }}
-              </div>
-              <h3 class="font-semibold text-gray-800">{{ item.title }}</h3>
-            </div>
-            <p class="text-gray-600 mb-2 text-left ml-8">
-              {{ item.description }}
-            </p>
-            <p
-              :class="
-                item.met
-                  ? 'text-green-600 font-medium'
-                  : 'text-red-600 font-medium'
-              "
-              class="text-left ml-8"
+        <!-- Summary Stats -->
+        <div
+          class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 border rounded-lg p-4 text-sm w-full"
+        >
+          <div class="flex flex-col justify-center items-center">
+            <span class="font-semibold text-gray-700">Education</span>
+            <span
+              class="mt-2 inline-block bg-blue-100 text-blue-800 text-xs t font-medium px-2 py-1 rounded-full w-[50%]"
             >
-              {{ item.met ? "Requirement met" : "Requirement not met" }}
+              {{ employeeData.level }}
+            </span>
+          </div>
+          <div class="flex flex-col justify-center items-center">
+            <span class="font-semibold text-gray-700">Experience (Years)</span>
+            <span
+              class="mt-2 inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full w-[25%]"
+            >
+              {{ employeeData.total_years_experience }}
+            </span>
+          </div>
+
+          <div class="flex flex-col justify-center items-center">
+            <span class="font-semibold text-gray-700">Designation</span>
+            <span
+              class="mt-2 inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full"
+            >
+              {{ employeeData.present_designation }}
+            </span>
+          </div>
+
+          <div class="flex flex-col justify-center items-center">
+            <span class="font-semibold text-gray-700">Commendation Count</span>
+            <span
+              class="mt-2 inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full w-[20%]"
+            >
+              {{ employeeData.total_count_of_learning_development }}
+            </span>
+          </div>
+
+          <div class="flex flex-col justify-center items-center">
+            <span class="font-semibold text-gray-700">Commendation Hours</span>
+            <span
+              class="mt-2 inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full w-[25%]"
+            >
+              {{ employeeData.total_ld_hours_rendered }}
+            </span>
+          </div>
+          <div class="flex flex-col justify-center items-center">
+            <span class="font-semibold text-gray-700">Attendance Hours</span>
+            <span
+              class="mt-2 inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full w-[25%]"
+            >
+              {{ employeeData.total_attendance_hours }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div>
+          <div class="flex justify-between items-center">
+            <!-- Tabs -->
+            <nav class="p-2 flex gap-2" aria-label="Tabs">
+              <button
+                @click="activeTab = 'service'"
+                :class="tabClass('service')"
+              >
+                Service Records
+              </button>
+              <button
+                @click="activeTab = 'learning'"
+                :class="tabClass('learning')"
+              >
+                Accomplishments - Learning & Development
+              </button>
+            </nav>
+
+            <!-- Edit Button (only for Service tab) -->
+            <button
+              v-if="activeTab === 'service'"
+              @click="editServiceRecords(currentServiceId)"
+              class="p-2 py-1 h-8 border-2 border-green-200 hover:bg-green-300 text-green-700 rounded-lg flex gap-1"
+            >
+              <icon name="edit" /> Update
+            </button>
+          </div>
+
+          <!-- Service Records Tab -->
+          <div v-show="activeTab === 'service'">
+            <div
+              v-if="filteredServiceRecords.length"
+              class="overflow-x-auto border rounded-lg"
+            >
+              <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="px-4 py-2 text-center">Period From</th>
+                    <th class="px-4 py-2 text-center">Period To</th>
+                    <th class="px-4 py-2 text-center">Designation</th>
+                    <th class="px-4 py-2 text-center">Status</th>
+                    <th class="px-4 py-2 text-center">Basic Salary</th>
+                    <th class="px-4 py-2 text-left w-[15%]">Office</th>
+                    <th class="px-4 py-2 text-left">Remarks</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  <tr
+                    v-for="record in filteredServiceRecords"
+                    :key="record.record_id"
+                  >
+                    <td class="px-4 py-2">{{ record.period_from }}</td>
+                    <td class="px-4 py-2">{{ record.period_to }}</td>
+                    <td class="px-4 py-2">{{ record.roa_designation }}</td>
+                    <td class="px-4 py-2">{{ record.roa_status }}</td>
+                    <td class="px-4 py-2">
+                      {{ record.roa_basic_salary }}
+                      {{ record.roa_basic_salary_day }}
+                    </td>
+                    <td class="px-4 py-2 text-left">{{ record.office }}</td>
+                    <td class="px-4 py-2 text-left">{{ record.remarks }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p v-else class="text-gray-500 text-sm">
+              No service records found.
             </p>
           </div>
+
+          <!-- Learning & Development Tab -->
+          <div v-show="activeTab === 'learning'">
+            <div
+              v-if="learningRecords.length"
+              class="overflow-x-auto border rounded-lg"
+            >
+              <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="px-4 py-2 text-left w-[50%]">Title</th>
+                    <th class="px-4 py-2 text-center">From</th>
+                    <th class="px-4 py-2 text-center">To</th>
+                    <th class="px-4 py-2 text-center">Hours</th>
+                    <th class="px-4 py-2 text-center">Type</th>
+                    <th class="px-4 py-2 text-center">Sponsor</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  <tr v-for="record in learningRecords" :key="record.ld_id">
+                    <td class="px-4 py-2 text-left">{{ record.title }}</td>
+                    <td class="px-4 py-2">{{ formatDate(record.from) }}</td>
+                    <td class="px-4 py-2">{{ formatDate(record.to) }}</td>
+
+                    <td class="px-4 py-2">{{ record.hours }}</td>
+                    <td class="px-4 py-2">{{ record.type }}</td>
+                    <td class="px-4 py-2">{{ record.sponsor }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p v-else class="text-gray-500 text-sm">
+              No Learning & Development records found.
+            </p>
+          </div>
+        </div>
+
+        <!-- Download Button -->
+        <div class="flex justify-end mt-4">
+          <button
+            @click="openPrintableModal"
+            class="flex items-center gap-2 px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            <icon name="check" />
+            Download
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="flex flex-row justify-end">
-      <button
-        class="px-2 py-3 bg-blue-800 rounded-lg mb-2 text-white flex items-center gap-2"
-        @click="openPrintableModal"
-      >
-        <icon :name="'check'" />
-        Download
-      </button>
-    </div>
+    <!-- Printable Modal -->
     <PrintableModal
       :show="showModal"
       :employeeData="employeeData"
       :predictionData="predictionData"
-      :criteria="criteria"
+      :criteria="promotionCriteriaList"
+      :serviceRecords="filteredServiceRecords"
+      :learningRecords="learningRecords"
+      :currentPromotionDate="formattedLastPromotionDate"
+      :endPromotionDate="formattedEndPromotionDate"
       @close="showModal = false"
+    />
+
+    <editServiceRecords
+      v-if="isEditSR"
+      :serviceId="selectedServiceId"
+      @back-to-table-service="handleBackToTable"
+      @refresh="fetchServiceRecords"
     />
   </div>
 </template>
@@ -229,276 +322,316 @@
 import axios from "axios";
 import icon from "@/assets/icon.vue";
 import PrintableModal from "@/components/admin/predictive/modals/print-promotion.vue";
+import editServiceRecords from "./edit-service-records.vue";
+
 export default {
   name: "viewSeminar",
-  components: { icon, PrintableModal },
+  components: { icon, PrintableModal, editServiceRecords },
+
   props: {
     selectedFirstName: String,
     selectedLastName: String,
+    promotionCriteria: Object,
   },
+
   data() {
     return {
       showModal: false,
       employeeData: null,
       predictionData: { eligible: 0 },
-      ruleChecks: {},
       loading: false,
-      criteria: {
-        age: {
-          title: "Age Requirement",
-          description: "Must be at least 21 years old.",
-          met: true,
-        },
-        educ: {
-          title: "Education",
-          description: "Must have completed secondary education or higher.",
-          met: true,
-        },
-        exp: {
-          title: "Work Experience",
-          description: "Must have at least 5 years of work experience.",
-          met: true,
-        },
-        designation: {
-          title: "Designation",
-          description: "Must hold an eligible designation.",
-          met: true,
-        },
-        ldCount: {
-          title: "Commendations",
-          description: "Must have at least 3 commendations.",
-          met: true,
-        },
-        ldHours: {
-          title: "Commendation Hours",
-          description: "Must have at least 30 commendation hours.",
-          met: true,
-        },
-        attendance: {
-          title: "Attendance Hours",
-          description: "Must have at least 160 attendance hours.",
-          met: true,
-        },
-      },
+      // promotionCriteriaList: [],
+      matchingServiceRecords: [],
+      learningRecords: [],
+      activeTab: "service",
+      isEditSR: false,
+      selectedServiceRecord: null,
+      selectedServiceId: null,
+      promotionCriteriaList: this.promotionCriteria || [],
     };
   },
+
+  /* ===================== COMPUTED ===================== */
   computed: {
-    promotedTitle() {
-      const romanToNum = { I: 1, II: 2, III: 3 };
-      const numToRoman = ["", "I", "II", "III", "IV", "V"];
-      return (this.employeeData?.present_designation || "").replace(
-        /\b(I{1,3})\b/g,
-        (match) => numToRoman[(romanToNum[match] || 1) + 1] || "IV+"
+    currentServiceId() {
+      if (!this.employeeData || !this.matchingServiceRecords.length)
+        return null;
+
+      const empFirst = this.employeeData.first_name?.toLowerCase();
+      const empLast = this.employeeData.last_name?.toLowerCase();
+
+      const matched = this.matchingServiceRecords.find(
+        (r) =>
+          r.first_name?.toLowerCase() === empFirst &&
+          r.last_name?.toLowerCase() === empLast
       );
+
+      return matched?.service_id || null;
     },
+    filteredServiceRecords() {
+      return this.getFilteredServiceRecords();
+    },
+
+    formattedLastPromotionDate() {
+      if (!this.filteredServiceRecords.length || !this.employeeData) return "";
+
+      const currentDesignationRecords = this.filteredServiceRecords.filter(
+        (r) => r.roa_designation === this.employeeData.present_designation
+      );
+
+      if (!currentDesignationRecords.length) return "";
+
+      const latestRecord = currentDesignationRecords.reduce(
+        (latest, record) => {
+          const recordDate = new Date(record.period_from);
+          return recordDate > new Date(latest.period_from) ? record : latest;
+        },
+        currentDesignationRecords[0]
+      );
+
+      const date = new Date(latestRecord.period_from);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+
+    formattedEndPromotionDate() {
+      if (!this.filteredServiceRecords.length || !this.employeeData)
+        return "Present";
+
+      const currentDesignationRecords = this.filteredServiceRecords.filter(
+        (r) => r.roa_designation === this.employeeData.present_designation
+      );
+
+      if (!currentDesignationRecords.length) return "Present";
+
+      const latestRecord = currentDesignationRecords.reduce(
+        (latest, record) => {
+          const recordDate = new Date(record.period_from);
+          return recordDate > new Date(latest.period_from) ? record : latest;
+        },
+        currentDesignationRecords[0]
+      );
+
+      if (!latestRecord.period_to) return "Present";
+
+      const date = new Date(latestRecord.period_to);
+      if (isNaN(date)) return "Present";
+
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+
     formattedBirthdate() {
       if (!this.employeeData?.birthdate) return "";
       const date = new Date(this.employeeData.birthdate);
-      const options = { year: "numeric", month: "long", day: "numeric" };
-      return date.toLocaleDateString("en-US", options); // e.g., December 27, 1986
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
     },
   },
+
+  /* ===================== METHODS ===================== */
   methods: {
+    formatDate(date) {
+      if (!date) return "";
+
+      const d = new Date(date);
+      if (isNaN(d)) return "";
+
+      return d.toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      });
+    },
+    /** ✅ MOVED LOGIC HERE (NO ESLINT ERROR) */
+    getFilteredServiceRecords() {
+      if (!this.employeeData || !this.matchingServiceRecords.length) {
+        return [];
+      }
+
+      const empFirst = this.employeeData.first_name?.toLowerCase();
+      const empMiddle = (this.employeeData.middle_name || "").toLowerCase();
+      const empLast = this.employeeData.last_name?.toLowerCase();
+      const empBirthdate = this.employeeData.birthdate;
+
+      // Match by name
+      const nameMatches = this.matchingServiceRecords.filter((record) => {
+        return (
+          record.first_name?.toLowerCase() === empFirst ||
+          record.middle_name?.toLowerCase() === empMiddle ||
+          record.last_name?.toLowerCase() === empLast
+        );
+      });
+
+      if (nameMatches.length) {
+        return nameMatches.flatMap((r) => r.serviceRecords || []);
+      }
+
+      // Fallback match by birthdate
+      const birthMatches = this.matchingServiceRecords.filter(
+        (record) => record.birthdate === empBirthdate
+      );
+
+      if (birthMatches.length) {
+        return birthMatches.flatMap((r) => r.serviceRecords || []);
+      }
+
+      return [];
+    },
+
+    tabClass(tab) {
+      return [
+        "px-3 py-2 text-sm font-medium border-b-2",
+        this.activeTab === tab
+          ? "border-blue-600 text-blue-600"
+          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
+      ];
+    },
+
     openPrintableModal() {
+      console.log(
+        "Promotion Criteria being sent to PrintableModal:",
+        this.promotionCriteriaList
+      );
       this.showModal = true;
     },
     toggleBack() {
       this.employeeData = null;
       this.$emit("back-to-table-seminar");
     },
+
     async fetchPromotionData() {
       this.loading = true;
       try {
         const res = await axios.get(
-          process.env.VUE_APP_API_BASE_URL + "/predictive/fetch-promotion"
+          `${process.env.VUE_APP_API_BASE_URL}/predictive/fetch-promotion`
         );
+
         const matched = res.data.find(
           (emp) =>
             emp.first_name === this.selectedFirstName &&
             emp.last_name === this.selectedLastName
         );
-        const eligibleDesignations = [
-          "Administrative Aide I (Utility Worker I)",
-          "Accounting Clerk I",
-          "Administrative Aide",
-          "Administrative Aide I",
-          "Administrative Aide I (Utility Worker I)",
-          "Administrative Aide I SG 1 Step 1",
-          "Administrative Aide II",
-          "Administrative Aide II (Bookbinder I)",
-          "Administrative Aide II (Messenger)",
-          "Administrative Aide III",
-          "Administrative Aide III (Clerk I)",
-          "Administrative Aide III (Driver I)",
-          "Administrative Aide III (Utility Worker II)",
-          "Administrative Aide IV (Accounting Clerk I)",
-          "Administrative Aide IV (Bookbinder II)",
-          "Administrative Aide IV (Clerk III)",
-          "Administrative Aide VI (Disbursing Officer I)",
-          "Administrative Assistant I (Bookbinder III)",
-          "Administrative Assistant I (Bookbinder IV)",
-          "Administrative Assistant V",
-          "Administrative Assistant V (Private Secretary I)",
-          "Administrative Officer I (Supply Officer I)",
-          "Administrative Officer II",
-          "Administrative Officer II (Budget Officer I)",
-          "Administrative Officer II (HRMO I)",
-          "Administrative Officer II (Human Resource Management Officer I)",
-          "Administrative Officer II (Management Audit Analyst I)",
-          "Administrative Officer III (Records Officer II)",
-          "Administrative Officer IV (Budget Officer II)",
-          "Administrative Officer IV (Human Resource Management Officer II)",
-          "Administrative Officer IV (Management and Audit Analyst I)",
-          "Agricultural Technician",
-          "Agricultural Technician I",
-          "Agriculturist II",
-          "Animal Keeper",
-          "Assistant Nutritionist Dietitian",
-          "Bookbinder",
-          "Bookbinder I",
-          "Budget Officer I",
-          "Building Helper",
-          "Building Inspector I",
-          "CARP Technician",
-          "Clerk",
-          "Clerk I",
-          "Clerk II",
-          "Clerk III",
-          "Community Affairs Assistant I",
-          "Computer Operator",
-          "Construction and Maintenance Man",
-          "Disbursing Officer I",
-          "District Coordinator",
-          "Draftsman",
-          "Draftsman I",
-          "Driver/Personal Driver",
-          "Engineering Aide",
-          "Engineering Staff",
-          "Environmental Management Specialist II",
-          "Executive Assistant I",
-          "Farm Foreman",
-          "Heavy Equipment Operator",
-          "Heavy Equipment Operator II",
-          "Human Resource Management Officer I",
-          "Institutional Officer",
-          "Laborer",
-          "Licensing Officer II",
-          "Livestock Inspector I",
-          "Local Assessment Operation Officer I",
-          "Local Disaster Risk Reduction Management Officer II",
-          "Local Legislative Staff Assistant I",
-          "Local Legislative Staff Employee I",
-          "Local Legislative Staff Employee II",
-          "Local Treasury Operation Officer I",
-          "Local Treasury Operation Officer II",
-          "Meat Inspector I",
-          "Medical Officer III",
-          "Medical Officer IV",
-          "Medical Technologist",
-          "Medical Technologist II",
-          "Messenger",
-          "MGDH I (Municipal Budget Officer)",
-          "MGDH I (Assistant Municipal Health Officer)",
-          "MGDH I (General Services Officer)",
-          "MGDH I (Municipal Accountant)",
-          "MGDH I (Municipal Agriculturist)",
-          "MGDH I (Municipal Assessor)",
-          "MGDH I (Municipal Civil Registrar)",
-          "MGDH I (Municipal Disaster Risk Reduction Management Officer V)",
-          "MGDH I (Municipal Economic Enterprise Officer I)",
-          "MGDH I (Municipal Engineer)",
-          "MGDH I (Municipal Health Officer)",
-          "MGDH I (Municipal Planning and Development Coordinator)",
-          "MGDH I (Municipal Social Welfare Development Officer)",
-          "MGDH I (Municipal Treasurer)",
-          "Midwife",
-          "Midwife I",
-          "Midwife III",
-          "Municipal Budget Officer",
-          "Municipal Environment and Natural Resources Officer I",
-          "Municipal Government Department Head I (Municipal Accountant)",
-          "Municipal Health Officer",
-          "Municipal Mayor",
-          "Municipal Vice Mayor",
-          "Nurse",
-          "Nurse I",
-          "Nursing Attendant",
-          "Nursing Attendant I",
-          "Nutrition Aide",
-          "Private Secretary",
-          "Private Secretary I",
-          "Private Secretary II",
-          "Project Development Officer II",
-          "Project Officer",
-          "Provincial Supervisor",
-          "Radio Operator",
-          "Registration Officer II",
-          "Revenue Collection Clerk I",
-          "Sangguniang Bayan Member",
-          "Sangguniang Bayan Member (Sangguniang Kabataan Federation President)",
-          "Sangguniang Bayan Member/ABC President",
-          "Sangguniang Bayan Member/SKF President",
-          "Sangguniang Kabataan Federation President",
-          "Sanitary Inspector",
-          "Sanitation Inspector II",
-          "Sanitation Inspector V",
-          "SB Member",
-          "Secretary to the Sanggunian (MGDH I)",
-          "Secretary to the Sanggunian",
-          "Senior Administrative Assistant III (Private Secretary II)",
-          "Social Welfare Aide",
-          "Social Welfare Assistant",
-          "Social Welfare Officer II",
-          "Social Worker",
-          "SP Member",
-          "Stenographic Reporter IV",
-          "Teacher I",
-          "Technical Staff",
-          "Watchman I",
-          "Zoning Inspector I",
-        ];
 
-        if (matched) {
-          this.employeeData = matched;
-          const checks = {
-            age: matched.age >= 21,
-            educ: /college|tertiary|secondary/i.test(matched.level),
-            exp: matched.total_years_experience >= 5,
-            designation: eligibleDesignations.includes(
-              matched.present_designation
-            ),
+        if (!matched) return;
 
-            ldCount: matched.total_count_of_learning_development >= 3,
-            ldHours: matched.total_ld_hours_rendered >= 30,
-            attendance: matched.total_attendance_hours >= 160,
-          };
-
-          this.ruleChecks = checks;
-          this.predictionData.eligible = Object.values(checks).every(Boolean);
-
-          Object.entries(this.criteria).forEach(([key, value]) => {
-            value.met = checks[key];
-          });
-        }
+        this.employeeData = matched;
+        await this.fetchLearningRecords();
       } catch (err) {
-        console.error("Failed to fetch data:", err);
+        console.error("Failed to fetch promotion data:", err);
       } finally {
-        // Show loading screen at least 2 seconds
-        setTimeout(() => {
-          this.loading = false;
-        }, 2000);
+        setTimeout(() => (this.loading = false), 500);
       }
     },
+
+    async fetchLearningRecords() {
+      try {
+        const ldRes = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`
+        );
+
+        const empFirst = this.selectedFirstName.toUpperCase();
+        const empLast = this.selectedLastName.toUpperCase();
+
+        const matchedEmp = (ldRes.data || []).find(
+          (emp) =>
+            emp.first_name.toUpperCase() === empFirst &&
+            emp.last_name.toUpperCase() === empLast
+        );
+
+        if (!matchedEmp) {
+          this.learningRecords = [];
+          return;
+        }
+
+        this.learningRecords = (matchedEmp.fifthTable || []).map((ld) => ({
+          ld_id: ld.fifth_table_id,
+          title: ld.title_learning_development,
+          from: ld.ld_from,
+          to: ld.ld_to,
+          hours: ld.ld_number_of_hours,
+          type: ld.type_of_ld,
+          sponsor: ld.ld_conducted_sponsor,
+        }));
+      } catch (err) {
+        console.error("Error fetching Learning & Development records:", err);
+        this.learningRecords = [];
+      }
+    },
+
+    fetchServiceRecords() {
+      axios
+        .get(`${process.env.VUE_APP_API_BASE_URL}/service-of-records/get-all`)
+        .then((res) => {
+          this.matchingServiceRecords = res.data || [];
+        })
+        .catch((err) => console.error("Error fetching service records:", err));
+    },
+    editServiceRecords(serviceId) {
+      if (!serviceId) {
+        console.warn("No service ID found for this employee");
+        return;
+      }
+
+      console.log("Editing Service ID:", serviceId);
+      this.selectedServiceId = serviceId;
+      this.isEditSR = true;
+    },
+
+    handleBackToTable() {
+      this.isEditSR = false;
+      this.selectedServiceRecord = null;
+    },
   },
+
+  /* ===================== WATCHERS ===================== */
+  watch: {
+    promotionCriteria: {
+      immediate: true,
+      handler(newVal) {
+        this.promotionCriteriaList = newVal || [];
+        console.log(
+          "Promotion Criteria received in viewPromotion:",
+          this.promotionCriteriaList
+        );
+      },
+    },
+    selectedFirstName: {
+      immediate: true,
+      handler() {
+        if (this.selectedFirstName && this.selectedLastName) {
+          this.fetchPromotionData();
+        }
+      },
+    },
+    selectedLastName: {
+      immediate: true,
+      handler() {
+        if (this.selectedFirstName && this.selectedLastName) {
+          this.fetchPromotionData();
+        }
+      },
+    },
+  },
+
   mounted() {
-    this.fetchPromotionData();
+    this.fetchServiceRecords();
   },
 };
 </script>
 
 <style scoped>
 .loader {
-  border-top-color: #1d4ed8; /* Tailwind's blue-700 */
+  border-top-color: #1d4ed8;
   animation: spin 1s linear infinite;
 }
 

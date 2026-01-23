@@ -88,8 +88,8 @@ export class FirstTable {
   @Column({ name: 'citizenship' })
   citizenship: string;
 
-  @Column({ name: 'is_dual_citizen', default: false })
-  is_dual_citizen: boolean;
+  @Column({ name: 'is_dual_citizen' })
+  is_dual_citizen: string;
 
   // New fields
   @Column({ name: 'gsis_id' })

@@ -9,6 +9,8 @@ import { HttpModule } from '@nestjs/axios';
 import { AttendanceRecordModule } from './attendance-record/attendance-record.module';
 import { AvailableTrainingsModule } from './available-trainings/available-trainings.module';
 import { CustomerFeedbackModule } from './customer-feedback/customer-feedback.module';
+import { PromotionCriteriaModule } from './promotion-criteria/promotion-criteria.module';
+
 @Module({
   imports: [
     HttpModule,
@@ -30,6 +32,7 @@ import { CustomerFeedbackModule } from './customer-feedback/customer-feedback.mo
     AttendanceRecordModule,
     AvailableTrainingsModule,
     CustomerFeedbackModule,
+    PromotionCriteriaModule,
   ],
 })
 export class AppModule {}

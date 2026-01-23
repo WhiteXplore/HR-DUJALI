@@ -476,7 +476,7 @@
 
         <!-- Live Sentiment Result -->
         <div v-if="sentimentResult" class="mt-2 text-sm">
-          <span
+          <!-- <span
             :class="{
               'text-green-600 font-semibold':
                 sentimentResult.sentiment === 'Positive',
@@ -488,7 +488,7 @@
           >
             Sentiment: {{ sentimentResult.sentiment }} (Score:
             {{ sentimentResult.score }})
-          </span>
+          </span> -->
         </div>
       </div>
 
@@ -509,6 +509,7 @@
 import Sentiment from "sentiment";
 import icon from "@/assets/icon.vue";
 import { toast } from "vue3-toastify";
+
 export default {
   name: "CustomerFeedbackForm",
   components: { icon },
@@ -529,8 +530,8 @@ export default {
         commonComment: "",
       },
       errors: {},
-
-      // ✅ same data as before
+      searchOfficeQuery: "",
+      showOfficeDropdown: false,
       questions: [
         {
           text: "Which of the following best describes your awareness of a Citizen's Charter?",
@@ -594,82 +595,192 @@ export default {
       ],
 
       offices: [
-        "Mayor's Office",
-        "Municipal Treasurer’s Office",
-        "Municipal Assessor’s Office",
-        "Municipal Civil Registrar",
-        "Municipal Health Office",
-        "Municipal Agriculture Office",
-        "Municipal Social Welfare and Development Office",
-        "Municipal Engineering Office",
-        "Municipal Planning and Development Office",
+        "Municipal Business Permit and Licensing Section (MBPLS)",
+        "General Services Office",
+        "Human Resource Office",
+        "Internal Audit Services Unit",
+        "Legislative Department",
+        "Municipal Disaster Risk Reduction and Management Office (MDRRMO)",
+        "Municipal Agriculture Office (MAO)",
+        "Municipal Administrator’s Office (MAO)",
+        "Municipal Assessor’s Office (MASSO)",
+        "Municipal Engineering Office (MEO)",
+        "Municipal Information Office (MIO)",
+        "Municipal Social Welfare and Development Office (MSWDO)",
+        "Municipal Treasury Office (MTO)",
+        "Municipal Planning and Development Office (MPDO)",
+        "Municipal Health Office (MHO)",
+        "Municipal Environment and Natural Resources Office (MENRO)",
+        "Municipal Economic Enterprise Development Office (MEEDO)",
+        "Municipal Accounting Office",
         "Municipal Budget Office",
-        "Municipal Accountant’s Office",
+        "Municipal Civil Registrar’s Office",
+        "Municipal Anti-Drug Abuse Council",
       ],
-      searchOfficeQuery: "",
-      showOfficeDropdown: false,
+
       servicesByOffice: {
-        "Mayor's Office": [
-          "Issuance of Mayor’s Permit",
-          "Barangay Certification Assistance",
-          "Executive Order Requests",
+        "Municipal Business Permit and Licensing Section (MBPLS)": [
+          "Mayor’s Permit for Business - New Application",
+          "Mayor’s Permit for Business Renewal",
+          "Business Permit Schedule of Fees",
         ],
-        "Municipal Treasurer’s Office": [
+
+        "General Services Office": [
+          "Issuance of Acknowledgement Receipt for Equipment for Newly Acquired Properties",
+          "Vehicle, Tables and Chairs, and Gym Scheduling Management",
+          "Acceptance and Inspection of Delivered Supplies, Materials, and Equipment",
+        ],
+
+        "Human Resource Office": [
+          "Acceptance of Job Application",
+          "Application for Leave of Absence",
+          "Clearance from Money and Property Accountabilities",
+          "Service Record",
+        ],
+
+        "Internal Audit Services Unit": [
+          "Request for Investigation, Review and/or Audit",
+          "Preparatory Review, Investigation, and/or Audit of Requests",
+          "Review, Investigation, and/or Audit of Request",
+        ],
+
+        "Legislative Department": [
+          "Provision of Authenticated Copy of Ordinances, Resolutions, and Legislative Documents",
+          "Provision of Services on the Quasi-Judicial Body and Related Legislative Actions",
+        ],
+
+        "Municipal Disaster Risk Reduction and Management Office (MDRRMO)": [
+          "Data Request",
+          "MDRRMO 24/7 Hotline",
+          "Provision of Weather Forecast upon Request",
+          "Request for Interview",
+          "Review of Barangay Contingency Plan",
+          "Review of Barangay Disaster Risk Reduction and Management Plan",
+        ],
+
+        "Municipal Agriculture Office (MAO)": [
+          "Dog Anti-rabies Vaccination",
+          "Livestock Shipping Permit",
+          "Rice Production Services",
+          "Municipal Agriculture Certification",
+        ],
+
+        "Municipal Administrator’s Office (MAO)": [
+          "Request for Burial Assistance (Console Program)",
+          "Request for Municipal Vehicle (External Clients)",
+          "Provision of Medical Cash Assistance (MCAP)",
+        ],
+
+        "Municipal Assessor’s Office (MASSO)": [
+          "Assessor’s Certification",
+          "Cancellation of Tax Declaration (Building, Machinery, Double Declaration)",
+          "Certificate of Land Holding",
+          "Certificate of Land with Improvement",
+          "Certificate of Land with No Improvement",
+          "Certificate of No Property and Land Holding",
+          "Certified True Copy of Tax Declaration",
+          "New Discovery / Assessment of Real Property",
+        ],
+
+        "Municipal Engineering Office (MEO)": [
+          "Building, Electrical and Mechanical Permit",
+          "Certificate of Final Inspection",
+          "Certificate of Occupancy",
+        ],
+
+        "Municipal Information Office (MIO)": [
+          "Information Desk Assistance",
+          "Receiving of Lost and Found Items",
+          "Returning of Lost and Found Items",
+          "Providing Information through Social Media",
+          "Conducting Press Conference / Media Statement",
+          "Answering Queries via Facebook and Email",
+        ],
+
+        "Municipal Social Welfare and Development Office (MSWDO)": [
+          "AICS Medical Assistance",
+          "AICS Burial Assistance",
+          "Certificate of Travel for Minor",
+          "Solo Parent Identification",
+          "PWD Identification Card Registration and Issuance",
+          "Senior Citizen Identification Card Registration",
+          "Preparation of Social Case Study Report",
+          "Provision of Referrals",
+        ],
+
+        "Municipal Treasury Office (MTO)": [
+          "Collection of Local Taxes, Fees and Charges",
+          "Community Tax Certificate",
+          "Motorized Tricycle Operator’s Permit (MTOP)",
           "Payment of Real Property Tax",
-          "Payment of Business Tax",
-          "Issuance of Official Receipts",
-          "Assessment of Taxes and Fees",
+          "Releasing of Claims and Payroll",
+          "Tax Clearance",
         ],
-        "Municipal Assessor’s Office": [
-          "Issuance of Tax Declaration",
-          "Assessment of Real Property",
-          "Certification of Assessed Value",
+
+        "Municipal Planning and Development Office (MPDO)": [
+          "Processing and Approval of Zoning Certifications",
+          "Processing of Locational Clearances",
         ],
-        "Municipal Civil Registrar": [
-          "Issuance of Birth Certificate",
-          "Issuance of Marriage Certificate",
-          "Issuance of Death Certificate",
-          "Correction of Entries",
+
+        "Municipal Health Office (MHO)": [
+          "Health Certificate Issuance",
+          "Pre-Natal Examination",
+          "Signing and Review of Death Certificate",
+          "Laboratory Services",
+          "Immunization Services",
+          "Medical Certificate Issuance",
+          "Medico-Legal Certification Issuance",
+          "Sanitary Permit Issuance",
+          "Provision of Family Planning Methods",
         ],
-        "Municipal Health Office": [
-          "Medical Consultation",
-          "Issuance of Medical Certificate",
-          "Vaccination Services",
-          "Sanitation Permit",
+
+        "Municipal Environment and Natural Resources Office (MENRO)": [
+          "Issuance of MENRO Certification / Clearances",
+          "Garbage Collection Services",
+          "Request for Tree Planting and Seeding",
+          "Wildlife Rescue and Release",
         ],
-        "Municipal Agriculture Office": [
-          "Distribution of Seeds and Fertilizers",
-          "Fisheries Assistance",
-          "Livestock Vaccination",
-          "Farmer Training Program",
+
+        "Municipal Economic Enterprise Development Office (MEEDO)": [
+          "Market Stall Awarding",
+          "Rental Collection – Public Market",
+          "Renewal of Contract of Lease",
+          "Night Market and Tabo-Tabo Operation",
+          "Collection of Parking and Departure Fee",
+          "Slaughtering Operation",
         ],
-        "Municipal Social Welfare and Development Office": [
-          "Assistance to Individuals in Crisis Situation (AICS)",
-          "Issuance of Certification for 4Ps",
-          "Senior Citizen ID Processing",
-          "Disaster Relief Assistance",
+
+        "Municipal Accounting Office": [
+          "Processing of Claims for Payment (Employees)",
+          "Processing of Claims for Payment (Suppliers and Utilities)",
+          "Issuance of Accountant’s Advice",
+          "Processing and Remittance of Employee Contributions and Loans",
         ],
-        "Municipal Engineering Office": [
-          "Building Permit Application",
-          "Occupancy Permit Application",
-          "Infrastructure Project Inspection",
-        ],
-        "Municipal Planning and Development Office": [
-          "Zoning Certification",
-          "Barangay Development Plan Assistance",
-          "Local Investment Plan Endorsement",
-        ],
+
         "Municipal Budget Office": [
-          "Issuance of Budget Certification",
-          "Review of Barangay Budgets",
-          "Preparation of Annual Budget",
+          "Preliminary Review of Barangay Budget",
+          "Processing of Obligation Requests",
         ],
-        "Municipal Accountant’s Office": [
-          "Issuance of Certification of No Pending Obligation",
-          "Verification of Financial Statements",
-          "Processing of Disbursement Vouchers",
+
+        "Municipal Civil Registrar’s Office": [
+          "Registration of Certificate of Live Birth",
+          "Registration of Acknowledgement / Admission of Paternity",
+          "Issuance of Marriage License",
+          "Registration of Marriage Certificate",
+          "Registration of Death Certificate",
+          "Registration of Court Decrees",
+          "Application of Legitimation",
+          "Application of Supplemental Report",
+          "RA 9048 / RA 10172",
+        ],
+
+        "Municipal Anti-Drug Abuse Council": [
+          "Rehabilitation Referral Services",
+          "Monitoring and Reporting",
+          "Information and Consultation",
         ],
       },
+
       commonComments: {
         Positive: [
           "Staff were very helpful",
@@ -709,31 +820,58 @@ export default {
         ],
       },
       sentimentResult: null,
+      feedbackSentimentScore: null,
+      commonCommentSentimentScore: null,
     };
   },
   watch: {
     "form.feedback"(newText) {
       if (newText.trim()) {
         const result = this.analyzeSentiment(newText);
+
+        // Determine sentiment category with improved neutral handling
+        let sentimentLabel = "Neutral";
+        if (result.score > 3) {
+          sentimentLabel = "Positive";
+        } else if (result.score < 0) {
+          sentimentLabel = "Negative";
+        }
+
         this.sentimentResult = {
           score: result.score,
-          sentiment:
-            result.score > 0
-              ? "Positive"
-              : result.score < 0
-              ? "Negative"
-              : "Neutral",
+          sentiment: sentimentLabel,
         };
+
+        this.feedbackSentimentScore = result.score;
       } else {
         this.sentimentResult = null;
+        this.feedbackSentimentScore = null;
+      }
+    },
+
+    "form.commonComment"(newText) {
+      if (newText) {
+        const result = this.analyzeSentiment(newText);
+
+        // Optional: you can also categorize commonComment sentiment
+        let commentSentiment = "Neutral";
+        if (result.score > 3) commentSentiment = "Positive";
+        else if (result.score < 0) commentSentiment = "Negative";
+
+        this.commonCommentSentimentScore = result.score;
+        this.commonCommentSentimentLabel = commentSentiment; // optional if you want to display
+      } else {
+        this.commonCommentSentimentScore = null;
+        this.commonCommentSentimentLabel = null;
       }
     },
   },
+
   computed: {
     filteredOffices() {
       if (!this.searchOfficeQuery) return this.offices;
       return this.offices.filter((office) =>
-        office.toLowerCase().includes(this.searchOfficeQuery.toLowerCase())
+        office.toLowerCase().includes(this.searchOfficeQuery.toLowerCase()),
       );
     },
     availableServices() {
@@ -755,7 +893,7 @@ export default {
       const sentiment = new Sentiment();
       const options = {
         extras: {
-          // Stronger negative weights (from earlier)
+          // Negative words (strongly negative)
           confusing: -4,
           unclear: -4,
           delay: -5,
@@ -770,23 +908,13 @@ export default {
           bad: -4,
           worst: -6,
           disappointed: -5,
-
-          // 🔥 Added based on your Negative Common Comments
-          "faced delays": -6,
-          delays: -5,
-          "lacked knowledge": -6,
-          "rude behavior": -7,
-
-          "waiting time": -5,
-          "too long": -4,
+          faced: -6, // "faced delays" → only "faced" counted
+          lacked: -6, // "lacked knowledge" → only "lacked" counted
+          behavior: -7, // "rude behavior" → "behavior"
           overwhelming: -5,
+          assistance: -6, // "no assistance" → "assistance"
 
-          "did not receive": -6,
-          "no assistance": -6,
-          "poor service": -7,
-          "overall service was poor": -8,
-
-          // Positive weights
+          // Positive words (strongly positive)
           helpful: 3,
           smooth: 3,
           fast: 3,
@@ -797,17 +925,27 @@ export default {
           proactive: 3,
           satisfactory: 3,
           convenient: 3,
+
+          // Neutral words (mildly positive)
+          adequate: 2,
+          acceptable: 2,
+          average: 2,
+          expectations: 2,
+          expectation: 2,
+          documentation: 2, // "documentation straightforward" → "documentation"
+          technical: 2, // "technical issues" → "technical"
+          information: 2, // "information clear" → "information"
+          experience: 3, // "overall experience" → "experience"
+          service: 2, // "service delivery" → "service"
+          facilities: 2, // "facilities adequate" → "facilities"
         },
       };
 
       return sentiment.analyze(text.toLowerCase(), options);
     },
-    updateFeedbackFromCommonComment() {
-      console.log("Selected comment:", this.form.commonComment);
-    },
+
     validateForm() {
       this.errors = {};
-
       if (!this.form.office) this.errors.office = "Office is required";
       if (!this.form.controlNo)
         this.errors.controlNo = "Control No. is required";
@@ -849,19 +987,6 @@ export default {
           : this.form.commonComment;
       }
 
-      if (finalFeedback) {
-        const result = this.analyzeSentiment(finalFeedback);
-        this.sentimentResult = {
-          score: result.score,
-          sentiment:
-            result.score > 0
-              ? "Positive"
-              : result.score < 0
-              ? "Negative"
-              : "Neutral",
-        };
-      }
-
       const payload = {
         office: this.form.office,
         controlNo: this.form.controlNo,
@@ -873,8 +998,10 @@ export default {
         municipality: this.form.municipality,
         feedback: finalFeedback,
         commonComment: this.form.commonComment || null,
-        sentiment: this.sentimentResult?.sentiment || null,
+        sentiment: this.feedbackSentimentScore ?? 0,
         sentimentScore: this.sentimentResult?.score || 0,
+        additional_comment_sentimentScore:
+          this.commonCommentSentimentScore ?? 0,
         answers: this.form.answers.map((value, index) => ({
           question: this.questions[index].text,
           value,
@@ -893,8 +1020,7 @@ export default {
         body: JSON.stringify(payload),
       })
         .then((res) => res.json())
-        .then((data) => {
-          console.log("Server response:", data);
+        .then(() => {
           alert("Feedback submitted successfully!");
           this.resetForm();
         })
@@ -906,7 +1032,7 @@ export default {
     resetForm() {
       this.form = {
         office: "",
-        controlNo: "",
+        controlNo: "N/A",
         timeOfVisit: "",
         clientType: "",
         sex: "",

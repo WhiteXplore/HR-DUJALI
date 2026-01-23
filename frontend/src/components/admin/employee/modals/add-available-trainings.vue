@@ -10,7 +10,7 @@
       >
         <!-- Header -->
         <div
-          class="w-full p-5 py-3 bg-green-600 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
+          class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
         >
           <div class="flex gap-1 items-center">
             <icon :name="editData ? 'edit' : 'add-account'" />
@@ -272,7 +272,7 @@
                     :key="index"
                     class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
                   >
-                    {{ pos }}
+                    {{ pos.name }}
                     <button
                       class="ml-1 text-green-600 hover:text-red-600 font-bold"
                       @click="removePosition(pos)"
@@ -294,7 +294,7 @@
               v-if="currentStep > 1"
               type="button"
               @click="prevStep"
-              class="bg-gray-500 hover:bg-gray-300 px-5 py-2 rounded-md text-white hover:text-gray-700 transition-all duration-200"
+              class="bg-gray-500 hover:bg-gray-300 px-5 py-2 rounded-lg text-white hover:text-gray-700 transition-all duration-200"
             >
               Previous
             </button>
@@ -303,14 +303,14 @@
               v-if="currentStep < totalSteps"
               type="button"
               @click="nextStep"
-              class="ml-auto bg-green-600 hover:bg-green-200 px-5 py-2 rounded-md text-white hover:text-green-700 transition-all duration-200"
+              class="ml-auto bg-blue-900 hover:bg-green-200 px-5 py-2 rounded-lg text-white hover:text-blue-700 transition-all duration-200"
             >
               Next
             </button>
 
             <button
               v-if="currentStep === totalSteps"
-              class="ml-auto bg-green-600 hover:bg-green-200 px-5 py-2 rounded-md text-white hover:text-green-700 transition-all duration-200"
+              class="ml-auto bg-green-600 hover:bg-green-200 px-5 py-2 rounded-lg text-white hover:text-green-700 transition-all duration-200"
               type="submit"
             >
               Submit
@@ -373,14 +373,15 @@ export default {
   watch: {
     "form.category"(newVal) {
       if (newVal === "General") {
-        // Populate arrays with string values directly
-        this.form.training_position = this.service_positions.map((p) => p.name);
+        // Keep as object array
+        this.form.training_position = this.service_positions.map((p) => ({
+          name: p.name,
+        }));
         this.form.educational_level = this.educationalLevels.map((e) => e.name);
         this.form.employment_status = this.employmentStatuses.map(
           (e) => e.name
         );
       } else if (newVal === "Specialized") {
-        // Clear arrays
         this.form.training_position = [];
         this.form.educational_level = [];
         this.form.employment_status = [];
@@ -407,18 +408,19 @@ export default {
     addPosition() {
       if (
         this.selectedPosition &&
-        !this.form.training_position.includes(this.selectedPosition)
+        !this.form.training_position.some(
+          (p) => p.name === this.selectedPosition
+        )
       ) {
-        this.form.training_position.push(this.selectedPosition);
+        this.form.training_position.push({ name: this.selectedPosition });
       }
       this.selectedPosition = "";
     },
     removePosition(pos) {
       this.form.training_position = this.form.training_position.filter(
-        (p) => p !== pos
+        (p) => p.name !== pos.name
       );
     },
-
     addEmploymentStatus() {
       if (
         this.selectedEmploymentStatus &&
@@ -519,7 +521,8 @@ export default {
           category: this.form.category,
           experience_year_from: this.form.experience_year_from,
           experience_year_to: this.form.experience_year_to,
-          training_position: this.form.training_position, // strings
+          training_position: this.form.training_position.map((p) => p.name),
+
           employment_status: this.form.employment_status, // strings
           training_educational_level: this.form.educational_level, // strings
         };

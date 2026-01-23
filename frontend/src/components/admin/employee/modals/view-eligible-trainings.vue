@@ -1,17 +1,26 @@
 <template>
   <div class="min-h-screen bg-gray-50 p-2">
     <!-- Header -->
-    <div class="mb-4 text-left">
-      <h1 class="text-md font-bold text-gray-800">Training Details</h1>
-      <p class="text-sm text-gray-500 mt-1">
-        View training information and eligible employees.
-      </p>
+    <div class="w-full justify-between flex">
+      <div class="mb-4 text-left">
+        <h1 class="text-md font-bold text-gray-800">Training Details</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          View training information and eligible employees.
+        </p>
+      </div>
+      <router-link to="/available-trainings">
+        <div
+          class="cursor-pointer flex gap-2 items-center tracking-wider bg-red-500 text-white text-sm hover:text-red-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-red-900 hover:shadow-lg transition-all duration-300"
+        >
+          Back
+        </div></router-link
+      >
     </div>
 
     <!-- Content Container -->
     <div class="bg-white rounded-2xl shadow p-2.5 w-full mx-auto min-h-[90vh]">
       <!-- Training Info -->
-      <div class="p-6 text-sm">
+      <div class="p-6 text-sm mb-6 rounded-xl border bg-gray-50">
         <p class="flex items-center justify-end mb-6">
           <span class="font-medium text-gray-600 w-40">Training Date:</span>
           <span class="text-gray-800 font-semibold">
@@ -136,10 +145,19 @@
             Select employees to assign for this training.
           </p>
         </div>
-        <div>
+        <div class="flex gap-2">
+          <!-- Preview Assigned -->
+          <button
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow-md text-sm font-medium transition flex gap-1"
+            @click="openTrainingAttendeesModal"
+          >
+            <icon name="eye" /> Preview
+          </button>
+
+          <!-- Assign -->
           <button
             @click="openConfirmModal"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl shadow-md text-sm font-medium transition"
+            class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl shadow-md text-sm font-medium transition"
           >
             Assign
           </button>
@@ -165,7 +183,11 @@
                 <th class="px-4 py-3 border-b">Name</th>
                 <th class="px-4 py-3 border-b">Department</th>
                 <th class="px-4 py-3 border-b">Designation</th>
+                <th class="px-4 py-3 border-b">
+                  Number of Trainings / Seminars
+                </th>
                 <th class="px-4 py-3 border-b">Years of Service</th>
+                <th class="px-4 py-3 border-b">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -192,7 +214,18 @@
                   {{ emp.present_designation }}
                 </td>
                 <td class="px-4 py-3 border-b">
-                  {{ emp.total_years_experience }}
+                  {{ emp.total_count_of_learning_development }}
+                </td>
+                <td class="px-4 py-3 border-b">
+                  {{ formatExperience(emp.total_years_experience) }}
+                </td>
+                <td class="px-4 py-3 border-b">
+                  <button
+                    @click="openPreviewModal(emp)"
+                    class="px-2 py-2 text-sm bg-gray-200 rounded-lg flex gap-1 hover:bg-gray-300"
+                  >
+                    <icon name="eye" /> Preview
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -267,88 +300,351 @@
       </div>
     </div>
   </div>
+  <!-- ✅ Preview Modal -->
+  <div
+    v-if="showPreviewModal && previewEmployee"
+    class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+  >
+    <div class="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold text-gray-800">
+          {{ previewEmployee.first_name }} {{ previewEmployee.last_name }} -
+          Trainings
+        </h2>
+        <button
+          @click="closePreviewModal"
+          class="text-gray-600 hover:text-gray-800 font-bold"
+        >
+          X
+        </button>
+      </div>
+
+      <div
+        v-if="employeeFifthTable(previewEmployee)?.length"
+        class="overflow-y-auto max-h-72 border rounded p-2"
+      >
+        <table class="w-full text-sm text-left border-collapse">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-3 py-2 border-b">Title</th>
+              <th class="px-3 py-2 border-b">From</th>
+              <th class="px-3 py-2 border-b">To</th>
+              <th class="px-3 py-2 border-b">Hours</th>
+              <th class="px-3 py-2 border-b">Type</th>
+              <th class="px-3 py-2 border-b">Sponsor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="record in employeeFifthTable(previewEmployee)"
+              :key="record.fifth_table_id"
+              class="hover:bg-gray-50"
+            >
+              <td class="px-3 py-2 border-b">
+                {{ record.title_learning_development }}
+              </td>
+              <td class="px-3 py-2 border-b">{{ record.ld_from }}</td>
+              <td class="px-3 py-2 border-b">{{ record.ld_to }}</td>
+              <td class="px-3 py-2 border-b">
+                {{ record.ld_number_of_hours }}
+              </td>
+              <td class="px-3 py-2 border-b">{{ record.type_of_ld }}</td>
+              <td class="px-3 py-2 border-b">
+                {{ record.ld_conducted_sponsor }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p v-else class="text-center text-gray-500 py-4">
+        No previous trainings found.
+      </p>
+
+      <div class="flex justify-end mt-4">
+        <button
+          @click="closePreviewModal"
+          class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- ✅ Employees Already Attended Modal -->
+  <div
+    v-if="showTrainingAttendeesModal"
+    class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+  >
+    <div class="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold text-gray-800">
+          Employees Who Already Attended "{{ selectedTraining?.title }}"
+        </h2>
+        <button
+          @click="closeTrainingAttendeesModal"
+          class="text-gray-600 hover:text-gray-800 font-bold"
+        >
+          X
+        </button>
+      </div>
+
+      <div
+        v-if="trainingAttendees.length"
+        class="overflow-y-auto max-h-72 border rounded p-2"
+      >
+        <table class="w-full text-sm text-left border-collapse">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-3 py-2 border-b">Employee Name</th>
+              <th class="px-3 py-2 border-b">Department</th>
+              <th class="px-3 py-2 border-b">Designation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="emp in trainingAttendees"
+              :key="emp.first_table_id"
+              class="hover:bg-gray-50"
+            >
+              <td class="px-3 py-2 border-b">
+                {{ emp.first_name }} {{ emp.middle_name || "" }}
+                {{ emp.last_name }}
+              </td>
+              <td class="px-3 py-2 border-b">{{ emp.department }}</td>
+              <td class="px-3 py-2 border-b">
+                {{ emp.present_designation }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p v-else class="text-center text-gray-500 py-4">
+        No employees have attended this training yet.
+      </p>
+
+      <div class="flex justify-end mt-4">
+        <button
+          @click="closeTrainingAttendeesModal"
+          class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
 import { toast } from "vue3-toastify";
-
+import icon from "@/assets/icon.vue";
 export default {
   name: "ViewEligibleTrainings",
+  components: {
+    icon,
+  },
   data() {
     return {
       training: null,
       eligibleEmployees: [],
       selectedEmployees: [],
+      employee_learning_development: [],
+
+      // ✅ NEW
+      showTrainingAttendeesModal: false,
+      trainingAttendees: [],
+      selectedTraining: null,
+
       selectAll: false,
       showConfirmModal: false,
+      showPreviewModal: false,
+      previewEmployee: null,
     };
   },
+
   methods: {
-    formatDate(dateStr) {
-      if (!dateStr) return "";
-      const date = new Date(dateStr);
-      return new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }).format(date);
+    /* -------------------- UI -------------------- */
+    openPreviewModal(emp) {
+      this.previewEmployee = emp;
+      this.showPreviewModal = true;
+    },
+    closePreviewModal() {
+      this.previewEmployee = null;
+      this.showPreviewModal = false;
+    },
+
+    /* -------------------- HELPERS -------------------- */
+    normalize(str) {
+      return str?.toLowerCase().replace(/\s+/g, "").trim();
+    },
+
+    // 🔥 Removes year (2024, 2025, etc.) for base-title comparison
+    normalizeBaseTitle(str) {
+      return str
+        ?.toLowerCase()
+        .replace(/\d{4}/g, "") // remove years
+        .replace(/\s+/g, "")
+        .trim();
+    },
+
+    employeeFifthTable(emp) {
+      const empLD = this.employee_learning_development.find(
+        (e) => e.first_table_id === emp.first_table_id
+      );
+      return empLD?.fifthTable || [];
+    },
+
+    /* -------------------- FETCH -------------------- */
+    async fetchEmployeeLearningDevelopment() {
+      try {
+        /* 1️⃣ Get learning & development records */
+        const ldRes = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`
+        );
+
+        /* 2️⃣ Get eligible employees (department & designation) */
+        const eligibleRes = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-eligible-employees-trainings`
+        );
+
+        /* 3️⃣ Map eligible employees by employee_id */
+        this.eligibleEmployeesMap = {};
+        (eligibleRes.data || []).forEach((emp) => {
+          this.eligibleEmployeesMap[emp.employee_id] = emp;
+        });
+
+        /* 4️⃣ Merge department & designation into learning records */
+        this.employee_learning_development = (ldRes.data || []).map((emp) => {
+          const matched = this.eligibleEmployeesMap[emp.employee_id];
+
+          return {
+            ...emp,
+            department: matched?.department || "—",
+            present_designation: matched?.present_designation || "—",
+          };
+        });
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load employee records");
+      }
     },
 
     async fetchTrainingDetails() {
       try {
         const id = this.$route.query.id;
-        const response = await axios.get(
+        const res = await axios.get(
           process.env.VUE_APP_API_BASE_URL + `/available-trainings/${id}`
         );
-        this.training = response.data || null;
+        this.training = res.data || null;
       } catch (error) {
         console.error("Error fetching training details:", error);
       }
     },
 
+    /* -------------------- CORE LOGIC -------------------- */
     async fetchEligibleEmployees() {
-      if (!this.training) return;
+      if (!this.training || !this.employee_learning_development.length) return;
 
       try {
         const res = await axios.get(
           process.env.VUE_APP_API_BASE_URL +
             "/upload/get-eligible-employees-trainings"
         );
+
         const employees = res.data || [];
 
-        const normalize = (str) =>
-          str?.toLowerCase().replace(/\s+/g, "").trim();
+        /* ------------------ PREP ------------------ */
+        const exactTitle = this.normalize(this.training.title);
+        const baseTitle = this.normalizeBaseTitle(this.training.title);
 
-        this.eligibleEmployees = employees.filter((emp) => {
+        const minYears = Number(this.training.experience_year_from ?? 0);
+        const maxYears = Number(this.training.experience_year_to ?? Infinity);
+
+        const FOUR_YEARS_AGO = new Date();
+        FOUR_YEARS_AGO.setFullYear(FOUR_YEARS_AGO.getFullYear() - 4);
+
+        const priorityEmployees = [];
+        const lowerPriorityEmployees = [];
+
+        /* ------------------ LOOP ------------------ */
+        employees.forEach((emp) => {
+          const empLD = this.employee_learning_development.find(
+            (e) => e.first_table_id === emp.first_table_id
+          );
+
+          const fifthTable = empLD?.fifthTable || [];
+
+          /* ❌ EXCLUDE: exact same training title */
+          const alreadyAttendedExact = fifthTable.some(
+            (record) =>
+              this.normalize(record.title_learning_development) === exactTitle
+          );
+          if (alreadyAttendedExact) return;
+
+          /* ❌ EXCLUDE: same base training within last 4 years */
+          const attendedWithinLast4Years = fifthTable.some((record) => {
+            if (
+              this.normalizeBaseTitle(record.title_learning_development) !==
+              baseTitle
+            )
+              return false;
+
+            const recordDate = new Date(record.ld_from);
+            return recordDate >= FOUR_YEARS_AGO;
+          });
+          if (attendedWithinLast4Years) return;
+
+          /* ---------------- ELIGIBILITY CHECKS ---------------- */
+
+          /* Employment Status */
           const matchesStatus =
             !this.training.employment_status ||
-            normalize(emp.current_roa_status) ===
-              normalize(this.training.employment_status);
+            this.normalize(emp.current_roa_status) ===
+              this.normalize(this.training.employment_status);
 
+          /* Educational Level */
           const matchesEducation =
             !this.training.educational_level ||
-            normalize(emp.level) === normalize(this.training.educational_level);
+            this.normalize(emp.level) ===
+              this.normalize(this.training.educational_level);
 
+          /* Years of Experience */
           const years = parseFloat(emp.total_years_experience) || 0;
-          const minYears = Number(this.training.experience_year_from ?? 0);
-          const matchesYears = years >= minYears;
+          const matchesYears =
+            Math.floor(years) >= minYears && Math.floor(years) <= maxYears;
 
+          /* Position / Designation */
           const matchesPosition =
             !this.training.training_positions?.length ||
             this.training.training_positions.some((pos) =>
-              normalize(emp.present_designation).includes(normalize(pos.name))
+              this.normalize(emp.present_designation).includes(
+                this.normalize(pos.name)
+              )
             );
 
-          return (
-            matchesStatus && matchesEducation && matchesYears && matchesPosition
-          );
+          /* ---------------- FINAL DECISION ---------------- */
+          if (
+            matchesStatus &&
+            matchesEducation &&
+            matchesYears &&
+            matchesPosition
+          ) {
+            priorityEmployees.push(emp);
+          }
         });
+
+        /* ------------------ SORT & SET ------------------ */
+        this.eligibleEmployees = [
+          ...priorityEmployees,
+          ...lowerPriorityEmployees,
+        ];
       } catch (error) {
         console.error("Error fetching eligible employees:", error);
       }
     },
-
+    /* -------------------- ACTIONS -------------------- */
     toggleSelectAll() {
       this.selectedEmployees = this.selectAll
         ? [...this.eligibleEmployees]
@@ -387,17 +683,80 @@ export default {
         }
 
         toast.success("Selected employees assigned successfully!");
-        this.showConfirmModal = false;
+
+        /* 🔄 REFRESH DATA */
+        await this.fetchEmployeeLearningDevelopment();
+        await this.fetchEligibleEmployees();
+
+        /* 🧹 RESET UI */
         this.selectedEmployees = [];
+        this.selectAll = false;
+        this.showConfirmModal = false;
       } catch (error) {
         console.error("Error assigning employees:", error);
         toast.error("Failed to assign employees.");
       }
     },
+    /* -------------------- FORMATTERS -------------------- */
+    formatDate(dateStr) {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(date);
+    },
+
+    formatExperience(yearsFloat) {
+      if (yearsFloat === null || yearsFloat === undefined) return "N/A";
+
+      const totalMonths = Math.floor(parseFloat(yearsFloat) * 12);
+      const years = Math.floor(totalMonths / 12);
+      const months = totalMonths % 12;
+
+      if (years && months)
+        return `${years} year${years > 1 ? "s" : ""}, ${months} month${
+          months > 1 ? "s" : ""
+        }`;
+      if (years) return `${years} year${years > 1 ? "s" : ""}`;
+      if (months) return `${months} month${months > 1 ? "s" : ""}`;
+      return "Less than a month";
+    },
+    openTrainingAttendeesModal() {
+      if (!this.training) return;
+
+      this.selectedTraining = this.training;
+
+      const normalize = (str) => str?.toLowerCase().replace(/\s+/g, "").trim();
+
+      const currentTitle = normalize(this.training.title);
+      const currentFrom = this.training.date_from;
+      const currentTo = this.training.date_to;
+
+      this.trainingAttendees = this.employee_learning_development.filter(
+        (emp) =>
+          Array.isArray(emp.fifthTable) &&
+          emp.fifthTable.some(
+            (record) =>
+              normalize(record.title_learning_development) === currentTitle &&
+              record.ld_from === currentFrom &&
+              record.ld_to === currentTo
+          )
+      );
+
+      this.showTrainingAttendeesModal = true;
+    },
+    closeTrainingAttendeesModal() {
+      this.showTrainingAttendeesModal = false;
+      this.trainingAttendees = [];
+      this.selectedTraining = null;
+    },
   },
 
   async mounted() {
     await this.fetchTrainingDetails();
+    await this.fetchEmployeeLearningDevelopment();
     await this.fetchEligibleEmployees();
   },
 };

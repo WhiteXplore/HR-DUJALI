@@ -45,6 +45,9 @@ export class CreateCustomerFeedbackDto {
   @IsOptional()
   sentimentScore?: number;
 
+  @IsOptional()
+  additional_comment_sentimentScore?: number;
+
   @ValidateNested({ each: true })
   @Type(() => AnswerDto)
   answers: AnswerDto[];

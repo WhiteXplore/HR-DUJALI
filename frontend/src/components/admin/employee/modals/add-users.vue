@@ -2,10 +2,10 @@
   <div
     class="fixed inset-0 bg-gray-800 bg-opacity-30 flex justify-center items-center z-50"
   >
-    <div class="bg-white rounded-xl shadow-lg w-[400px]">
+    <div class="bg-white rounded-xl shadow-lg w-[30%]">
       <!-- Header -->
       <div
-        class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
+        class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-xl flex justify-between items-center border-b shadow"
       >
         <div class="flex gap-1 items-center">
           <icon :name="'add-account'" />
@@ -24,45 +24,79 @@
       <!-- Form -->
       <form
         @submit.prevent="submitForm"
-        class="flex flex-col gap-3 text-left p-4"
+        class="flex flex-col gap-3 text-left p-4 text-[13px]"
       >
-        <!-- First Name -->
-        <div>
-          <label class="text-sm font-medium">First Name</label>
-          <input
-            v-model="form.first_name"
-            type="text"
-            class="w-full px-3 py-2 border rounded-md"
-            required
-          />
+        <div class="flex gap-2 items-center">
+          <!-- First Name -->
+          <div class="w-full space-y-2">
+            <label for="first_name" class="font-bold text-xs"
+              >First Name:</label
+            >
+            <input
+              v-model="form.first_name"
+              type="text"
+              id="first_name"
+              required
+              class="w-full border px-3 py-3 border-gray-600 rounded-md text-sm text-gray-800"
+              placeholder="Enter First Name"
+            />
+          </div>
+          <!-- Middle Name  -->
+          <div class="w-full space-y-2">
+            <label for="middle_name" class="font-bold text-xs"
+              >Middle Name</label
+            >
+            <input
+              v-model="form.middle_name"
+              type="text"
+              required
+              class="w-full border px-3 py-3 border-gray-600 rounded-md text-sm text-gray-800"
+              placeholder="Enter Middle Name"
+            />
+          </div>
+
+          <!-- Last Name -->
+          <div class="w-full space-y-2">
+            <label class="font-bold text-xs">Last Name</label>
+            <input
+              v-model="form.last_name"
+              type="text"
+              required
+              class="w-full border px-3 py-3 border-gray-600 rounded-md text-sm text-gray-800"
+              placeholder="Enter Last Name"
+            />
+          </div>
         </div>
 
-        <!-- Last Name -->
-        <div>
-          <label class="text-sm font-medium">Last Name</label>
+        <div class="w-full space-y-2">
+          <label for="employee_id" class="font-bold text-xs"
+            >Employee ID:</label
+          >
           <input
-            v-model="form.last_name"
+            v-model="form.employee_id"
             type="text"
-            class="w-full px-3 py-2 border rounded-md"
+            id="employee_id"
             required
+            class="w-full border px-3 py-3 border-gray-600 rounded-md text-sm text-gray-800"
+            placeholder="Enter  employee id"
           />
         </div>
 
         <!-- Email -->
         <div>
-          <label class="text-sm font-medium">Email</label>
+          <label class="font-bold text-xs">Email</label>
           <input
             v-model="form.email"
             type="email"
-            class="w-full px-3 py-2 border rounded-md"
             required
+            class="w-full border px-3 py-3 border-gray-600 rounded-md text-sm text-gray-800"
+            placeholder="Enter Email"
           />
         </div>
 
         <!-- Password -->
-        <!-- Password -->
         <div>
-          <label class="text-sm font-medium">
+          <label class="font-bold text-xs">
             Password
             <span v-if="isEditMode" class="text-gray-500 text-xs">
               (Leave blank to keep current password)
@@ -73,12 +107,12 @@
             <input
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
-              class="w-full px-3 py-2 border rounded-md pr-10"
               :required="!isEditMode"
-              placeholder="Enter password"
+              class="w-full border px-3 py-3 border-gray-600 rounded-md text-sm text-gray-800 pr-10"
+              placeholder="Enter Password"
             />
 
-            <!-- Eye Icon Toggle -->
+            <!-- Eye Icon -->
             <span
               class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600"
               @click="showPassword = !showPassword"
@@ -87,9 +121,9 @@
             </span>
           </div>
 
-          <!-- Real-time Password Complexity Message -->
+          <!-- Password Validation -->
           <p
-            v-if="form.password && !validatePassword(form.password)"
+            v-if="form.password.length > 0 && !validatePassword(form.password)"
             class="text-red-600 text-xs mt-1"
           >
             Password must be at least 8 characters long and include uppercase,
@@ -99,15 +133,15 @@
 
         <!-- Role -->
         <div>
-          <label class="text-sm font-medium">Role</label>
+          <label class="font-bold text-xs">Role</label>
           <select
             v-model="form.role"
-            class="w-full px-3 py-2 border rounded-md"
             required
+            class="w-full border px-3 py-3 border-gray-600 rounded-md text-sm text-gray-800"
           >
             <option value="" disabled>Select Role</option>
             <option value="Admin">Admin</option>
-            <option value="Staff">Staff</option>
+            <option value="Employee">Employee</option>
           </select>
         </div>
 
@@ -151,7 +185,9 @@ export default {
     return {
       form: {
         first_name: "",
+        middle_name: "",
         last_name: "",
+        employee_id: "",
         email: "",
         password: "",
         role: "",
@@ -171,7 +207,9 @@ export default {
         if (newVal) {
           this.form = {
             first_name: newVal.first_name || "",
+            middle_name: newVal.middle_name || "",
             last_name: newVal.last_name || "",
+            employee_id: newVal.employee_id || "",
             email: newVal.email || "",
             password: "",
             role: newVal.role || "",
@@ -188,10 +226,9 @@ export default {
     // 🔐 PASSWORD COMPLEXITY VALIDATION
     validatePassword(password) {
       const strongPassword =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
       return strongPassword.test(password);
     },
-
     async submitForm() {
       try {
         // Validate password complexity (Add mode OR Edit but with new password)

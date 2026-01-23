@@ -377,6 +377,23 @@ export default {
           );
         });
     },
+    async fetchUser() {
+      try {
+        const response = await axios.get(
+          process.env.VUE_APP_API_BASE_URL + "/auth/me",
+          { withCredentials: true }
+        );
+
+        if (response.data) {
+          this.user = response.data;
+
+          // Fetch linked employee records
+          await this.fetchEmployeeRecords(this.user.employee_id);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    },
 
     toggleDelete(item) {
       this.recordToDelete = item;

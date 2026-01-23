@@ -33,7 +33,9 @@ export class AuthController {
     @Body('email') email: string,
     @Body('password') password: string,
     @Body('first_name') first_name: string,
+    @Body('middle_name') middle_name: string,
     @Body('last_name') last_name: string,
+    @Body('employee_id') employee_id: string,
     @Body('role') role: string,
     @Res() res: Response,
   ) {
@@ -45,7 +47,9 @@ export class AuthController {
       email,
       password,
       first_name,
+      middle_name,
       last_name,
+      employee_id,
       role,
       res,
     );
@@ -55,7 +59,9 @@ export class AuthController {
   async updateUser(
     @Param('id') id: string,
     @Body('first_name') first_name: string,
+    @Body('middle_name') middle_name: string,
     @Body('last_name') last_name: string,
+    @Body('employee_id') employee_id: string,
     @Body('email') email: string,
     @Body('role') role: string,
     @Body('password') password?: string,
@@ -63,7 +69,9 @@ export class AuthController {
     return this.authService.updateUser(
       +id,
       first_name,
+      middle_name,
       last_name,
+      employee_id,
       email,
       role,
       password,

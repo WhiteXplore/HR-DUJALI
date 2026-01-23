@@ -27,7 +27,7 @@
               @blur="hideResults"
               type="text"
               placeholder="Search module..."
-              class="border border-gray-300 rounded-full p-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="border border-gray-300 rounded-xl p-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             <!-- Circle Close Icon -->
@@ -66,10 +66,9 @@
           <button
             v-if="!searchActive"
             @click="toggleSearch"
-            class="flex items-center gap-2 px-2 py-1 rounded-full border hover:text-blue-900 hover:border-blue-800 transition-colors duration-300 ease-in-out"
+            class="flex items-center gap-2 px-2 py-1 rounded-xl border hover:text-blue-900 hover:border-blue-800 transition-colors duration-300 ease-in-out"
           >
-            <span class="text-gray-400">Search</span>
-            <icon :name="'search-bar'" class="text-gray-400" />
+            <icon :name="'search-bar'" class="text-gray-500" />
           </button>
 
           <!-- Profile Picture -->
@@ -100,7 +99,7 @@
           v-if="isOpenProfile"
           @mouseleave="isOpenProfile = false"
         >
-          <Profile />
+          <ProfileSetting />
         </div>
       </div>
     </div>
@@ -111,12 +110,12 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-import Profile from "./profile-setting.vue";
+import ProfileSetting from "./profile-setting.vue";
 import icon from "@/assets/icon.vue";
 
 export default {
   name: "TopBarPage",
-  components: { Profile, icon },
+  components: { ProfileSetting, icon },
   data() {
     return {
       isOpenProfile: false,

@@ -5,7 +5,7 @@
       <div class="flex justify-between">
         <div
           @click="toggleBack"
-          class="cursor-pointer text-red-800 hover:text-white border-red-800 border p-2 py-1.5 text-sm rounded-md hover:bg-red-800"
+          class="cursor-pointer flex gap-2 items-center tracking-wider bg-red-500 text-white text-sm hover:text-red-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-red-900 hover:shadow-lg transition-all duration-300"
         >
           Back
         </div>
@@ -269,6 +269,40 @@ export default {
     attendanceId: "fetchAttendanceRecords",
   },
   methods: {
+    getAllDatesInMonth(month, year) {
+      const dates = [];
+      const date = new Date(year, month - 1, 1);
+      while (date.getMonth() === month - 1) {
+        dates.push(new Date(date));
+        date.setDate(date.getDate() + 1);
+      }
+      return dates;
+    },
+    getFullMonthRecords(employee, month, year) {
+      const allDates = this.getAllDatesInMonth(month, year);
+
+      // map existing records by date string
+      const recordsMap = {};
+      employee.records.forEach((rec) => {
+        const key = new Date(rec.date).toDateString();
+        recordsMap[key] = rec;
+      });
+
+      // return full month with empty records for missing days
+      return allDates.map((d) => {
+        const key = d.toDateString();
+        return (
+          recordsMap[key] || {
+            date: d,
+            in_am: null,
+            out_am: null,
+            in_pm: null,
+            out_pm: null,
+          }
+        );
+      });
+    },
+
     downloadAttendancePDF() {
       const employee = this.matchingRecord[0];
       if (!employee) return;
@@ -455,7 +489,7 @@ export default {
               paddingTop: () => 5,
               paddingBottom: () => 5,
             },
-            fontSize: 9,
+            fontSize: 6,
             alignment: "center",
           },
         ],
@@ -503,21 +537,40 @@ export default {
         )
         .then((res) => {
           let data = Array.isArray(res.data) ? res.data : [res.data];
-          this.matchingRecord = data
-            .map((emp) => ({
-              ...emp,
-              records: emp.records.filter((rec) => {
-                const d = new Date(rec.date);
-                return d.getFullYear() === year && d.getMonth() + 1 === month;
-              }),
-            }))
-            .filter((emp) => emp.records.length > 0);
+          this.matchingRecord = data.map((emp) => {
+            // Map existing records
+            const recordsMap = {};
+            emp.records.forEach((r) => {
+              const key = new Date(r.date).toDateString();
+              recordsMap[key] = r;
+            });
+
+            // Fill all dates in month
+            const fullMonthRecords = [];
+            const date = new Date(year, month - 1, 1);
+            while (date.getMonth() === month - 1) {
+              const key = date.toDateString();
+              fullMonthRecords.push(
+                recordsMap[key] || {
+                  date: new Date(date),
+                  in_am: null,
+                  out_am: null,
+                  in_pm: null,
+                  out_pm: null,
+                }
+              );
+              date.setDate(date.getDate() + 1);
+            }
+
+            return { ...emp, records: fullMonthRecords };
+          });
         })
         .catch((err) => {
           console.error(err);
           this.matchingRecord = [];
         });
     },
+
     formatDate(date) {
       return new Date(date).toLocaleDateString("en-US", {
         month: "short",

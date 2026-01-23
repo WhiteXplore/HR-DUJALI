@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="isOpen"
     class="fixed inset-0 bg-gray-800 bg-opacity-30 flex justify-center items-center z-50 w-min-screen"
   >
     <div class="rounded-[15px] shadow-lg fixed top-20">
@@ -11,7 +10,7 @@
           <div class="flex gap-1 items-center">
             <icon :name="'add-students'" />
             <h1 class="font-bold tracking-wide text-lg">
-              Add Employee Profile
+              Edit Employee Profile
             </h1>
           </div>
 
@@ -97,7 +96,7 @@
             <!-- First Row -->
             <div class="flex flex-row gap-3">
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">First Name :</label>
+                <label class="font-semibold">First Name :</label>
                 <input
                   v-model="form.first_name"
                   type="text"
@@ -106,7 +105,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Middle Name :</label>
+                <label class="font-semibold">Middle Name :</label>
                 <input
                   v-model="form.middle_name"
                   type="text"
@@ -115,7 +114,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Last Name :</label>
+                <label class="font-semibold">Last Name :</label>
                 <input
                   v-model="form.last_name"
                   type="text"
@@ -124,7 +123,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Suffix :</label>
+                <label class="font-semibold">Suffix :</label>
                 <input
                   v-model="form.suffix"
                   type="text"
@@ -137,7 +136,7 @@
             <!-- Second Row -->
             <div class="flex flex-row gap-3">
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Date of Birth :</label>
+                <label class="font-semibold">Date of Birth :</label>
                 <input
                   v-model="form.birthdate"
                   type="date"
@@ -145,7 +144,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Place of Birth :</label>
+                <label class="font-semibold">Place of Birth :</label>
                 <input
                   v-model="form.place_of_birth"
                   type="text"
@@ -154,7 +153,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Gender :</label>
+                <label class="font-semibold">Gender :</label>
                 <select
                   v-model="form.gender"
                   class="px-3 py-2 border w-[300px] border-gray-300 rounded-md text-gray-700"
@@ -165,7 +164,7 @@
                 </select>
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Civil Status :</label>
+                <label class="font-semibold">Civil Status :</label>
                 <select
                   v-model="form.civil_status"
                   class="px-3 py-2 border w-[300px] border-gray-300 rounded-md text-gray-700"
@@ -189,7 +188,7 @@
           <div class="flex justify-between w-full space-x-3">
             <div class="text-gray-700 space-y-4 border p-3 rounded-md w-full">
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Blood Type:</label>
+                <label class="font-semibold">Blood Type:</label>
                 <select
                   v-model="form.blood_type"
                   class="px-3 py-2 border w-full border-gray-300 rounded-md text-gray-700"
@@ -208,7 +207,7 @@
 
               <div class="flex gap-x-4">
                 <div class="flex flex-col space-y-2 w-full">
-                  <label class="font-semibold text-xs">Height (m):</label>
+                  <label class="font-semibold">Height (m):</label>
                   <input
                     v-model="form.height"
                     type="text"
@@ -217,7 +216,7 @@
                   />
                 </div>
                 <div class="flex flex-col space-y-2 w-full">
-                  <label class="font-semibold text-xs">Weight (kg):</label>
+                  <label class="font-semibold">Weight (kg):</label>
                   <input
                     v-model="form.weight"
                     type="text"
@@ -228,9 +227,7 @@
               </div>
               <div class="flex gap-x-4">
                 <div class="flex flex-col space-y-2 w-full">
-                  <label class="font-semibold text-xs"
-                    >Is Dual Citizenship:</label
-                  >
+                  <label class="font-semibold">Is Dual Citizenship:</label>
                   <select
                     v-model="form.is_dual_citizen"
                     class="px-3 py-2 border w-full border-gray-300 rounded-md text-gray-700"
@@ -241,7 +238,7 @@
                   </select>
                 </div>
                 <div class="flex flex-col space-y-2 w-full">
-                  <label class="font-semibold text-xs">Citizenship :</label>
+                  <label class="font-semibold">Citizenship :</label>
                   <input
                     v-model="form.citizenship"
                     type="text"
@@ -252,7 +249,7 @@
               </div>
               <div class="flex gap-x-4">
                 <div class="flex flex-col space-y-2 w-full">
-                  <label class="font-semibold text-xs">Employment Id:</label>
+                  <label class="font-semibold">Employment Id:</label>
                   <input
                     v-model="form.employee_id"
                     type="text"
@@ -261,9 +258,7 @@
                   />
                 </div>
                 <div class="flex flex-col space-y-2 w-full">
-                  <label class="font-semibold text-xs"
-                    >Employment Status:</label
-                  >
+                  <label class="font-semibold">Employment Status:</label>
                   <select
                     v-model="form.employment_status"
                     class="px-3 py-3 border w-full border-gray-300 rounded-md text-gray-700"
@@ -279,7 +274,7 @@
             <div class="text-gray-700 space-y-4 border p-3 rounded-md w-full">
               <div class="flex gap-2 w-full">
                 <div class="flex flex-col space-y-2 flex-1">
-                  <label class="font-semibold text-xs">GSIS ID Number :</label>
+                  <label class="font-semibold">GSIS ID Number :</label>
                   <input
                     v-model="form.gsis_id"
                     type="text"
@@ -288,9 +283,7 @@
                   />
                 </div>
                 <div class="flex flex-col space-y-2 flex-1">
-                  <label class="font-semibold text-xs"
-                    >PAG-IBIG ID Number :</label
-                  >
+                  <label class="font-semibold">PAG-IBIG ID Number :</label>
                   <input
                     v-model="form.pagibig_id"
                     type="text"
@@ -301,7 +294,7 @@
               </div>
               <div class="flex gap-2 w-full">
                 <div class="flex flex-col space-y-2 flex-1">
-                  <label class="font-semibold text-xs">Philhealth :</label>
+                  <label class="font-semibold">Philhealth :</label>
                   <input
                     v-model="form.philhealth"
                     type="text"
@@ -310,7 +303,7 @@
                   />
                 </div>
                 <div class="flex flex-col space-y-2 flex-1">
-                  <label class="font-semibold text-xs">SSS Number :</label>
+                  <label class="font-semibold">SSS Number :</label>
                   <input
                     v-model="form.sss_number"
                     type="text"
@@ -321,7 +314,7 @@
               </div>
               <div class="flex gap-2 w-full">
                 <div class="flex flex-col space-y-2 flex-1">
-                  <label class="font-semibold text-xs">TIN Number :</label>
+                  <label class="font-semibold">TIN Number :</label>
                   <input
                     v-model="form.tin_number"
                     type="text"
@@ -330,9 +323,7 @@
                   />
                 </div>
                 <div class="flex flex-col space-y-2 flex-1">
-                  <label class="font-semibold text-xs"
-                    >Telephone Number :</label
-                  >
+                  <label class="font-semibold">Telephone Number :</label>
                   <input
                     v-model="form.telephone_number"
                     type="text"
@@ -343,7 +334,7 @@
               </div>
               <div class="flex gap-2 w-full">
                 <div class="flex flex-col space-y-2 flex-1">
-                  <label class="font-semibold text-xs">Mobile Number :</label>
+                  <label class="font-semibold">Mobile Number :</label>
                   <input
                     v-model="form.mobile_number"
                     type="text"
@@ -352,7 +343,7 @@
                   />
                 </div>
                 <div class="flex flex-col space-y-2 flex-1">
-                  <label class="font-semibold text-xs">Agency :</label>
+                  <label class="font-semibold">Agency :</label>
                   <input
                     v-model="form.agency"
                     type="text"
@@ -375,7 +366,7 @@
             <!-- First Row -->
             <div class="flex flex-row gap-3">
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">House Number :</label>
+                <label class="font-semibold">House Number :</label>
                 <input
                   v-model="form.house_number"
                   type="text"
@@ -384,7 +375,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Street :</label>
+                <label class="font-semibold">Street :</label>
                 <input
                   v-model="form.street"
                   type="text"
@@ -393,9 +384,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs"
-                  >Subdivision/Village :</label
-                >
+                <label class="font-semibold">Subdivision/Village :</label>
                 <input
                   v-model="form.subdivision"
                   type="text"
@@ -404,7 +393,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Barangay :</label>
+                <label class="font-semibold">Barangay :</label>
                 <input
                   v-model="form.barangay"
                   type="text"
@@ -417,7 +406,7 @@
             <!-- Second Row -->
             <div class="flex flex-row gap-3">
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Municipality :</label>
+                <label class="font-semibold">Municipality :</label>
                 <input
                   v-model="form.municipality"
                   type="text"
@@ -426,7 +415,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Province :</label>
+                <label class="font-semibold">Province :</label>
                 <input
                   v-model="form.province"
                   type="text"
@@ -435,7 +424,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Zip Code :</label>
+                <label class="font-semibold">Zip Code :</label>
                 <input
                   v-model="form.zip_code"
                   type="text"
@@ -461,7 +450,7 @@
             <!-- First Row -->
             <div class="flex flex-row gap-3">
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">House Number :</label>
+                <label class="font-semibold">House Number :</label>
                 <input
                   v-model="form.same_house_number"
                   type="text"
@@ -470,7 +459,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Street :</label>
+                <label class="font-semibold">Street :</label>
                 <input
                   v-model="form.same_street"
                   type="text"
@@ -479,9 +468,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs"
-                  >Subdivision/Village :</label
-                >
+                <label class="font-semibold">Subdivision/Village :</label>
                 <input
                   v-model="form.same_subdivision"
                   type="text"
@@ -490,7 +477,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Barangay :</label>
+                <label class="font-semibold">Barangay :</label>
                 <input
                   v-model="form.same_barangay"
                   type="text"
@@ -503,7 +490,7 @@
             <!-- Second Row -->
             <div class="flex flex-row gap-3">
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Municipality :</label>
+                <label class="font-semibold">Municipality :</label>
                 <input
                   v-model="form.same_municipality"
                   type="text"
@@ -512,7 +499,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Province :</label>
+                <label class="font-semibold">Province :</label>
                 <input
                   v-model="form.same_province"
                   type="text"
@@ -521,7 +508,7 @@
                 />
               </div>
               <div class="flex flex-col space-y-2">
-                <label class="font-semibold text-xs">Zip Code :</label>
+                <label class="font-semibold">Zip Code :</label>
                 <input
                   v-model="form.same_zip_code"
                   type="text"
@@ -1093,16 +1080,24 @@
 import icon from "@/assets/icon.vue";
 import axios from "axios";
 import { toast } from "vue3-toastify";
+
 export default {
-  name: "AddEmployeeProfile",
-  components: {
-    icon,
+  name: "EditEmployeeProfile",
+  components: { icon },
+
+  props: {
+    employeeRecord: {
+      type: Object,
+      required: true,
+    },
   },
+
   data() {
     return {
       isOpen: true,
       activeSection: "personal",
       sameAddress: false,
+
       form: {
         first_name: "",
         middle_name: "",
@@ -1115,8 +1110,8 @@ export default {
         blood_type: "",
         height: "",
         weight: "",
-        is_dual_citizen: false,
         citizenship: "",
+        is_dual_citizen: false,
         gsis_id: "",
         pagibig_id: "",
         philhealth: "",
@@ -1125,13 +1120,10 @@ export default {
         telephone_number: "",
         mobile_number: "",
         agency: "",
-        educationalRecords: [],
-        civilRecords: [],
-        learningRecords: [],
-        otherRecords: [],
-        specialSkillsRecords: [],
-        nonAcadRecords: [],
-        membershipRecords: [],
+        employment_status: "",
+        employee_id: "",
+
+        // Residential Address
         house_number: "",
         street: "",
         subdivision: "",
@@ -1139,6 +1131,8 @@ export default {
         municipality: "",
         province: "",
         zip_code: "",
+
+        // Permanent Address
         same_house_number: "",
         same_street: "",
         same_subdivision: "",
@@ -1146,342 +1140,141 @@ export default {
         same_municipality: "",
         same_province: "",
         same_zip_code: "",
-        employment_status: "",
-        employee_id: "",
+
+        // Records
+        educationalRecords: [],
+        civilRecords: [],
+        learningRecords: [],
+        specialSkillsRecords: [],
+        nonAcadRecords: [],
+        membershipRecords: [],
       },
-      validationErrors: [],
-      showValidationModal: false,
-      user: {},
     };
   },
+
   methods: {
+    // Close modal
     closeAdd() {
       this.isOpen = false;
       this.$emit("close");
     },
+
     toggleSection(section) {
       this.activeSection = section;
     },
+
     formatBirthdate(dateStr) {
-      if (!dateStr || typeof dateStr !== "string") return "N/A";
-      const parts = dateStr.split("/"); // ["11", "15", "1991"]
-      if (parts.length !== 3) return dateStr; // fallback if unexpected format
+      if (!dateStr) return "";
+      if (dateStr.includes("-")) return dateStr;
+
+      const parts = dateStr.split("/");
+      if (parts.length !== 3) return dateStr;
+
       const [month, day, year] = parts;
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
 
-    async submitData() {
-      if (this.validateForm()) {
-        const formData = { ...this.form };
-
-        // Replace empty strings with "N/A"
-        Object.keys(formData).forEach((key) => {
-          if (
-            formData[key] === "" &&
-            typeof formData[key] !== "boolean" &&
-            !Array.isArray(formData[key])
-          ) {
-            formData[key] = undefined; // Not "N/A"
-          }
-        });
-
-        // Format birthdate
-        formData.birthdate = this.formatBirthdate(this.form.birthdate);
-
-        try {
-          const response = await axios.post(
-            process.env.VUE_APP_API_BASE_URL + "/upload/add-data",
-            formData
-          );
-          toast.success("Employee added successfully!");
-          this.$emit("refresh-employees");
-
-          if (response.status === 200) {
-            this.resetForm();
-            this.closeAdd();
-          }
-          this.isOpen = false;
-        } catch (error) {
-          console.error(
-            "Error during form submission:",
-            error.response || error
-          );
-          if (error.response?.data?.message) {
-            alert("Server Error: " + error.response.data.message);
-          } else {
-            alert("There was an error submitting the form.");
-          }
-        }
-      } else {
-        this.showValidationModal = true;
-        console.warn("Validation Errors:", this.validationErrors);
-      }
-    },
-    validateForm() {
-      this.validationErrors = [];
-
-      // Helper function to check empty string or falsy (except false boolean)
-      const isEmpty = (value) =>
-        value === "" || value === null || value === undefined;
-
-      // Validate top-level required fields
-      if (isEmpty(this.form.first_name)) {
-        this.validationErrors.push("First Name is required.");
-      }
-      if (isEmpty(this.form.middle_name)) {
-        this.validationErrors.push("Middle Name is required.");
-      }
-      if (isEmpty(this.form.last_name)) {
-        this.validationErrors.push("Last Name is required.");
-      }
-      if (isEmpty(this.form.birthdate)) {
-        this.validationErrors.push("Birthdate is required.");
-      }
-      if (isEmpty(this.form.place_of_birth)) {
-        this.validationErrors.push("Place of Birth is required.");
-      }
-      if (isEmpty(this.form.gender)) {
-        this.validationErrors.push("Gender is required.");
-      }
-      if (isEmpty(this.form.civil_status)) {
-        this.validationErrors.push("Civil Status is required.");
-      }
-      if (isEmpty(this.form.blood_type)) {
-        this.validationErrors.push("Blood Type is required.");
-      }
-      if (isEmpty(this.form.height)) {
-        this.validationErrors.push("Height is required.");
-      }
-      if (isEmpty(this.form.weight)) {
-        this.validationErrors.push("Weight is required.");
-      }
-      if (this.form.is_dual_citizen && isEmpty(this.form.citizenship)) {
-        this.validationErrors.push(
-          "Citizenship is required when dual citizen is checked."
-        );
-      }
-      if (isEmpty(this.form.gsis_id)) {
-        this.validationErrors.push("GSIS ID is required.");
-      }
-      if (isEmpty(this.form.pagibig_id)) {
-        this.validationErrors.push("Pagibig ID is required.");
-      }
-      if (isEmpty(this.form.philhealth)) {
-        this.validationErrors.push("PhilHealth number is required.");
-      }
-      if (isEmpty(this.form.sss_number)) {
-        this.validationErrors.push("SSS Number is required.");
-      }
-      if (isEmpty(this.form.tin_number)) {
-        this.validationErrors.push("TIN Number is required.");
-      }
-      if (isEmpty(this.form.telephone_number)) {
-        this.validationErrors.push("Telephone Number is required.");
-      }
-      if (isEmpty(this.form.mobile_number)) {
-        this.validationErrors.push("Mobile Number is required.");
-      }
-      if (isEmpty(this.form.agency)) {
-        this.validationErrors.push("Agency is required.");
-      }
-
-      // Validate address fields
-      if (isEmpty(this.form.house_number)) {
-        this.validationErrors.push("House Number is required.");
-      }
-      if (isEmpty(this.form.street)) {
-        this.validationErrors.push("Street is required.");
-      }
-      if (isEmpty(this.form.subdivision)) {
-        this.validationErrors.push("Subdivision is required.");
-      }
-      if (isEmpty(this.form.barangay)) {
-        this.validationErrors.push("Barangay is required.");
-      }
-      if (isEmpty(this.form.municipality)) {
-        this.validationErrors.push("Municipality is required.");
-      }
-      if (isEmpty(this.form.province)) {
-        this.validationErrors.push("Province is required.");
-      }
-      if (isEmpty(this.form.zip_code)) {
-        this.validationErrors.push("Zip Code is required.");
-      }
-
-      // If sameAddress is true, validate same address fields too
+    handleSameAddress() {
       if (this.sameAddress) {
-        if (isEmpty(this.form.same_house_number)) {
-          this.validationErrors.push("Same House Number is required.");
-        }
-        if (isEmpty(this.form.same_street)) {
-          this.validationErrors.push("Same Street is required.");
-        }
-        if (isEmpty(this.form.same_subdivision)) {
-          this.validationErrors.push("Same Subdivision is required.");
-        }
-        if (isEmpty(this.form.same_barangay)) {
-          this.validationErrors.push("Same Barangay is required.");
-        }
-        if (isEmpty(this.form.same_municipality)) {
-          this.validationErrors.push("Same Municipality is required.");
-        }
-        if (isEmpty(this.form.same_province)) {
-          this.validationErrors.push("Same Province is required.");
-        }
-        if (isEmpty(this.form.same_zip_code)) {
-          this.validationErrors.push("Same Zip Code is required.");
-        }
+        this.form.same_house_number = this.form.house_number;
+        this.form.same_street = this.form.street;
+        this.form.same_subdivision = this.form.subdivision;
+        this.form.same_barangay = this.form.barangay;
+        this.form.same_municipality = this.form.municipality;
+        this.form.same_province = this.form.province;
+        this.form.same_zip_code = this.form.zip_code;
+      } else {
+        this.form.same_house_number = "";
+        this.form.same_street = "";
+        this.form.same_subdivision = "";
+        this.form.same_barangay = "";
+        this.form.same_municipality = "";
+        this.form.same_province = "";
+        this.form.same_zip_code = "";
       }
-
-      // Validate educationalRecords array
-      this.form.educationalRecords.forEach((record, index) => {
-        if (isEmpty(record.level)) {
-          this.validationErrors.push(
-            `Educational record #${index + 1}: Level is required.`
-          );
-        }
-        if (isEmpty(record.name_of_school)) {
-          this.validationErrors.push(
-            `Educational record #${index + 1}: Name of School is required.`
-          );
-        }
-        if (isEmpty(record.basic_education)) {
-          this.validationErrors.push(
-            `Educational record #${index + 1}: Basic Education is required.`
-          );
-        }
-        // Add more fields if needed
-      });
-
-      // Validate civilRecords array
-      this.form.civilRecords.forEach((record, index) => {
-        if (isEmpty(record.career_service)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: Career Service is required.`
-          );
-        }
-        if (isEmpty(record.rating)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: Rating is required.`
-          );
-        }
-        if (isEmpty(record.date_of_exam)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: Date of Exam is required.`
-          );
-        }
-        if (isEmpty(record.place_of_exam)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: Place of Exam is required.`
-          );
-        }
-        if (isEmpty(record.license_number)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: License Number is required.`
-          );
-        }
-        if (isEmpty(record.license_validity)) {
-          this.validationErrors.push(
-            `Civil record #${index + 1}: License Validity is required.`
-          );
-        }
-      });
-
-      // Validate learningRecords array
-      this.form.learningRecords.forEach((record, index) => {
-        if (isEmpty(record.title_learning_development)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: Title is required.`
-          );
-        }
-        if (isEmpty(record.ld_from)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: From date is required.`
-          );
-        }
-        if (isEmpty(record.ld_to)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: To date is required.`
-          );
-        }
-        if (isEmpty(record.ld_number_of_hours)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: Number of hours is required.`
-          );
-        }
-        if (isEmpty(record.type_of_ld)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: Type is required.`
-          );
-        }
-        if (isEmpty(record.ld_conducted_sponsor)) {
-          this.validationErrors.push(
-            `Learning record #${index + 1}: Conducted/Sponsor is required.`
-          );
-        }
-      });
-
-      // Validate specialSkillsRecords array
-      this.form.specialSkillsRecords.forEach((record, index) => {
-        if (isEmpty(record.special_skills)) {
-          this.validationErrors.push(
-            `Special skills record #${index + 1}: Skill is required.`
-          );
-        }
-      });
-
-      // Validate nonAcadRecords array
-      this.form.nonAcadRecords.forEach((record, index) => {
-        if (isEmpty(record.non_academic)) {
-          this.validationErrors.push(
-            `Non-academic record #${index + 1}: Field is required.`
-          );
-        }
-      });
-
-      // Validate membershipRecords array
-      this.form.membershipRecords.forEach((record, index) => {
-        if (isEmpty(record.membership)) {
-          this.validationErrors.push(
-            `Membership record #${index + 1}: Membership is required.`
-          );
-        }
-      });
-
-      return this.validationErrors.length === 0;
     },
 
-    closeValidationModal() {
-      this.showValidationModal = false;
+    // 🔹 Populate modal with **copies** of parent data
+    populateForm() {
+      if (!this.employeeRecord) return;
+
+      this.form = {
+        ...this.form, // keep default keys
+        ...{ ...this.employeeRecord }, // fresh copy to avoid reference issues
+
+        educationalRecords: [...(this.employeeRecord.secondTable || [])],
+        civilRecords: [...(this.employeeRecord.fourthTable || [])],
+        learningRecords: [...(this.employeeRecord.fifthTable || [])],
+        specialSkillsRecords: [...(this.employeeRecord.thirdTable || [])],
+        nonAcadRecords: [...(this.employeeRecord.sixthTable || [])],
+        membershipRecords: [...(this.employeeRecord.seventhTable || [])],
+      };
+
+      this.form.birthdate = this.formatBirthdate(this.form.birthdate);
+
+      this.sameAddress =
+        this.form.house_number === this.form.same_house_number &&
+        this.form.street === this.form.same_street;
     },
-    resetForm() {
-      Object.keys(this.form).forEach((key) => {
-        if (Array.isArray(this.form[key])) {
-          this.form[key] = [];
-        } else if (typeof this.form[key] === "boolean") {
-          this.form[key] = false;
+
+    async submitData() {
+      const payload = { ...this.form };
+
+      // Convert empty strings to undefined for backend
+      Object.keys(payload).forEach((key) => {
+        if (payload[key] === "" && !Array.isArray(payload[key])) {
+          payload[key] = undefined;
+        }
+      });
+
+      payload.birthdate = this.formatBirthdate(this.form.birthdate);
+
+      try {
+        let response;
+
+        if (this.form.first_table_id) {
+          // Update existing employee
+          response = await axios.patch(
+            `${process.env.VUE_APP_API_BASE_URL}/upload/${this.form.first_table_id}`,
+            payload
+          );
+          toast.success("Employee updated successfully!");
         } else {
-          this.form[key] = "";
+          // Create new employee
+          response = await axios.post(
+            `${process.env.VUE_APP_API_BASE_URL}/upload/add-data`,
+            payload
+          );
+          toast.success("Employee created successfully!");
         }
-      });
+
+        // Emit fresh copy to parent
+        this.$emit("employee-updated", { ...response.data });
+
+        this.closeAdd();
+      } catch (error) {
+        console.error("Error submitting employee:", error);
+        const msg =
+          error.response?.data?.message ||
+          "There was an error submitting the form.";
+        alert(msg);
+      }
     },
     removeRow(index, type) {
-      if (type === "level") {
-        this.form.educationalRecords.splice(index, 1);
-      } else if (type === "civil") {
-        this.form.civilRecords.splice(index, 1);
-      } else if (type === "title_learning_development") {
-        this.form.learningRecords.splice(index, 1);
-      } else if (type === "others") {
-        this.form.otherRecords.splice(index, 1);
-      } else if (type === "special_skills") {
-        this.form.specialSkillsRecords.splice(index, 1);
-      } else if (type === "non_academic") {
-        this.form.nonAcadRecords.splice(index, 1);
-      } else if (type === "membership") {
-        this.form.membershipRecords.splice(index, 1);
-      }
+      const mapping = {
+        level: "educationalRecords",
+        civil: "civilRecords",
+        title_learning_development: "learningRecords",
+        special_skills: "specialSkillsRecords",
+        non_academic: "nonAcadRecords",
+        membership: "membershipRecords",
+        others: "otherRecords",
+      };
+
+      const key = mapping[type];
+      if (key && this.form[key]) this.form[key].splice(index, 1);
     },
+
     addRowEducation() {
       this.form.educationalRecords.push({
         level: "",
@@ -1494,6 +1287,7 @@ export default {
         scholarship: "",
       });
     },
+
     addRowCivil() {
       this.form.civilRecords.push({
         career_service: "",
@@ -1517,40 +1311,26 @@ export default {
     },
 
     addRowSpecial() {
-      this.form.specialSkillsRecords.push({
-        special_skills: "",
-      });
+      this.form.specialSkillsRecords.push({ special_skills: "" });
     },
 
     addRowNonAcad() {
-      this.form.nonAcadRecords.push({
-        non_academic: "",
-      });
+      this.form.nonAcadRecords.push({ non_academic: "" });
     },
+
     addRowMembership() {
-      this.form.membershipRecords.push({
-        membership: "",
-      });
+      this.form.membershipRecords.push({ membership: "" });
     },
-    handleSameAddress() {
-      if (this.sameAddress) {
-        this.form.same_house_number = this.form.house_number;
-        this.form.same_street = this.form.street;
-        this.form.same_subdivision = this.form.subdivision;
-        this.form.same_barangay = this.form.barangay;
-        this.form.same_municipality = this.form.municipality;
-        this.form.same_province = this.form.province;
-        this.form.same_zip_code = this.form.zip_code;
-      } else {
-        this.form.same_house_number = "";
-        this.form.same_street = "";
-        this.form.same_subdivision = "";
-        this.form.same_barangay = "";
-        this.form.same_municipality = "";
-        this.form.same_province = "";
-        this.form.same_zip_code = "";
-      }
-    },
+  },
+
+  mounted() {
+    this.populateForm();
   },
 };
 </script>
+
+<style scoped>
+table input {
+  outline: none;
+}
+</style>

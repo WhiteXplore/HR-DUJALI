@@ -2,293 +2,215 @@
   <div
     class="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center z-50 w-screen"
   >
-    <div class="rounded-xl shadow-lg w-full max-w-7xl bg-white fixed top-20">
-      <div class="text-text1 text-[13px] rounded-xl">
+    <!-- Dynamic Width Container -->
+    <div
+      class="rounded-xl shadow-lg bg-white fixed top-20 transition-all duration-300"
+      :class="step === 1 ? 'w-[50vw]' : 'w-full max-w-7xl'"
+    >
+      <div class="text-[13px] rounded-xl">
         <!-- Header -->
         <div
-          class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
+          class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-xl flex justify-between items-center"
         >
-          <div class="flex gap-1 items-center">
-            <icon :name="'add-account'" />
-            <h1 class="font-bold tracking-wide text-lg">Add Service Records</h1>
+          <div class="flex gap-2 items-center">
+            <icon name="add-account" />
+            <h1 class="font-bold text-lg">Add Service Records</h1>
           </div>
-
           <icon
-            :name="'circle-close3'"
-            @click="closeModal"
+            name="circle-close3"
             class="cursor-pointer"
+            @click="closeModal"
           />
         </div>
 
-        <!-- Main Content -->
-        <div class="p-4 space-y-4">
-          <div class="text-gray-700 border-b pb-4 space-y-4">
-            <!-- Row 1 -->
-            <div class="flex flex-row gap-4">
-              <div class="w-full flex-col text-left items-center space-y-1">
-                <label for="first_name" class="font-bold">First Name</label>
-                <input
-                  id="first_name"
-                  v-model="form.first_name"
-                  type="text"
-                  class="py-3 px-3 w-full border rounded-md"
-                  placeholder="Enter First Name"
-                />
+        <!-- Step Indicator -->
+        <div class="flex gap-3 px-4 py-3 border-b">
+          <div
+            :class="step === 1 ? activeStep : inactiveStep"
+            class="step-pill"
+          >
+            1. Personal Information
+          </div>
+          <div
+            :class="step === 2 ? activeStep : inactiveStep"
+            class="step-pill"
+          >
+            2. Record of Appointment
+          </div>
+        </div>
+
+        <!-- ================= STEP 1 ================= -->
+        <div v-if="step === 1" class="p-4 space-y-4">
+          <div class="space-y-4 border-b pb-4">
+            <div class="flex gap-4">
+              <div class="w-full">
+                <label class="font-bold text-xs">First Name</label>
+                <input v-model="form.first_name" class="input" />
               </div>
-              <div class="w-full flex-col text-left items-center space-y-1">
-                <label for="middle_name" class="font-bold">Middle Name</label>
-                <input
-                  id="middle_name"
-                  v-model="form.middle_name"
-                  type="text"
-                  class="py-3 px-3 w-full border rounded-md"
-                  placeholder="Enter Middle Name"
-                />
+              <div class="w-full">
+                <label class="font-bold text-xs">Middle Name</label>
+                <input v-model="form.middle_name" class="input" />
               </div>
-              <div class="w-full flex-col text-left items-center space-y-1">
-                <label for="last_name" class="font-bold">Last Name</label>
-                <input
-                  id="last_name"
-                  v-model="form.last_name"
-                  type="text"
-                  class="py-3 px-3 w-full border rounded-md"
-                  placeholder="Enter Last Name"
-                />
-              </div>
-            </div>
-            <!-- Row 2 -->
-            <div class="flex flex-row gap-4">
-              <div class="w-full flex-col text-left items-center space-y-1">
-                <label for="birthdate" class="font-bold">Employee ID</label>
-                <input
-                  id="text"
-                  v-model="form.employee_id"
-                  type="text"
-                  class="py-3 px-3 w-full border rounded-md"
-                  placeholder="Enter Employee ID ..."
-                />
-              </div>
-              <div class="w-full flex-col text-left items-center space-y-1">
-                <label for="birthdate" class="font-bold">Date of Birth</label>
-                <input
-                  id="birthdate"
-                  v-model="form.birthdate"
-                  type="date"
-                  class="py-3 px-3 w-full border rounded-md"
-                />
-              </div>
-              <div class="w-full flex-col text-left items-center space-y-1">
-                <label for="birth_place" class="font-bold"
-                  >Place of Birth</label
-                >
-                <input
-                  id="birth_place"
-                  v-model="form.birth_place"
-                  type="text"
-                  class="py-3 px-3 w-full border rounded-md"
-                  placeholder="Enter Birth Place"
-                />
+              <div class="w-full">
+                <label class="font-bold text-xs">Last Name</label>
+                <input v-model="form.last_name" class="input" />
               </div>
             </div>
 
-            <!-- Row 3  -->
-            <div class="flex flex-row gap-4">
-              <div class="w-full flex-col text-left items-center space-y-1">
-                <label for="department" class="font-bold">Department</label>
-                <select
-                  id="department"
-                  v-model="form.department"
-                  class="py-3 px-3 w-full border rounded-md"
-                >
-                  <option disabled value="">Select Department</option>
-                  <option value="Office of the Mayor">
-                    Office of the Mayor
-                  </option>
-                  <option value="Sangguniang Bayan Office">
-                    Sangguniang Bayan Office
-                  </option>
-                  <option value="Municipal Planning and Development Office">
-                    Municipal Planning and Development Office
-                  </option>
-                  <option value="Municipal Budget Office">
-                    Municipal Budget Office
-                  </option>
-                  <option value="Municipal Accounting Office">
-                    Municipal Accounting Office
-                  </option>
-                  <option value="Municipal Treasury Office">
-                    Municipal Treasury Office
-                  </option>
-                  <option value="Municipal Assessor’s Office">
-                    Municipal Assessor’s Office
-                  </option>
-                  <option value="Municipal Engineering Office">
-                    Municipal Engineering Office
-                  </option>
-                  <option value="Municipal Health Office">
-                    Municipal Health Office
-                  </option>
-                  <option
-                    value="Municipal Social Welfare and Development Office"
-                  >
-                    Municipal Social Welfare and Development Office
-                  </option>
-                </select>
+            <div class="flex gap-4">
+              <div class="w-full">
+                <label class="font-bold text-xs">Employee ID</label>
+                <input v-model="form.employee_id" class="input" />
+              </div>
+              <div class="w-full">
+                <label class="font-bold text-xs">Date of Birth</label>
+                <input type="date" v-model="form.birthdate" class="input" />
+              </div>
+              <div class="w-full">
+                <label class="font-bold text-xs">Place of Birth</label>
+                <input v-model="form.birth_place" class="input" />
               </div>
             </div>
 
-            <!-- Service Records -->
-            <div class="mt-5">
-              <div class="overflow-x-auto max-h-96 border">
-                <table class="min-w-full text-[14px]">
-                  <thead class="bg-gray-100 sticky top-0">
-                    <tr>
-                      <th colspan="2" class="border border-gray-400 px-2 py-3">
-                        PERIOD
-                      </th>
-                      <th colspan="6" class="border border-gray-400 px-2 py-3">
-                        RECORD OF APPOINTMENT
-                      </th>
-                      <th rowspan="2" class="border border-gray-400 px-2 py-3">
-                        OFFICE
-                      </th>
-                      <th rowspan="2" class="border border-gray-400 px-2 py-3">
-                        REMARKS
-                      </th>
-                      <th rowspan="2" class="border border-gray-400 px-2 py-3">
-                        ACTION
-                      </th>
-                    </tr>
-                    <tr>
-                      <th class="border px-2 border-gray-400 py-3">FROM</th>
-                      <th class="border px-2 border-gray-400 py-3">TO</th>
-                      <th class="border px-2 border-gray-400 py-3">
-                        DESIGNATION
-                      </th>
-                      <th class="border px-2 border-gray-400 py-3">SG</th>
-                      <th class="border px-2 border-gray-400 py-3">STEP</th>
-                      <th class="border px-2 border-gray-400 py-3">STATUS</th>
-                      <th class="border px-2 border-gray-400 py-3">
-                        BASIC SALARY
-                      </th>
-                      <th class="border px-2 border-gray-400 py-3">
-                        DAILY RATE
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(record, index) in form.serviceRecords"
-                      :key="index"
-                      class="hover:bg-gray-50"
-                    >
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.period_from"
-                          type="text"
-                          class="border border-gray-400 rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.period_to"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.roa_designation"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.roa_sg"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.roa_step"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.roa_status"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.roa_basic_salary"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.roa_basic_salary_day"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.office"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <input
-                          v-model="record.remarks"
-                          type="text"
-                          class="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td class="border border-gray-400 px-2 py-1 text-center">
-                        <button
-                          @click="removeRow(index)"
-                          class="text-red-500 hover:text-red-700 text-xs"
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <button
-                class="mt-2 bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1 rounded"
-                @click="addRow"
-              >
-                Add Row
-              </button>
+            <div>
+              <label class="font-bold text-xs">Department</label>
+              <select v-model="form.department" class="input">
+                <option disabled value="">Select Department</option>
+                <option>Office of the Mayor</option>
+                <option>Sangguniang Bayan Office</option>
+                <option>Municipal Planning and Development Office</option>
+                <option>Municipal Budget Office</option>
+                <option>Municipal Accounting Office</option>
+                <option>Municipal Treasury Office</option>
+                <option>Municipal Assessor’s Office</option>
+                <option>Municipal Engineering Office</option>
+                <option>Municipal Health Office</option>
+                <option>Municipal Social Welfare and Development Office</option>
+              </select>
             </div>
           </div>
         </div>
 
-        <!-- Submit and Cancel Button -->
-        <div class="flex place-items-end justify-end gap-2 p-4">
+        <!-- ================= STEP 2 ================= -->
+        <div v-if="step === 2" class="p-4 space-y-4">
+          <div class="overflow-x-auto max-h-96 border">
+            <table class="min-w-full text-[14px]">
+              <thead class="bg-gray-100 sticky top-0">
+                <tr>
+                  <th colspan="2" class="th">PERIOD</th>
+                  <th colspan="6" class="th">RECORD OF APPOINTMENT</th>
+                  <th rowspan="2" class="th">OFFICE</th>
+                  <th rowspan="2" class="th">REMARKS</th>
+                  <th rowspan="2" class="th">ACTION</th>
+                </tr>
+                <tr>
+                  <th class="th">FROM</th>
+                  <th class="th">TO</th>
+                  <th class="th">DESIGNATION</th>
+                  <th class="th">SG</th>
+                  <th class="th">STEP</th>
+                  <th class="th">STATUS</th>
+                  <th class="th">BASIC SALARY</th>
+                  <th class="th">DAILY RATE</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr v-for="(record, index) in form.serviceRecords" :key="index">
+                  <td class="td">
+                    <input v-model="record.period_from" class="table-input" />
+                  </td>
+                  <td class="td">
+                    <input v-model="record.period_to" class="table-input" />
+                  </td>
+                  <td class="td">
+                    <input
+                      v-model="record.roa_designation"
+                      class="table-input"
+                    />
+                  </td>
+                  <td class="td">
+                    <input v-model="record.roa_sg" class="table-input" />
+                  </td>
+                  <td class="td">
+                    <input v-model="record.roa_step" class="table-input" />
+                  </td>
+                  <td class="td">
+                    <input v-model="record.roa_status" class="table-input" />
+                  </td>
+                  <td class="td">
+                    <input
+                      v-model="record.roa_basic_salary"
+                      class="table-input"
+                    />
+                  </td>
+                  <td class="td">
+                    <input
+                      v-model="record.roa_basic_salary_day"
+                      class="table-input"
+                    />
+                  </td>
+                  <td class="td">
+                    <input v-model="record.office" class="table-input" />
+                  </td>
+                  <td class="td">
+                    <input v-model="record.remarks" class="table-input" />
+                  </td>
+                  <td class="td">
+                    <button
+                      class="text-red-500 text-xs"
+                      @click="removeRow(index)"
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <button
-            class="bg-gray-500 hover:bg-gray-300 px-5 py-2 rounded-md text-white hover:text-gray-700 transition-all duration-200"
-            @click="closeModal"
+            class="mt-2 bg-green-500 text-white text-xs px-3 py-1 rounded"
+            @click="addRow"
           >
-            Cancel
+            Add Row
           </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-between p-4 border-t">
           <button
-            class="bg-green-600 hover:bg-green-200 px-5 py-2 rounded-md text-white hover:text-green-700 transition-all duration-200"
-            @click="submitData"
+            v-if="step === 2"
+            class="bg-gray-400 px-5 py-2 rounded text-white"
+            @click="step = 1"
           >
-            Save Changes
+            Back
           </button>
+
+          <div class="ml-auto flex gap-2">
+            <button
+              v-if="step === 1"
+              class="bg-blue-900 px-5 py-2 rounded text-white"
+              @click="step = 2"
+            >
+              Next
+            </button>
+
+            <button
+              v-if="step === 2"
+              class="bg-green-600 px-5 py-2 rounded text-white"
+              @click="submitData"
+            >
+              Save Changes
+            </button>
+
+            <button
+              class="bg-gray-500 px-5 py-2 rounded text-white"
+              @click="closeModal"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -298,13 +220,16 @@
 <script>
 import icon from "@/assets/icon.vue";
 import axios from "axios";
+
 export default {
   name: "ServiceRecordModal",
-  components: {
-    icon,
-  },
+  components: { icon },
+
   data() {
     return {
+      step: 1,
+      activeStep: "bg-blue-900 text-white",
+      inactiveStep: "bg-gray-200 text-gray-600",
       form: {
         generated_service_id: "",
         first_name: "",
@@ -312,32 +237,14 @@ export default {
         last_name: "",
         birthdate: "",
         birth_place: "",
-        serviceRecords: [],
         employee_id: "",
         department: "",
+        serviceRecords: [],
       },
     };
   },
+
   methods: {
-    formatDate(record, field) {
-      const input = record[field];
-      if (!input) return;
-
-      const cleaned = input.replace(/[-.]/g, "/");
-      const date = new Date(cleaned);
-
-      if (!isNaN(date)) {
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const year = date.getFullYear();
-        record[field] = `${month}/${day}/${year}`;
-      } else {
-        record[field] = input;
-      }
-    },
-    removeRow(index) {
-      this.form.serviceRecords.splice(index, 1);
-    },
     addRow() {
       this.form.serviceRecords.push({
         period_from: "",
@@ -352,42 +259,57 @@ export default {
         remarks: "",
       });
     },
+
+    removeRow(index) {
+      this.form.serviceRecords.splice(index, 1);
+    },
+
     closeModal() {
       this.$emit("close");
     },
+
     generatedEmployeeID() {
       let lastId = localStorage.getItem("lastEmployeeID");
       let newId = lastId ? parseInt(lastId) + 1 : 100;
       return newId.toString();
     },
-    async submitData() {
-      this.form.generated_service_id = this.generatedEmployeeID();
-      localStorage.setItem("lastEmployeeID", this.form.generated_service_id);
 
+    async submitData() {
       if (this.form.serviceRecords.length === 0) {
-        alert("Please add at least one service record before submitting.");
+        alert("Please add at least one service record.");
         return;
       }
 
-      try {
-        const response = await axios.post(
-          process.env.VUE_APP_API_BASE_URL + "/service-of-records/add-service",
-          this.form
-        );
+      this.form.generated_service_id = this.generatedEmployeeID();
+      localStorage.setItem("lastEmployeeID", this.form.generated_service_id);
 
-        console.log("Data successfully submitted:", response.data);
-        alert("Service record successfully added!");
-        this.$emit("refresh");
-        this.closeModal();
-      } catch (error) {
-        console.error("Error submitting data:", error);
-        alert("Failed to submit data. Please try again.");
-      }
+      await axios.post(
+        `${process.env.VUE_APP_API_BASE_URL}/service-of-records/add-service`,
+        this.form
+      );
+
+      alert("Service record successfully added!");
+      this.$emit("refresh");
+      this.closeModal();
     },
   },
 };
 </script>
 
 <style scoped>
-/* Optional: Add styles for the child component */
+.input {
+  @apply py-3 px-3 w-full border rounded-md;
+}
+.step-pill {
+  @apply px-4 py-1 rounded-full text-xs font-semibold;
+}
+.th {
+  @apply border border-gray-400 px-2 py-3;
+}
+.td {
+  @apply border border-gray-400 px-2 py-1;
+}
+.table-input {
+  @apply border rounded px-2 py-1 w-full;
+}
 </style>

@@ -278,10 +278,12 @@ export default {
           { withCredentials: true }
         );
 
-        const role = response.data.role;
+        // Get role from response.user.role if needed
+        const role = response.data.role || response.data.user?.role;
+
         localStorage.setItem("role", role);
 
-        if (role === "Admin" || role === "Staff") {
+        if (["Admin", "Employee", "Staff"].includes(role)) {
           this.$router.push("/dashboard");
         } else {
           this.errorMessage =

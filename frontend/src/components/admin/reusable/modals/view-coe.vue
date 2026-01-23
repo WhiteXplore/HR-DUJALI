@@ -5,7 +5,7 @@
       <div class="flex justify-between items-start w-full">
         <div
           @click="toggleBack"
-          class="cursor-pointer text-red-800 hover:text-white border-red-800 border p-2 py-1 rounded-md hover:bg-red-800 text-sm"
+          class="cursor-pointer flex gap-2 items-center tracking-wider bg-red-500 text-white text-sm hover:text-red-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-red-900 hover:shadow-lg transition-all duration-300"
         >
           Back
         </div>
@@ -13,7 +13,7 @@
         <div class="flex gap-2">
           <!-- Download COE -->
           <div
-            class="px-2 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition flex gap-1 text-sm"
+            class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-500 text-white text-sm hover:text-blue-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-blue-900 hover:shadow-lg transition-all duration-300"
           >
             <icon name="download1" />
             <button @click="showDownloadAlert">Download PDF</button>

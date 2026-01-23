@@ -1,30 +1,47 @@
 <template>
-  <!-- Filter Header -->
-  <div class="flex gap-4 mb-4 items-center text-sm">
-    <select
-      v-model="selectedMonth"
-      class="p-2 border rounded-md cursor-pointer"
-    >
-      <option value="">Select Month</option>
-      <option v-for="(m, index) in months" :key="index" :value="index + 1">
-        {{ m }}
-      </option>
-    </select>
+  <div class="flex justify-between items-end mb-4">
+    <!-- Filter Header -->
+    <div class="flex flex-col text-left">
+      <h1 class="font-semibold tracking-wide text-md">
+        Client Feedback Form Reports
+      </h1>
+      <p class="text-sm text-gray-500 mt-1">
+        View
+        <span class="font-normal">
+          Summary of feedback for {{ selectedMonthName || "?" }}
+          {{ selectedYear || "Select Years" }}
+        </span>
+      </p>
+    </div>
+    <div class="flex gap-4 text-sm">
+      <select
+        v-model="selectedMonth"
+        class="p-2 border rounded-xl cursor-pointer"
+      >
+        <option value="">Select Month</option>
+        <option v-for="(m, index) in months" :key="index" :value="index + 1">
+          {{ m }}
+        </option>
+      </select>
 
-    <select v-model="selectedYear" class="p-2 border rounded-md cursor-pointer">
-      <option value="">Select Years</option>
-      <option v-for="year in years" :key="year" :value="year">
-        {{ year }}
-      </option>
-    </select>
+      <select
+        v-model="selectedYear"
+        class="p-2 border rounded-xl cursor-pointer"
+      >
+        <option value="">Select Years</option>
+        <option v-for="year in years" :key="year" :value="year">
+          {{ year }}
+        </option>
+      </select>
 
-    <button
-      @click="applyFilter"
-      :disabled="loading"
-      class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
-    >
-      Apply Filter
-    </button>
+      <button
+        @click="applyFilter"
+        :disabled="loading || !selectedMonth || !selectedYear"
+        class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-500 text-white text-sm hover:text-blue-700 px-4 py-2 rounded-xl hover:bg-white border hover:border-blue-900 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Apply Filter
+      </button>
+    </div>
   </div>
 
   <!-- Progress Overlay -->
@@ -53,26 +70,12 @@
   </div>
 
   <div
-    class="p-6 space-y-6 h-[80vh] overflow-y-auto border rounded-2xl bg-gray-50"
+    class="p-4 space-y-6 h-[80vh] overflow-y-auto border rounded-2xl bg-gray-50"
   >
-    <!-- Report Header -->
-    <div>
-      <h2 class="text-2xl font-bold text-gray-800">Client Feedback Report</h2>
-      <p class="text-gray-600 mt-1">
-        <span v-if="!filterApplied" class="font-normal"
-          >Please select month and year</span
-        >
-        <span v-else class="font-normal">
-          Summary of feedback for {{ selectedMonthName }}
-          {{ selectedYear || "Select Years" }}
-        </span>
-      </p>
-    </div>
-
     <!-- Summary & Chart Section -->
     <div
       v-if="filteredFeedbacks.length"
-      class="flex flex-col md:flex-row gap-6 mt-6"
+      class="flex flex-col md:flex-row gap-6"
     >
       <!-- Summary Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 flex-1">
@@ -285,11 +288,22 @@
               <th class="p-3 border-b uppercase text-xs font-semibold">
                 Sentiment
               </th>
+
               <th class="p-3 border-b uppercase text-xs font-semibold">
+                Common Feedback
+              </th>
+              <th
+                class="p-3 border-b uppercase text-xs font-semibold text-center"
+              >
                 Score
               </th>
               <th class="p-3 border-b uppercase text-xs font-semibold">
-                Feedback
+                Additional Feedback
+              </th>
+              <th
+                class="p-3 border-b uppercase text-xs font-semibold text-center"
+              >
+                Score
               </th>
               <th class="p-3 border-b uppercase text-xs font-semibold">Date</th>
             </tr>
@@ -312,8 +326,19 @@
               >
                 {{ item.sentiment }}
               </td>
-              <td class="p-3 border-b">{{ item.sentimentScore }}</td>
-              <td class="p-3 border-b">{{ item.feedback || "-" }}</td>
+
+              <td class="p-3 border-b">
+                {{ getFirstSentence(item.feedback) }}
+              </td>
+              <td class="p-3 border-b text-center">
+                {{ item.additional_comment_sentimentScore }}
+              </td>
+              <td class="p-3 border-b">
+                {{ getRemainingSentences(item.feedback) }}
+              </td>
+              <td class="p-3 border-b text-center">
+                {{ item.sentimentScore }}
+              </td>
               <td class="p-3 border-b">{{ formatDate(item.fileDate) }}</td>
             </tr>
           </tbody>
@@ -355,13 +380,14 @@
         </button>
       </div>
     </div>
-
-    <!-- <div
-      v-else-if="!loading"
+    <!-- Message when no data is available -->
+    <div
+      v-else-if="!filteredFeedbacks.length && !loading"
       class="text-gray-500 text-center py-10 text-lg font-medium mt-4"
     >
-      No feedback records available.
-    </div> -->
+      No data available. Please select <strong>"Month"</strong> and
+      <strong>"Year"</strong> and click the <strong>"Filter"</strong> button.
+    </div>
   </div>
 </template>
 
@@ -375,6 +401,7 @@ export default {
   name: "CustomerFeedbackReport",
   components: { Pie, icon },
   data() {
+    const now = new Date();
     return {
       feedbacks: [],
       filteredFeedbacks: [],
@@ -402,7 +429,7 @@ export default {
         "November",
         "December",
       ],
-      years: [2024, 2025, 2026],
+      years: Array.from({ length: 10 }, (_, i) => now.getFullYear() - i),
       loading: false,
       progress: 0,
       filterApplied: false,
@@ -414,6 +441,10 @@ export default {
     };
   },
   computed: {
+    formattedMonth() {
+      if (!this.selectedMonth || !this.selectedYear) return "All Time";
+      return `${this.months[this.selectedMonth - 1]} ${this.selectedYear}`;
+    },
     feedbackByOffice() {
       const counts = {};
       this.filteredFeedbacks.forEach((f) => {
@@ -580,6 +611,18 @@ export default {
       };
 
       this.loading = false;
+    },
+    getFirstSentence(text) {
+      if (!text) return "-";
+      const sentences = text.split(".");
+      return sentences[0] ? sentences[0].trim() + "." : "-";
+    },
+    getRemainingSentences(text) {
+      if (!text) return "-";
+      const sentences = text.split(".");
+      if (sentences.length <= 1) return "-";
+      // Join all remaining sentences and trim whitespace
+      return sentences.slice(1).join(".").trim();
     },
     formatDate(dateStr) {
       return new Date(dateStr).toLocaleDateString();

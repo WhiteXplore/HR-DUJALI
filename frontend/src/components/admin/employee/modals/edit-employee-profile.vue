@@ -229,7 +229,7 @@
                 <div class="flex flex-col space-y-2 w-full">
                   <label class="font-semibold">Is Dual Citizenship:</label>
                   <select
-                    v-model="form.is_dual_citizenship"
+                    v-model="form.is_dual_citizen"
                     class="px-3 py-2 border w-full border-gray-300 rounded-md text-gray-700"
                   >
                     <option disabled value="">Select</option>

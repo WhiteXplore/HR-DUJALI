@@ -65,61 +65,116 @@ export class AttendanceRecordService {
 
   async getMonthlyAttendanceReports() {
     const sql = `
-      CREATE OR REPLACE VIEW hris.vw_monthly_attendance_report AS
-      SELECT 
-    ar.employee_id,
-    ar.name,
-    DATE_FORMAT(ard.date, '%Y-%m') AS month_year, -- Month-Year
+       CREATE OR REPLACE VIEW hris.vw_monthly_attendance_report AS
+WITH RECURSIVE calendar AS (
+    -- Generate all dates in the month based on the minimum date in records
+    SELECT DATE_FORMAT(MIN(date), '%Y-%m-01') AS day_date
+    FROM hris.attendance_records_data
+    UNION ALL
+    SELECT DATE_ADD(day_date, INTERVAL 1 DAY)
+    FROM calendar
+    WHERE DATE_ADD(day_date, INTERVAL 1 DAY) <= LAST_DAY((SELECT MIN(date) FROM hris.attendance_records_data))
+),
+weekdays AS (
+    -- Only include Monday-Friday
+    SELECT day_date
+    FROM calendar
+    WHERE DAYOFWEEK(day_date) NOT IN (1, 7)  -- 1=Sunday, 7=Saturday
+)
+SELECT 
+    ar_main.employee_id,
+    ar_main.name,
+    MIN(ar_main.attendance_id) AS attendance_id,
+    DATE_FORMAT(wd.day_date, '%Y-%m') AS month_year,
 
-    COUNT(DISTINCT DATE_FORMAT(ard.date, '%Y-%m-%d')) AS total_days_present,
+    -- Days present
+    COUNT(DISTINCT CASE
+        WHEN ard.in_am IS NOT NULL OR ard.in_pm IS NOT NULL
+        THEN wd.day_date
+    END) AS total_days_present,
 
+    -- Days absent = weekdays without attendance or with all NULLs
+    COUNT(DISTINCT CASE
+        WHEN ard.attendance_id IS NULL 
+             OR (ard.in_am IS NULL AND ard.out_am IS NULL AND ard.in_pm IS NULL AND ard.out_pm IS NULL)
+        THEN wd.day_date
+    END) AS total_days_absent,
+
+    -- Total worked hours capped at 8h/day
     ROUND(
         SUM(
             LEAST(
-                GREATEST(
-                    IF(ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL, 
-                        TIMESTAMPDIFF(SECOND, ard.in_am, ard.out_am), 0
-                    ), 0
-                )
-                +
-                GREATEST(
-                    IF(ard.in_pm_24 IS NOT NULL AND ard.out_pm_24 IS NOT NULL, 
-                        TIMESTAMPDIFF(SECOND, ard.in_pm_24, ard.out_pm_24), 0
-                    ), 0
+                (
+                    IF(ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL,
+                        TIME_TO_SEC(ard.out_am) - TIME_TO_SEC(ard.in_am),
+                        0
+                    )
+                    +
+                    IF(ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL,
+                        (CASE WHEN HOUR(ard.in_pm) < 12 THEN TIME_TO_SEC(ard.in_pm) + 12*3600 ELSE TIME_TO_SEC(ard.in_pm) END)
+                        -
+                        (CASE WHEN HOUR(ard.out_pm) < 12 THEN TIME_TO_SEC(ard.out_pm) + 12*3600 ELSE TIME_TO_SEC(ard.out_pm) END)
+                        * -1,
+                        0
+                    )
                 ),
-                8 * 3600
+                8*3600
             )
-        ) / 3600
-    , 2) AS total_attendance_hours,
+        ) / 3600, 2
+    ) AS total_attendance_hours,
+    -- Total undertime hours
+-- Total undertime hours (FIXED 4H BLOCK LOGIC)
+ROUND(
+    SUM(
+        CASE
+            -- Full absence = not undertime
+            WHEN ard.attendance_id IS NULL
+              OR (ard.in_am IS NULL AND ard.out_am IS NULL
+              AND ard.in_pm IS NULL AND ard.out_pm IS NULL)
+            THEN 0
 
+            ELSE
+                -- AM undertime (4h if incomplete)
+                (CASE
+                    WHEN ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                    THEN 0
+                    ELSE 4
+                END)
+
+                +
+
+                -- PM undertime (4h if incomplete)
+                (CASE
+                    WHEN ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL
+                    THEN 0
+                    ELSE 4
+                END)
+        END
+    ),
+    2
+) AS total_undertime_hours,
+
+
+
+    -- Late days
     SUM(
         CASE 
-            WHEN (
-                (ard.in_am IS NOT NULL AND STR_TO_DATE(ard.in_am, '%H:%i:%s') > '08:02:00')
-                OR
-                (ard.in_pm_24 IS NOT NULL AND STR_TO_DATE(ard.in_pm_24, '%H:%i:%s') > '13:02:00')
-            )
+            WHEN (ard.in_am IS NOT NULL AND ard.in_am > '08:02:00')
+              OR (ard.in_pm IS NOT NULL AND ard.in_pm > '13:02:00')
             THEN 1 ELSE 0
         END
-    ) AS total_late_days,
+    ) AS total_late_days
 
-    SUM(
-        CASE 
-            WHEN ard.out_pm_24 < '17:00:00' AND ard.out_pm_24 IS NOT NULL 
-                THEN TIMESTAMPDIFF(MINUTE, ard.out_pm_24, '17:00:00')
-            ELSE 0 
-        END
-    ) AS total_undertime_minutes
+FROM hris.attendance_records ar_main
+-- Join weekdays to include all possible dates
+CROSS JOIN weekdays wd
+-- Left join attendance data per employee per day
+LEFT JOIN hris.attendance_records_data ard
+    ON ard.attendance_id = ar_main.attendance_id
+   AND DATE(ard.date) = wd.day_date
+GROUP BY ar_main.employee_id, ar_main.name, month_year
+ORDER BY ar_main.employee_id, month_year;
 
-FROM hris.attendance_records ar
-JOIN hris.vw_attendance_24hr ard 
-    ON ar.attendance_id = ard.attendance_id
-WHERE ard.in_am IS NOT NULL 
-   OR ard.in_pm_24 IS NOT NULL 
-   OR ard.out_am IS NOT NULL 
-   OR ard.out_pm_24 IS NOT NULL
-GROUP BY ar.employee_id, ar.name, month_year
-ORDER BY ar.name, month_year;
 
     `;
     return await this.dataSource.query(sql);

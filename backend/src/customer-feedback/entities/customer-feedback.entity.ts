@@ -41,6 +41,9 @@ export class CustomerFeedback {
   @Column({ type: 'int', nullable: true })
   sentimentScore: number;
 
+  @Column({ type: 'int', nullable: true })
+  additional_comment_sentimentScore: number;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fileDate: Date;
 

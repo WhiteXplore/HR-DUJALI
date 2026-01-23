@@ -1,12 +1,5 @@
 <template>
   <div>
-    <!-- <div class="flex justify-end mb-2 absolute right-12 top-[120px]">
-      <div
-        class="bg-blue-900 px-2 py-2 rounded-md text-white text-sm flex gap-1 cursor-pointer hover:bg-blue-500 transition duration-150"
-      >
-        <icon name="edit" /> <button>Edit</button>
-      </div>
-    </div> -->
     <div class="flex w-full items-start gap-5">
       <!-- Sidebar -->
 
@@ -77,11 +70,11 @@
             </div>
           </div>
           <!-- Back Button -->
-          <div class="flex justify-start" @click="toggleBack">
+          <div class="flex justify-start" @click="toggleEdit(matchingRecord)">
             <div
-              class="cursor-pointer flex gap-2 items-center tracking-wider bg-red-500 text-white text-sm hover:text-red-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-red-900 hover:shadow-lg transition-all duration-300"
+              class="cursor-pointer flex gap-2 items-center tracking-wider bg-green-500 text-white text-sm hover:text-green-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-green-900 hover:shadow-lg transition-all duration-300"
             >
-              Back
+              Edit
             </div>
           </div>
         </div>
@@ -109,49 +102,75 @@
             </div>
           </div>
 
-          <div v-else class="text-center text-gray-500 mt-10">Loading...</div>
+          <div v-else class="text-center text-gray-500 mt-10">
+            No data available! Please click
+            <span class="text-blue-900 font-bold">"Edit Button"</span>.
+          </div>
         </div>
 
         <!-- Address  -->
         <div
           v-if="activeSection === 'address'"
-          class="overflow-y-auto max-h-[700px] space-y-3 text-left py-4"
+          class="overflow-y-auto max-h-[700px] space-y-6 text-left py-4"
         >
-          <h1 class="text-lg font-bold text-blue-600">Residential Address</h1>
-          <div v-if="matchingRecord" class="grid grid-cols-2 gap-6 mt-4">
-            <div
-              v-for="(addressResidentLabel, key) in addressResidentFields"
-              :key="key"
-              :class="{ 'col-span-2': key === 'zip_code' }"
-            >
-              <p class="text-gray-600 text-sm font-semibold">
-                {{ addressResidentLabel }}:
-              </p>
-              <p
-                class="text-gray-900 text-[15px] mt-1 bg-gray-50 rounded-lg px-2 py-3 border border-gray-100"
-              >
-                {{ formatField(matchingRecord[key], key) }}
-              </p>
+          <template v-if="matchingRecord">
+            <!-- Residential Address -->
+            <div>
+              <h1 class="text-lg font-bold text-gray-600">
+                Residential Address
+              </h1>
+              <div class="grid grid-cols-2 gap-6 mt-4">
+                <div
+                  v-for="(label, key) in addressResidentFields"
+                  :key="key"
+                  :class="{ 'col-span-2': key === 'zip_code' }"
+                  class="flex flex-col"
+                >
+                  <p class="text-gray-600 text-sm font-semibold mb-1">
+                    {{ label }}:
+                  </p>
+                  <p
+                    class="text-gray-900 text-[15px] bg-gray-50 rounded-lg px-2 py-3 border border-gray-100"
+                  >
+                    {{ formatField(matchingRecord[key], key) }}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-          <h1 class="text-lg font-bold text-blue-600">Permanent Address</h1>
-          <div v-if="matchingRecord" class="grid grid-cols-2 gap-6 mt-4">
-            <div
-              v-for="(addressPermanentLabel, key) in addressPermanentFields"
-              :key="key"
-              :class="{ 'col-span-2': key === 'same_zip_code' }"
-            >
-              <p class="text-gray-600 text-sm font-semibold">
-                {{ addressPermanentLabel }}:
-              </p>
-              <p
-                class="text-gray-900 text-[15px] mt-1 bg-gray-50 rounded-lg px-2 py-3 border border-gray-100"
-              >
-                {{ formatField(matchingRecord[key], key) }}
-              </p>
+
+            <!-- Permanent Address -->
+            <div>
+              <h1 class="text-lg font-bold text-gray-600">Permanent Address</h1>
+              <div class="grid grid-cols-2 gap-6 mt-4">
+                <div
+                  v-for="(label, key) in addressPermanentFields"
+                  :key="key"
+                  :class="{ 'col-span-2': key === 'same_zip_code' }"
+                  class="flex flex-col"
+                >
+                  <p class="text-gray-600 text-sm font-semibold mb-1">
+                    {{ label }}:
+                  </p>
+                  <p
+                    class="text-gray-900 text-[15px] bg-gray-50 rounded-lg px-2 py-3 border border-gray-100"
+                  >
+                    {{ formatField(matchingRecord[key], key) }}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+          </template>
+
+          <template v-else>
+            <div
+              class="text-center text-gray-500 py-6 border rounded-lg bg-gray-50"
+            >
+              No data available! Please click
+              <span class="text-blue-900 font-bold">"Edit Button"</span>.
+            </div>
+          </template>
         </div>
+
         <!-- Education  -->
         <div
           v-if="activeSection === 'education'"
@@ -203,8 +222,9 @@
               </table>
             </div>
           </div>
-          <div v-else class="text-gray-500 italic mt-4">
-            No education records available.
+          <div v-else class="text-center text-gray-500 mt-10">
+            No data available! Please click
+            <span class="text-blue-900 font-bold">"Edit Button"</span>.
           </div>
         </div>
 
@@ -258,8 +278,9 @@
               </table>
             </div>
           </div>
-          <div v-else class="text-gray-500 italic mt-4">
-            No education records available.
+          <div v-else class="text-center text-gray-500 mt-10">
+            No data available! Please click
+            <span class="text-blue-900 font-bold">"Edit Button"</span>.
           </div>
         </div>
 
@@ -328,8 +349,9 @@
               </table>
             </div>
           </div>
-          <div v-else class="text-gray-500 italic mt-4">
-            No education records available.
+          <div v-else class="text-center text-gray-500 mt-10">
+            No data available! Please click
+            <span class="text-blue-900 font-bold">"Edit Button"</span>.
           </div>
         </div>
 
@@ -409,33 +431,41 @@
               </table>
             </div>
           </div>
-          <div v-else class="text-gray-500 italic mt-4">
-            No education records available.
+          <div v-else class="text-center text-gray-500 mt-10">
+            No data available! Please click
+            <span class="text-blue-900 font-bold">"Edit Button"</span>.
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <editEmployeeProfile
+    v-if="isEditEmployee"
+    :employeeRecord="selectedEmployeeRecord"
+    @close="closeEdit"
+    @employee-updated="onEmployeeUpdated"
+  />
 </template>
 
 <script>
 import axios from "axios";
-// import icon from "@/assets/icon.vue";
+import editEmployeeProfile from "@/components/employee/modals/edit-employee-profile.vue";
+
 export default {
   name: "ViewEmployeeProfilePage",
   components: {
-    // icon,
+    editEmployeeProfile,
   },
-  props: {
-    employeeId: {
-      type: String,
-      required: true,
-    },
-  },
+
   data() {
     return {
+      isEditEmployee: false,
+      selectedEmployeeRecord: null,
       activeSection: "personal",
       matchingRecord: null,
+      user: null,
+
       personalFields: {
         first_name: "First Name",
         middle_name: "Middle Name",
@@ -449,7 +479,7 @@ export default {
         height: "Height",
         weight: "Weight",
         citizenship: "Citizenship",
-        is_dual_citizen: "Dual Citizenship",
+        is_dual_citizenship: "Dual Citizenship",
         gsis_id: "GSIS ID",
         pagibig_id: "PAGIBIG ID",
         philhealth: "PhilHealth",
@@ -486,47 +516,118 @@ export default {
     toggleBack() {
       this.$emit("back-to-table-employee");
     },
+
     toggleSection(section) {
       this.activeSection = section;
     },
-    fetchEmployeeRecords() {
-      axios
-        .get(process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`)
-        .then((response) => {
-          this.matchingRecord = response.data || null;
-          if (!this.matchingRecord) {
-            console.warn(`No record found with ID: ${this.employeeId}`);
-          } else {
-            console.log("Employee Record:", this.matchingRecord);
-          }
-        })
-        .catch((error) => {
-          console.error(
-            "There was an error fetching the service record:",
-            error
-          );
-        });
+
+    async fetchUser() {
+      try {
+        const response = await axios.get(
+          process.env.VUE_APP_API_BASE_URL + "/auth/me",
+          { withCredentials: true }
+        );
+
+        if (response.data) {
+          this.user = response.data;
+
+          // Fetch linked employee records
+          await this.fetchEmployeeRecords(this.user.employee_id);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
     },
+
+    async fetchEmployeeRecords(employeeId) {
+      try {
+        const response = await axios.get(
+          process.env.VUE_APP_API_BASE_URL + "/upload/get-all"
+        );
+
+        const allRecords = response.data || [];
+
+        this.matchingRecord =
+          allRecords.find((record) => record.employee_id === employeeId) ||
+          null;
+      } catch (error) {
+        console.error("Error fetching employee records:", error);
+      }
+    },
+
     formatField(value, key) {
-      if (key === "birthdate") {
-        return this.formatDate(value); // Format birthdate
+      if (!value) return "--";
+
+      // Format birthdate
+      if (key === "birthdate") return this.formatDate(value);
+
+      // Dual citizenship
+      if (key === "is_dual_citizenship") return value ? "Yes" : "No";
+
+      // Format Pag-IBIG ID: 16-000071974-6
+      if (key === "pagibig_id") {
+        const val = String(value).replace(/\D/g, ""); // remove non-digits
+        if (val.length === 12) {
+          return `${val.slice(0, 2)}-${val.slice(2, 10)}-${val.slice(10)}`;
+        }
+        return val; // fallback
       }
-      if (key === "is_dual_citizenship") {
-        return value ? "Yes" : "No"; // Format dual citizenship
+
+      // Format SSS Number: 11-1111111-1
+      if (key === "sss_number") {
+        const val = String(value).replace(/\D/g, "");
+        if (val.length === 10) {
+          return `${val.slice(0, 2)}-${val.slice(2, 9)}-${val.slice(9)}`;
+        }
+        return val;
       }
-      return value || "--"; // Default fallback value
+
+      // Format GSIS ID: optional dash formatting if needed
+      if (key === "gsis_id") return String(value);
+
+      // Format PhilHealth: 12-345678901-2
+      if (key === "philhealth") {
+        const val = String(value).replace(/\D/g, "");
+        if (val.length === 12) {
+          return `${val.slice(0, 2)}-${val.slice(2, 10)}-${val.slice(10)}`;
+        }
+        return val;
+      }
+
+      // Format TIN: optional dash formatting
+      if (key === "tin_number") return String(value);
+
+      // Default: return as string
+      return String(value);
     },
     formatDate(date) {
+      if (!date) return "--";
       const options = { year: "numeric", month: "long", day: "2-digit" };
       return new Date(date).toLocaleDateString("en-US", options);
     },
+
+    // 🔥 OPEN EDIT MODAL + SEND DATA
+    toggleEdit(employeeRecord) {
+      this.selectedEmployeeRecord = employeeRecord;
+      this.isEditEmployee = true;
+    },
+    // 🔥 CLOSE EDIT MODAL
+    closeEdit() {
+      this.isEditEmployee = false;
+      this.selectedEmployeeRecord = null;
+    },
+
+    onEmployeeUpdated() {
+      if (this.user && this.user.employee_id) {
+        this.fetchEmployeeRecords(this.user.employee_id); // ✅ reloads the table
+      }
+      this.isEditEmployee = false;
+      this.selectedEmployeeRecord = null; // clear selected record
+    },
   },
+
   mounted() {
-    console.log(
-      "Service ID received in ViewServiceRecords component:",
-      this.employeeId
-    );
-    this.fetchEmployeeRecords();
+    this.fetchUser();
   },
 };
 </script>

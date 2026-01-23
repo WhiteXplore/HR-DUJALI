@@ -41,7 +41,9 @@ export class AuthService {
       email: user.email,
       role: user.role,
       first_name: user.first_name,
+      middle_name: user.middle_name,
       last_name: user.last_name,
+      employee_id: user.employee_id,
     };
 
     const token = this.jwtService.sign(payload, { expiresIn: '1h' });
@@ -77,7 +79,9 @@ export class AuthService {
         email: user.email,
         role: user.role,
         first_name: user.first_name,
+        middle_name: user.middle_name,
         last_name: user.last_name,
+        employee_id: user.employee_id,
       };
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
@@ -89,7 +93,9 @@ export class AuthService {
     email: string,
     password: string,
     first_name: string,
+    middle_name: string,
     last_name: string,
+    employee_id: string,
     role: string,
     res: Response,
   ) {
@@ -102,7 +108,9 @@ export class AuthService {
       email,
       password: hashedPassword,
       first_name,
+      middle_name,
       last_name,
+      employee_id,
       role: role || 'User', // default to 'User' if not provided
     });
 
@@ -113,7 +121,9 @@ export class AuthService {
       email: newUser.email,
       role: newUser.role,
       first_name: newUser.first_name,
+      middle_name: newUser.middle_name,
       last_name: newUser.last_name,
+      employee_id: newUser.employee_id,
     };
 
     const token = this.jwtService.sign(payload, { expiresIn: '1h' });
@@ -134,7 +144,9 @@ export class AuthService {
   async updateUser(
     id: number,
     first_name: string,
+    middle_name: string,
     last_name: string,
+    employee_id: string,
     email: string,
     role: string,
     password?: string,
@@ -143,7 +155,9 @@ export class AuthService {
     if (!user) throw new BadRequestException('User not found');
 
     user.first_name = first_name;
+    user.middle_name = middle_name;
     user.last_name = last_name;
+    user.employee_id = employee_id;
     user.email = email;
     user.role = role;
 

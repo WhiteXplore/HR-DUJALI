@@ -10,7 +10,7 @@
         <icon
           :name="'burger'"
           class="cursor-pointer"
-          :class="{ 'mr-3 mt-1': !isExpanded }"
+          :class="{ 'mr-2 mt-1': !isExpanded }"
         />
       </div>
 
@@ -23,7 +23,7 @@
         />
         <p
           :class="{
-            'text-sm font-medium mt-2': isExpanded,
+            'text-[12px] font-medium mt-2': isExpanded,
             hidden: !isExpanded,
           }"
         >
@@ -31,7 +31,15 @@
         </p>
         <p
           :class="{
-            'text-[12px] font-medium': isExpanded,
+            'text-[12px] font-normal mt-2': isExpanded,
+            hidden: !isExpanded,
+          }"
+        >
+          {{ user.email }}
+        </p>
+        <p
+          :class="{
+            'text-[13px] font-medium': isExpanded,
             hidden: !isExpanded,
           }"
         >
@@ -42,7 +50,7 @@
       <div v-if="isExpanded" class="w-full h-0.5 bg-[#fbfbfb] mt-4"></div>
 
       <!-- Dynamic Menu -->
-      <div class="flex flex-col mt-6 gap-2 tracking-wide text-[12px] w-full">
+      <div class="flex flex-col mt-6 gap-2 tracking-wide text-[13px] w-full">
         <template v-for="section in filteredSections" :key="section.name">
           <div v-if="isExpanded" class="text-md text-white mt-2 text-left">
             {{ section.name }}
@@ -53,12 +61,15 @@
             <router-link
               v-if="!item.children"
               :to="item.route"
-              class="flex items-center w-full p-2 rounded-md transition-all duration-200"
+              class="flex items-center w-full px-2 py-3 rounded-md transition-all duration-200"
               :class="[
+                'flex items-center w-full rounded-md transition-all duration-200',
+                !isExpanded
+                  ? 'px-1 py-2 justify-center'
+                  : 'px-4 py-3 justify-start gap-5',
                 $route.path === item.route
-                  ? 'bg-white text-green-700'
-                  : 'text-white hover:bg-white hover:text-green-800',
-                !isExpanded ? 'justify-center' : 'justify-start gap-5',
+                  ? 'bg-white text-blue-800'
+                  : 'text-white hover:bg-white hover:text-blue-800',
               ]"
             >
               <icon :name="item.icon" />
@@ -69,13 +80,17 @@
             <div v-else>
               <div
                 @click="toggleDropdown(item.name)"
-                class="flex items-center justify-between w-full p-2 cursor-pointer transition-all duration-200"
+                class="flex items-center justify-between w-full px-2 py-3 cursor-pointer transition-all duration-200"
                 :class="[
                   isDropdownOpen === item.name
-                    ? `bg-white text-green-800 ${
-                        !isExpanded ? 'rounded-md' : 'rounded-t-md'
+                    ? `bg-white text-blue-800 ${
+                        !isExpanded
+                          ? 'px-1 py-2 rounded-md'
+                          : 'px-4 py-3 rounded-t-md'
                       }`
-                    : 'text-white hover:bg-white hover:text-green-800 hover:rounded-md',
+                    : !isExpanded
+                    ? 'px-1 py-2 text-white hover:bg-white hover:text-blue-800 rounded-md'
+                    : 'px-4 py-3 text-white hover:bg-white hover:text-blue-800 hover:rounded-md',
                 ]"
               >
                 <div
@@ -103,7 +118,7 @@
                     v-for="(sub, index) in item.children"
                     :key="sub.name"
                     :to="sub.route"
-                    class="block w-full py-2 px-[60px] text-[11px] transition-all duration-200 text-left"
+                    class="block w-full py-2 px-[60px] text-[12px] transition-all duration-200 text-left"
                     :class="[
                       $route.path.startsWith(sub.route)
                         ? 'bg-blue-950 text-white'
@@ -140,7 +155,7 @@
 
 <script>
 import icon from "@/assets/icon.vue";
-import adminTopbar from "../../../components/admin/navigation/topbar.vue";
+import adminTopbar from "@/components/global/navigation/topbar.vue";
 import axios from "axios";
 
 export default {
@@ -154,72 +169,128 @@ export default {
       sections: [
         {
           name: "Home",
+          role: ["Admin", "Employee", "Staff"],
           items: [
             { name: "Dashboard", icon: "dashboard", route: "/dashboard" },
           ],
         },
+
         {
           name: "Records",
+          role: ["Admin", "Employee"],
           items: [
             {
               name: "Employee Records",
               icon: "users",
               route: "/employement-records",
+              role: ["Admin", "Employee"],
               children: [
-                { name: "Employee Profile", route: "/employement-records" },
-                { name: "Service Record", route: "/service-of-records" },
-                { name: "Attendance Record", route: "/attendance-records" },
+                {
+                  name: "Employee Profile",
+                  route: "/employement-records",
+                  role: ["Admin"],
+                },
+                {
+                  name: "Employee Profile",
+                  route: "/vw-employee-profile",
+                  role: ["Employee"],
+                },
+
+                {
+                  name: "Service Record",
+                  route: "/service-of-records",
+                  role: ["Admin"],
+                },
+                {
+                  name: "Service Record",
+                  route: "/vw-service-of-records",
+                  role: ["Employee"],
+                },
+                {
+                  name: "Attendance Record",
+                  route: "/attendance-records",
+                  role: ["Admin"],
+                },
+                {
+                  name: "Attendance Record",
+                  route: "/vw-attendance-records",
+                  role: ["Employee"],
+                },
               ],
             },
             {
               name: "Available Trainings",
               icon: "general",
               route: "/available-trainings",
+              role: ["Admin"],
             },
           ],
         },
+
         {
           name: "Utilities",
+          role: ["Admin"],
           items: [
             {
               name: "HR Templates",
               icon: "utilities",
               route: "/certificate-of-employment",
+              role: ["Admin"],
             },
           ],
         },
+
         {
           name: "Analysis",
+          role: ["Admin"],
           items: [
             {
               name: "Predictive Analysis",
               icon: "graph",
               route: "/predictive-analysis",
-              children: [{ name: "Promotion", route: "/promotion-page" }],
+              role: ["Admin"],
+              children: [
+                {
+                  name: "Promotion",
+                  route: "/promotion-page",
+                  role: ["Admin"],
+                },
+              ],
             },
           ],
         },
+
         {
           name: "User Management",
+          role: ["Admin"],
           items: [
             {
               name: "Users List",
               icon: "general",
               route: "/user-management",
+              role: ["Admin"],
             },
           ],
         },
+
         {
           name: "Report",
+          role: ["Admin"],
           items: [
             {
               name: "Monthly Report",
               icon: "general",
+              role: ["Admin", "Employee"],
               children: [
-                { name: "Attendance", route: "/attendance-report" },
+                {
+                  name: "Attendance",
+                  route: "/attendance-report",
+                  role: ["Admin"],
+                },
                 {
                   name: "Client Feedback",
                   route: "/client-feedback-report",
+                  role: ["Admin"],
                 },
               ],
             },
@@ -230,16 +301,43 @@ export default {
   },
   computed: {
     filteredSections() {
-      // If no user loaded yet
-      if (!this.user || !this.user.role) return this.sections;
+      if (!this.user || !this.user.role) return [];
 
-      // Hide "User Management" if role = Staff
-      return this.sections.filter((section) => {
-        if (section.name === "User Management" && this.user.role === "Staff") {
-          return false;
-        }
-        return true;
-      });
+      return this.sections
+        .map((section) => {
+          // 1. SECTION ROLE CHECK
+          const sectionAllowed =
+            !section.role || section.role.includes(this.user.role);
+          if (!sectionAllowed) return null;
+
+          // 2. FILTER ITEMS
+          const filteredItems = section.items
+            .map((item) => {
+              const itemAllowed =
+                !item.role || item.role.includes(this.user.role);
+              if (!itemAllowed) return null;
+
+              // 3. FILTER CHILDREN (IF ANY)
+              if (item.children) {
+                const filteredChildren = item.children.filter(
+                  (child) => !child.role || child.role.includes(this.user.role)
+                );
+
+                if (filteredChildren.length === 0) return null;
+
+                return { ...item, children: filteredChildren };
+              }
+
+              return item;
+            })
+            .filter(Boolean);
+
+          // HIDE SECTION IF NO ITEMS LEFT
+          if (filteredItems.length === 0) return null;
+
+          return { ...section, items: filteredItems };
+        })
+        .filter(Boolean);
     },
   },
   created() {

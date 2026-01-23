@@ -1,10 +1,5 @@
 <template>
   <div class="px-2 mt-2">
-    <!-- Headers -->
-    <div class="flex justify-between items-center">
-      <h1 class="font-semibold tracking-wide text-md">Attendance Reports</h1>
-    </div>
-
     <!-- Main Content  -->
     <div class="mt-3">
       <!-- Table -->

@@ -9,7 +9,13 @@ export class User_Accounts {
   first_name: string;
 
   @Column()
+  middle_name: string;
+
+  @Column()
   last_name: string;
+
+  @Column()
+  employee_id: string;
 
   @Column()
   email: string;

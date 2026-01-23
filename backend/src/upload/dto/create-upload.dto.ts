@@ -177,8 +177,8 @@ export class CreateUploadDto {
   citizenship?: string;
 
   @IsOptional()
-  @IsBoolean()
-  is_dual_citizen?: boolean;
+  @IsString()
+  is_dual_citizen?: string;
 
   @IsOptional()
   @IsString()

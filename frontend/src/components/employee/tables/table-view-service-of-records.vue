@@ -4,10 +4,10 @@
       <!-- Back & Action Buttons -->
       <div class="flex justify-between">
         <div
-          @click="toggleBack"
-          class="cursor-pointer flex gap-2 items-center tracking-wider bg-red-500 text-white text-sm hover:text-red-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-red-900 hover:shadow-lg transition-all duration-300"
+          @click="toggleEdit"
+          class="cursor-pointer flex gap-2 items-center tracking-wider bg-green-500 text-white text-sm hover:text-green-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-green-900 hover:shadow-lg transition-all duration-300"
         >
-          Back
+          Edit
         </div>
         <div class="flex gap-2">
           <button
@@ -184,26 +184,51 @@
       </div>
     </div>
   </div>
+  <editServiceOfRecords
+    v-if="isEditServiceOFREcords"
+    :employeeServiceRecord="selectedEmployeeServiceRecord"
+    @close="closeEdit"
+    @employee-updated="onEmployeeUpdated"
+  />
 </template>
 
 <script>
 import axios from "axios";
+import editServiceOfRecords from "../modals/edit-service-of-records.vue";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.vfs;
 
 export default {
   name: "ViewServiceRecords",
-  props: { serviceId: { type: String, required: true } },
+  components: {
+    editServiceOfRecords,
+  },
   data() {
     return {
       isOpenView: true,
       matchingRecord: null,
+      user: null,
+      isEditServiceOFREcords: false, // toggle edit modal
+      selectedEmployeeServiceRecord: null, // record to send to modal
     };
   },
+
   methods: {
-    toggleBack() {
-      this.$emit("back-to-table-service");
+    toggleEdit() {
+      if (!this.matchingRecord) return;
+      this.selectedEmployeeServiceRecord = this.matchingRecord; // send record to modal
+      this.isEditServiceOFREcords = true; // open modal
+    },
+
+    closeEdit() {
+      this.isEditServiceOFREcords = false;
+      this.selectedEmployeeServiceRecord = null;
+    },
+
+    onEmployeeUpdated(updatedRecord) {
+      this.matchingRecord = { ...updatedRecord }; // update local data
+      this.closeEdit();
     },
     downloadPDF() {
       if (!this.matchingRecord) return alert("No record to download!");
@@ -357,7 +382,6 @@ export default {
           r.remarks ?? "",
         ]);
       });
-
       const docDefinition = {
         pageSize,
         pageOrientation,
@@ -404,7 +428,7 @@ export default {
           },
           {
             table: {
-              headerRows: 1,
+              headerRows: 2,
               widths: [55, 55, 70, 20, 25, 50, 30, 30, 60, "*"],
               body: tableBody,
             },
@@ -439,18 +463,6 @@ export default {
 
       pdfMake.createPdf(docDefinition).open();
     },
-
-    fetchServiceRecords() {
-      axios
-        .get(
-          `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}`
-        )
-        .then((res) => {
-          this.matchingRecord = res.data || null;
-        })
-        .catch((err) => console.error("Error fetching service record:", err));
-    },
-
     formatDate(date) {
       return new Date(date).toLocaleDateString("en-US", {
         year: "numeric",
@@ -458,10 +470,41 @@ export default {
         day: "2-digit",
       });
     },
+
+    // Fetch logged-in user
+    async fetchUser() {
+      try {
+        const response = await axios.get(
+          process.env.VUE_APP_API_BASE_URL + "/auth/me",
+          { withCredentials: true }
+        );
+
+        this.user = response.data || null;
+
+        if (this.user?.employee_id) {
+          this.fetchServiceRecordsByEmployee(this.user.employee_id);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    },
+
+    // Fetch service records for logged-in employee
+    fetchServiceRecordsByEmployee(employeeId) {
+      axios
+        .get(process.env.VUE_APP_API_BASE_URL + "/service-of-records/get-all")
+        .then((res) => {
+          const allRecords = res.data || [];
+          this.matchingRecord = allRecords.find(
+            (r) => r.employee_id === employeeId
+          );
+        })
+        .catch((err) => console.error("Error fetching service records:", err));
+    },
   },
 
   mounted() {
-    this.fetchServiceRecords();
+    this.fetchUser();
   },
 };
 </script>

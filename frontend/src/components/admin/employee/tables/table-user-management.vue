@@ -8,7 +8,7 @@
       <div class="flex gap-2">
         <div
           @click="toggleAddUsers"
-          class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-900 text-white hover:text-blue-700 p-3 py-2 rounded-md hover:bg-blue-300 hover:shadow-lg"
+          class="cursor-pointer flex gap-2 items-center tracking-wider bg-green-500 text-white hover:text-green-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-green-900 hover:shadow-lg transition-all duration-300"
         >
           <icon name="add-account" />
           <button>Add User</button>
@@ -24,7 +24,7 @@
           <select
             v-model="itemsPerPage"
             @change="changePage(1)"
-            class="px-2 py-1 border rounded-md"
+            class="px-2 py-2 border rounded-md"
           >
             <option v-for="n in [5, 10, 15, 20]" :key="n" :value="n">
               {{ n }}
@@ -49,7 +49,7 @@
         >
           <thead class="sticky top-0 z-10">
             <tr>
-              <th class="w-[50px] px-5 py-3 text-center border-b">ID</th>
+              <th class="w-[7%] px-2 py-3 text-left border-b">Employee ID</th>
               <th class="px-2 py-3 text-left border-b">Full Name</th>
               <th class="px-2 py-3 text-left border-b">Email</th>
               <th class="px-2 py-3 text-left border-b">Role</th>
@@ -62,15 +62,15 @@
               :key="user.id"
               :class="{ 'bg-blue-50 border-b': (index + 1) % 2 === 0 }"
             >
-              <td class="px-2 py-1 border-b text-center">
-                {{ startIndex + index }}
+              <td class="px-2 py-2 border-b text-left">
+                {{ user.employee_id }}
               </td>
-              <td class="px-2 py-1 border-b text-left">
+              <td class="px-2 py-2 border-b text-left">
                 {{ user.first_name }} {{ user.last_name }}
               </td>
-              <td class="px-2 py-1 border-b text-left">{{ user.email }}</td>
-              <td class="px-2 py-1 border-b text-left">{{ user.role }}</td>
-              <td class="px-2 py-1 border-b text-left">
+              <td class="px-2 py-2 border-b text-left">{{ user.email }}</td>
+              <td class="px-2 py-2 border-b text-left">{{ user.role }}</td>
+              <td class="px-2 py-2 border-b text-left">
                 <div class="flex gap-1">
                   <button
                     class="p-2 py-1 h-8 border-2 border-green-200 hover:bg-green-300 text-green-700 rounded-lg flex gap-1"
@@ -104,7 +104,7 @@
           <button
             @click="changePage(currentPage - 1)"
             :disabled="currentPage === 1"
-            class="px-3 py-1 bg-gray-300 rounded-l-md"
+            class="px-3 py-2 bg-gray-300 rounded-l-md"
           >
             &lt;
           </button>
@@ -117,14 +117,14 @@
                 ? 'bg-blue-900 text-white'
                 : 'bg-gray-200 text-gray-700'
             "
-            class="px-3 py-1 mx-1 rounded-md"
+            class="px-3 py-2 mx-1 rounded-md"
           >
             {{ page }}
           </button>
           <button
             @click="changePage(currentPage + 1)"
             :disabled="currentPage === totalPages"
-            class="px-3 py-1 bg-gray-300 rounded-r-md"
+            class="px-3 py-2 bg-gray-300 rounded-r-md"
           >
             &gt;
           </button>

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LoginView from "@/views/LoginView.vue";
-import sidebar from "../components/admin/navigation/sidebar.vue";
+import sidebar from "@/components/global/navigation/sidebar.vue";
 // import templates from "../components/admin/reusable/templates.vue";
 
 const routes = [
@@ -26,6 +26,7 @@ const routes = [
         component: () =>
           import("@/components/admin/dashboard/employee-dashboard.vue"),
       },
+      // TODO ADMIN ROUTES
       {
         path: "/employement-records",
         name: "employee-profile",
@@ -50,6 +51,16 @@ const routes = [
             "@/components/admin/employee/modals/view-eligible-trainings.vue"
           ),
       },
+      {
+        path: "/view-eligible-for-promotion/:id",
+        name: "view-eligible-for-promotion",
+        component: () =>
+          import(
+            "@/components/admin/predictive/modals/view-eligible-for-promotion.vue"
+          ),
+        props: true,
+      },
+
       {
         path: "/available-trainings",
         name: "available-trainings",
@@ -106,7 +117,7 @@ const routes = [
         path: "/profile-view",
         name: "profile-view",
         component: () =>
-          import("@/components/admin/navigation/profile/view-profile.vue"),
+          import("@/components/global/navigation/profile/view-profile.vue"),
       },
 
       {
@@ -172,6 +183,26 @@ const routes = [
         name: "client-feedback-report",
         component: () =>
           import("@/components/admin/employee/customer-feedback-form.vue"),
+        children: [],
+      },
+
+      //TODO EMPLOYEE ROUTES
+      {
+        path: "/vw-employee-profile",
+        name: "vw-employee-profile",
+        component: () => import("@/components/employee/employee-profile.vue"),
+        children: [],
+      },
+      {
+        path: "/vw-service-of-records",
+        name: "vw-service-of-records",
+        component: () => import("@/components/employee/service-of-records.vue"),
+        children: [],
+      },
+      {
+        path: "/vw-attendance-records",
+        name: "vw-attendance-records",
+        component: () => import("@/components/employee/attendance-records.vue"),
         children: [],
       },
     ],

@@ -1,21 +1,24 @@
 <template>
   <div class="px-2 mt-2">
     <!-- Headers -->
+    <div class="flex justify-between items-center">
+      <h1 class="font-semibold tracking-wide text-md">Employee Profile</h1>
+    </div>
 
     <!-- Main Content  -->
     <div class="mt-3">
       <!-- Table -->
-      <viewTableCustomerFeedbackForm />
+      <tableViewEmployeeProfile />
     </div>
   </div>
 </template>
 
 <script>
-import viewTableCustomerFeedbackForm from "./tables/view-table-customer-feedback-form.vue";
+import tableViewEmployeeProfile from "./tables/table-view-employee-profile.vue";
 export default {
   name: "StudentRecordsPage",
   components: {
-    viewTableCustomerFeedbackForm,
+    tableViewEmployeeProfile,
   },
 };
 </script>

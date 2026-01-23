@@ -1,96 +1,47 @@
-<!-- PrintableModal.vue -->
 <template>
   <div
     v-if="show"
     class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center p-4"
   >
     <div
-      class="bg-white rounded-2xl w-full max-w-3xl p-8 shadow-xl relative overflow-y-auto max-h-[95vh]"
+      class="bg-white rounded-2xl w-[50vw] h-[95vh] shadow-xl relative flex flex-col"
     >
       <!-- Close Button -->
       <button
         @click="$emit('close')"
-        class="absolute top-4 right-4 text-red-600 font-semibold text-xl"
+        class="absolute top-4 right-4 text-red-600 font-semibold text-xl z-10"
       >
         ✕
       </button>
 
       <!-- Header -->
-      <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">
-        Promotion Eligibility Report
-      </h2>
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-bold text-gray-800 text-center">
+          Promotion Eligibility Report (Preview)
+        </h2>
+      </div>
 
-      <!-- Section: Employee Information -->
-      <div class="border rounded-lg p-5 bg-gray-50 shadow-sm">
-        <h3 class="text-lg font-semibold mb-3 text-gray-700">
-          Employee Information
-        </h3>
+      <!-- PDF Preview -->
+      <div class="flex-1 overflow-hidden">
+        <iframe
+          v-if="pdfUrl"
+          :src="pdfUrl"
+          class="w-full h-full border-none"
+        ></iframe>
 
-        <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
-          <p>
-            <strong>Name:</strong> {{ employeeData.first_name }}
-            {{ employeeData.last_name }}
-          </p>
-          <p><strong>Age:</strong> {{ employeeData.age }}</p>
-          <p><strong>Birthdate:</strong> {{ formattedBirthdate }}</p>
-          <p>
-            <strong>Designation:</strong> {{ employeeData.present_designation }}
-          </p>
-
-          <p class="col-span-2">
-            <strong>Promotion Eligibility:</strong>
-            <span
-              v-if="predictionData.eligible"
-              class="text-green-600 font-semibold"
-            >
-              Eligible
-            </span>
-            <span v-else class="text-red-600 font-semibold">Not Eligible</span>
-          </p>
+        <div
+          v-else
+          class="flex items-center justify-center h-full text-gray-500"
+        >
+          Loading PDF preview...
         </div>
       </div>
 
-      <!-- Section: Criteria -->
-      <div class="mt-8">
-        <h3 class="text-lg font-semibold text-gray-700 mb-3">
-          Eligibility Criteria Evaluation
-        </h3>
-
-        <div class="border rounded-xl overflow-hidden shadow-md">
-          <table class="w-full text-sm">
-            <thead class="bg-gray-200 text-gray-700">
-              <tr>
-                <th class="p-3 text-left w-1/4">Criteria</th>
-                <th class="p-3 text-left w-2/4">Description</th>
-                <th class="p-3 text-center w-1/4">Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr
-                v-for="(item, key) in criteria"
-                :key="key"
-                class="border-t hover:bg-gray-50 transition"
-              >
-                <td class="p-3 font-semibold">{{ item.title }}</td>
-                <td class="p-3 text-gray-600">{{ item.description }}</td>
-                <td
-                  class="p-3 text-center font-semibold"
-                  :class="item.met ? 'text-green-600' : 'text-red-600'"
-                >
-                  {{ item.met ? "Requirement Met" : "Not Met" }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Buttons -->
-      <div class="mt-6 flex justify-end gap-3">
+      <!-- Actions -->
+      <div class="p-4 border-t flex justify-end gap-3">
         <button
           @click="downloadPDF"
-          class="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+          class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
         >
           Download PDF
         </button>
@@ -106,16 +57,25 @@ pdfMake.vfs = pdfFonts.vfs;
 
 export default {
   name: "PrintableModal",
+
   props: {
     show: Boolean,
     employeeData: Object,
     predictionData: Object,
-    criteria: Object,
+    criteria: Object, // <-- criteria from parent
+    currentPromotionDate: String,
+    endPromotionDate: String,
+  },
+
+  data() {
+    return {
+      pdfUrl: null,
+    };
   },
 
   computed: {
     formattedBirthdate() {
-      if (!this.employeeData?.birthdate) return "";
+      if (!this.employeeData?.birthdate) return "—";
       const date = new Date(this.employeeData.birthdate);
       return date.toLocaleDateString("en-US", {
         year: "numeric",
@@ -123,104 +83,233 @@ export default {
         day: "numeric",
       });
     },
+
+    criteriaTableBody() {
+      if (!this.criteria) return [];
+
+      return [
+        {
+          label: "Age Requirement",
+          description: `Must be at least ${
+            this.criteria.age_requirement ?? "—"
+          } years old`,
+        },
+        {
+          label: "Education Requirement",
+          description: `Must have completed: ${
+            this.criteria.education_requirement?.join(", ") ?? "—"
+          }`,
+        },
+        {
+          label: "Work Experience Requirement",
+          description: `Must have at least ${
+            this.criteria.work_experience_requirement ?? "—"
+          } years of experience`,
+        },
+        {
+          label: "Commendation Count Requirement",
+          description: `Must have at least ${
+            this.criteria.commendation_count_requirement ?? "—"
+          } commendations`,
+        },
+        {
+          label: "Commendation Hours Requirement",
+          description: `Must have at least ${
+            this.criteria.commendation_hours_requirement ?? "—"
+          } commendation hours`,
+        },
+        {
+          label: "Attendance Hours Requirement",
+          description: `Must have at least ${
+            this.criteria.attendance_hours_requirement ?? "—"
+          } hours`,
+        },
+      ].map((row) => [
+        { text: row.label, style: "tableCellBold" },
+        { text: row.description, style: "tableCell" },
+        {
+          text: "Met", // Always MET
+          alignment: "center",
+          bold: true,
+          color: "#166534",
+          fontSize: 10,
+          margin: [0, 4, 0, 4],
+        },
+      ]);
+    },
+  },
+
+  watch: {
+    show(val) {
+      if (val) {
+        this.generatePreview();
+      } else {
+        this.pdfUrl = null;
+      }
+    },
+    criteria: {
+      immediate: true,
+      handler() {
+        if (this.show) this.generatePreview();
+        console.log("Updated criteria prop:", this.criteria);
+      },
+    },
   },
 
   methods: {
-    downloadPDF() {
-      const criteriaTable = [
+    buildDocDefinition() {
+      const tableBody = [
         [
-          { text: "Criteria", style: "tableHeader" },
-          { text: "Description", style: "tableHeader" },
-          { text: "Status", style: "tableHeader", alignment: "center" },
+          { text: "CRITERIA", style: "tableHeader" },
+          { text: "DESCRIPTION", style: "tableHeader" },
+          { text: "STATUS", style: "tableHeader", alignment: "center" },
         ],
-
-        ...Object.values(this.criteria).map((c) => [
-          { text: c.title, bold: true },
-          c.description,
-          {
-            text: c.met ? "Requirement Met" : "Not Met",
-            color: c.met ? "green" : "red",
-            alignment: "center",
-            bold: true,
-          },
-        ]),
+        ...this.criteriaTableBody,
       ];
 
-      const docDefinition = {
-        pageSize: "A4",
-        pageMargins: [45, 45, 45, 45],
-
+      return {
+        pageSize: { width: 612, height: 936 }, // Long bond
+        pageMargins: [50, 50, 50, 60],
+        defaultStyle: { fontSize: 11, color: "#111827" },
         content: [
+          { text: "Republic of the Philippines", style: "govHeader" },
+          { text: "Province of Davao del Norte", style: "govSubHeader" },
           {
-            text: "Promotion Eligibility Report",
-            style: "header",
+            text: "Municipality of Braulio E. Dujali",
+            style: "govSubHeader",
+            margin: [0, 0, 0, 15],
+          },
+          {
+            canvas: [
+              {
+                type: "line",
+                x1: 0,
+                y1: 0,
+                x2: 512,
+                y2: 0,
+                lineWidth: 1,
+                lineColor: "#d1d5db",
+              },
+            ],
+            margin: [0, 0, 0, 15],
+          },
+          {
+            text: "PROMOTION ELIGIBILITY REPORT",
+            style: "reportTitle",
+            margin: [0, 0, 0, 20],
           },
 
-          { text: "\n" },
-
+          // Employee Info
+          { text: "EMPLOYEE INFORMATION", style: "sectionHeader" },
           {
-            style: "sectionHeader",
-            text: "Employee Information",
-          },
-
-          {
-            style: "infoTable",
             table: {
-              widths: ["30%", "*"],
+              widths: ["35%", "*"],
               body: [
                 [
-                  "Name:",
-                  `${this.employeeData.first_name} ${this.employeeData.last_name}`,
+                  "Full Name",
+                  `${this.employeeData?.first_name || "—"} ${
+                    this.employeeData?.last_name || "—"
+                  }`,
                 ],
-                ["Age:", this.employeeData.age],
-                ["Birthdate:", this.formattedBirthdate],
-                ["Designation:", this.employeeData.present_designation],
+                ["Age", this.employeeData?.age ?? "—"],
+                ["Birthdate", this.formattedBirthdate],
+                ["Designation", this.employeeData?.present_designation || "—"],
                 [
-                  "Eligibility:",
-                  this.predictionData.eligible ? "Eligible" : "Not Eligible",
+                  "Overall Eligibility",
+                  { text: "ELIGIBLE", bold: true, color: "#166534" },
                 ],
               ],
             },
-            layout: "lightHorizontalLines",
+            layout: {
+              fillColor: (rowIndex) => (rowIndex % 2 === 0 ? "#f9fafb" : null),
+              paddingLeft: () => 8,
+              paddingRight: () => 8,
+              paddingTop: () => 6,
+              paddingBottom: () => 6,
+            },
+            margin: [0, 0, 0, 20],
           },
 
-          { text: "\n" },
-
-          { text: "Eligibility Criteria Evaluation", style: "sectionHeader" },
-
+          // Criteria Section
+          { text: "ELIGIBILITY CRITERIA EVALUATION", style: "sectionHeader" },
           {
             table: {
-              widths: ["25%", "55%", "20%"],
-              body: criteriaTable,
+              headerRows: 1,
+              widths: ["30%", "50%", "20%"], // adjust column widths
+              body: tableBody,
             },
-            layout: "lightHorizontalLines",
+            layout: {
+              fillColor: (rowIndex) => (rowIndex === 0 ? "#f3f4f6" : null),
+              paddingLeft: () => 8,
+              paddingRight: () => 8,
+              paddingTop: () => 6,
+              paddingBottom: () => 6,
+            },
+            margin: [0, 0, 0, 20],
+          },
+          // Promotion Details
+          { text: "PROMOTION DETAILS", style: "sectionHeader" },
+          {
+            table: {
+              widths: ["40%", "*"],
+              body: [
+                ["Current Promotion Date", this.currentPromotionDate || "—"],
+                ["End Promotion Date", this.endPromotionDate || "Present"],
+                ["Criteria Met", { text: "Yes", bold: true, color: "#166534" }],
+              ],
+            },
+            layout: {
+              fillColor: (rowIndex) => (rowIndex % 2 === 0 ? "#f9fafb" : null),
+              paddingLeft: () => 8,
+              paddingRight: () => 8,
+              paddingTop: () => 6,
+              paddingBottom: () => 6,
+            },
+            margin: [0, 0, 0, 20],
           },
         ],
-
         styles: {
-          header: {
-            fontSize: 20,
+          govHeader: { fontSize: 12, bold: true, alignment: "center" },
+          govSubHeader: {
+            fontSize: 10.5,
+            alignment: "center",
+            color: "#374151",
+          },
+          reportTitle: {
+            fontSize: 12,
             bold: true,
             alignment: "center",
-            margin: [0, 0, 0, 10],
+            letterSpacing: 0.5,
           },
           sectionHeader: {
-            fontSize: 14,
+            fontSize: 11,
             bold: true,
             margin: [0, 10, 0, 6],
+            color: "#1f2937",
           },
           tableHeader: {
+            fontSize: 9,
             bold: true,
-            fillColor: "#e5e7eb",
-            color: "#374151",
-            margin: [0, 3],
+            color: "#1f2937",
+            alignment: "center",
           },
-          infoTable: {
-            margin: [0, 0, 0, 10],
-          },
+          tableCell: { fontSize: 10 },
+          tableCellBold: { fontSize: 10, bold: true },
         },
       };
+    },
 
+    generatePreview() {
+      if (!this.employeeData) return;
+      const docDefinition = this.buildDocDefinition();
+      pdfMake.createPdf(docDefinition).getDataUrl((dataUrl) => {
+        this.pdfUrl = dataUrl;
+      });
+    },
+
+    downloadPDF() {
+      if (!this.employeeData) return;
+      const docDefinition = this.buildDocDefinition();
       pdfMake
         .createPdf(docDefinition)
         .download(
@@ -228,9 +317,15 @@ export default {
         );
     },
   },
+
+  mounted() {
+    console.log("Criteria prop on mount:", this.criteria);
+  },
 };
 </script>
 
 <style scoped>
-/* clean modern modal */
+iframe {
+  background: #f9fafb;
+}
 </style>
