@@ -219,7 +219,7 @@
             >
 
             <input
-              type="number"
+              type="text"
               v-model="form.age"
               placeholder="Enter age"
               class="w-full sm:w-32 rounded-md p-2 text-sm focus:outline-none border"
@@ -794,6 +794,7 @@ export default {
           "Service hours were convenient",
           "Staff were proactive in helping",
         ],
+
         Neutral: [
           "Transaction process was confusing",
           "Information was unclear",
@@ -821,7 +822,9 @@ export default {
       },
       sentimentResult: null,
       feedbackSentimentScore: null,
+      feedbackSentimentStatus: null,
       commonCommentSentimentScore: null,
+      commonCommentSentimentLabel: null,
     };
   },
   watch: {
@@ -829,13 +832,9 @@ export default {
       if (newText.trim()) {
         const result = this.analyzeSentiment(newText);
 
-        // Determine sentiment category with improved neutral handling
         let sentimentLabel = "Neutral";
-        if (result.score > 3) {
-          sentimentLabel = "Positive";
-        } else if (result.score < 0) {
-          sentimentLabel = "Negative";
-        }
+        if (result.score > 3) sentimentLabel = "Positive";
+        else if (result.score < 0) sentimentLabel = "Negative";
 
         this.sentimentResult = {
           score: result.score,
@@ -843,31 +842,77 @@ export default {
         };
 
         this.feedbackSentimentScore = result.score;
+        this.feedbackSentimentStatus = sentimentLabel;
       } else {
         this.sentimentResult = null;
         this.feedbackSentimentScore = null;
+        this.feedbackSentimentStatus = null;
       }
     },
 
+    // "form.commonComment"(newText) {
+    //   if (newText) {
+    //     const result = this.analyzeSentiment(newText);
+
+    //     // Optional: you can also categorize commonComment sentiment
+    //     let commentSentiment = "Neutral";
+    //     if (result.score > 3) commentSentiment = "Positive";
+    //     else if (result.score < 0) commentSentiment = "Negative";
+
+    //     this.commonCommentSentimentScore = result.score;
+    //     this.commonCommentSentimentLabel = commentSentiment; // optional if you want to display
+    //   } else {
+    //     this.commonCommentSentimentScore = null;
+    //     this.commonCommentSentimentLabel = null;
+    //   }
+    // },
     "form.commonComment"(newText) {
-      if (newText) {
-        const result = this.analyzeSentiment(newText);
-
-        // Optional: you can also categorize commonComment sentiment
-        let commentSentiment = "Neutral";
-        if (result.score > 3) commentSentiment = "Positive";
-        else if (result.score < 0) commentSentiment = "Negative";
-
-        this.commonCommentSentimentScore = result.score;
-        this.commonCommentSentimentLabel = commentSentiment; // optional if you want to display
-      } else {
+      if (!newText) {
         this.commonCommentSentimentScore = null;
         this.commonCommentSentimentLabel = null;
+        return;
+      }
+
+      // Determine the label first based on predefined lists
+      if (this.commonComments.Positive.includes(newText)) {
+        this.commonCommentSentimentLabel = "Positive";
+      } else if (this.commonComments.Neutral.includes(newText)) {
+        this.commonCommentSentimentLabel = "Neutral";
+      } else if (this.commonComments.Negative.includes(newText)) {
+        this.commonCommentSentimentLabel = "Negative";
+      } else {
+        this.commonCommentSentimentLabel = null; // fallback
+      }
+
+      // Now analyze sentiment to get a meaningful score
+      const result = this.analyzeSentiment(newText);
+      this.commonCommentSentimentScore = result.score;
+
+      // Optional: If you want, override label if it's not predefined
+      if (!this.commonCommentSentimentLabel) {
+        this.commonCommentSentimentLabel =
+          result.score > 3
+            ? "Positive"
+            : result.score < 0
+            ? "Negative"
+            : "Neutral";
       }
     },
   },
 
   computed: {
+    finalSentimentScore() {
+      const mainScore = this.commonCommentSentimentScore ?? 0;
+      const additionalScore = this.feedbackSentimentScore ?? 0;
+      return mainScore + additionalScore; // you could also use (mainScore + additionalScore)/2
+    },
+    finalSentimentStatus() {
+      const score = this.finalSentimentScore;
+
+      if (score > 5) return "Positive"; // threshold can be adjusted
+      else if (score < 0) return "Negative";
+      else return "Neutral";
+    },
     filteredOffices() {
       if (!this.searchOfficeQuery) return this.offices;
       return this.offices.filter((office) =>
@@ -891,59 +936,77 @@ export default {
     },
     analyzeSentiment(text) {
       const sentiment = new Sentiment();
+
       const options = {
         extras: {
-          // Negative words (strongly negative)
-          confusing: -4,
-          unclear: -4,
-          delay: -5,
-          rude: -6,
-          unhelpful: -5,
-          frustrating: -6,
-          slow: -4,
+          // ======================
+          // NEGATIVE (strong)
+          // ======================
+          confusing: -5,
+          unclear: -6,
+          delay: -6,
+          delays: -6,
+          rude: -7,
+          unhelpful: -6,
+          frustrating: -7,
+          slow: -5,
+          waiting: -4,
           long: -3,
-          waiting: -3,
-          disorganized: -5,
-          poor: -4,
-          bad: -4,
-          worst: -6,
-          disappointed: -5,
-          faced: -6, // "faced delays" → only "faced" counted
-          lacked: -6, // "lacked knowledge" → only "lacked" counted
-          behavior: -7, // "rude behavior" → "behavior"
-          overwhelming: -5,
-          assistance: -6, // "no assistance" → "assistance"
+          disorganized: -6,
+          poor: -5,
+          bad: -5,
+          worst: -7,
+          disappointed: -6,
+          faced: -5,
+          lacked: -6,
+          overwhelming: -6,
 
-          // Positive words (strongly positive)
-          helpful: 3,
-          smooth: 3,
-          fast: 3,
-          polite: 3,
-          courteous: 3,
-          clean: 2,
-          comfortable: 2,
-          proactive: 3,
-          satisfactory: 3,
-          convenient: 3,
+          // Phrase helpers
+          unclear_information: -7,
+          long_waiting: -6,
 
-          // Neutral words (mildly positive)
+          // ======================
+          // POSITIVE (strong)
+          // ======================
+          helpful: 4,
+          smooth: 4,
+          fast: 4,
+          polite: 4,
+          courteous: 4,
+          clean: 3,
+          comfortable: 3,
+          proactive: 4,
+          satisfactory: 4,
+          convenient: 4,
+
+          // ======================
+          // NEUTRAL (true two)
+          // ======================
           adequate: 2,
           acceptable: 2,
           average: 2,
           expectations: 2,
           expectation: 2,
-          documentation: 2, // "documentation straightforward" → "documentation"
-          technical: 2, // "technical issues" → "technical"
-          information: 2, // "information clear" → "information"
-          experience: 3, // "overall experience" → "experience"
-          service: 2, // "service delivery" → "service"
-          facilities: 2, // "facilities adequate" → "facilities"
+          documentation: 2,
+          technical: 2,
+          information: 2,
+          experience: 2,
+          service: 2,
+          facilities: 2,
+          process: 2,
+          staff: 2,
+          office: 2,
+
+          // ======================
+          // SOFT CONTEXT WORDS
+          // ======================
+          assistance: -2, // only mildly negative by itself
+          behavior: -3, // neutral unless paired with rude
         },
       };
 
       return sentiment.analyze(text.toLowerCase(), options);
     },
-
     validateForm() {
       this.errors = {};
       if (!this.form.office) this.errors.office = "Office is required";
@@ -998,14 +1061,22 @@ export default {
         municipality: this.form.municipality,
         feedback: finalFeedback,
         commonComment: this.form.commonComment || null,
-        sentiment: this.feedbackSentimentScore ?? 0,
-        sentimentScore: this.sentimentResult?.score || 0,
-        additional_comment_sentimentScore:
-          this.commonCommentSentimentScore ?? 0,
+
+        // individual sentiments
+        sentiment_status: this.commonCommentSentimentLabel || null,
+        sentiment_score: this.commonCommentSentimentScore ?? 0,
+        additional_sentiment_status: this.feedbackSentimentStatus || "Neutral",
+        additional_sentiment_score: this.feedbackSentimentScore ?? 0,
+
+        // ✅ final combined sentiment
+        final_sentiment_status: this.finalSentimentStatus,
+        final_sentiment_score: this.finalSentimentScore,
+
         answers: this.form.answers.map((value, index) => ({
           question: this.questions[index].text,
           value,
         })),
+
         likertAnswers: this.form.likertAnswers.map((value, index) => ({
           question: this.likertQuestions[index].text,
           value,
@@ -1021,7 +1092,7 @@ export default {
       })
         .then((res) => res.json())
         .then(() => {
-          alert("Feedback submitted successfully!");
+          toast.success("Feedback submitted successfully!");
           this.resetForm();
         })
         .catch((err) => {

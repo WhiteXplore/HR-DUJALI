@@ -1,86 +1,82 @@
 <template>
-  <div class="flex justify-between items-end mb-4">
-    <!-- Filter Header -->
-    <div class="flex flex-col text-left">
-      <h1 class="font-semibold tracking-wide text-md">
-        Client Feedback Form Reports
-      </h1>
-      <p class="text-sm text-gray-500 mt-1">
-        View
-        <span class="font-normal">
-          Summary of feedback for {{ selectedMonthName || "?" }}
-          {{ selectedYear || "Select Years" }}
-        </span>
-      </p>
-    </div>
-    <div class="flex gap-4 text-sm">
-      <select
-        v-model="selectedMonth"
-        class="p-2 border rounded-xl cursor-pointer"
-      >
-        <option value="">Select Month</option>
-        <option v-for="(m, index) in months" :key="index" :value="index + 1">
-          {{ m }}
-        </option>
-      </select>
-
-      <select
-        v-model="selectedYear"
-        class="p-2 border rounded-xl cursor-pointer"
-      >
-        <option value="">Select Years</option>
-        <option v-for="year in years" :key="year" :value="year">
-          {{ year }}
-        </option>
-      </select>
-
-      <button
-        @click="applyFilter"
-        :disabled="loading || !selectedMonth || !selectedYear"
-        class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-500 text-white text-sm hover:text-blue-700 px-4 py-2 rounded-xl hover:bg-white border hover:border-blue-900 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Apply Filter
-      </button>
-    </div>
-  </div>
-
   <!-- Progress Overlay -->
   <div
     v-if="loading"
     class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50"
   >
     <div class="flex flex-col items-center w-11/12 md:w-1/2 space-y-3">
-      <!-- Loading Text -->
       <p class="text-white text-lg font-semibold animate-pulse">
         Generating Report . . .
       </p>
-
-      <!-- Progress Bar Container -->
       <div class="w-80 bg-gray-300 rounded-full h-3 overflow-hidden shadow-sm">
-        <!-- Progress Fill -->
         <div
           class="bg-blue-600 h-3 transition-all duration-300 ease-out"
           :style="{ width: progress + '%' }"
         ></div>
       </div>
-
-      <!-- Optional Percentage Label -->
       <p class="text-white text-sm font-medium">{{ Math.floor(progress) }}%</p>
     </div>
   </div>
-
   <div
-    class="p-4 space-y-6 h-[80vh] overflow-y-auto border rounded-2xl bg-gray-50"
+    class="flex flex-col p-4 space-y-6 h-[89vh] overflow-y-auto border rounded-2xl bg-gray-50"
   >
-    <!-- Summary & Chart Section -->
+    <!-- Header & Filters -->
+    <div class="flex flex-col md:flex-row justify-between items-end mb-4">
+      <!-- Filter Header -->
+      <div class="flex flex-col text-left">
+        <h1 class="font-semibold tracking-wide text-md">
+          Client Feedback Form Reports
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
+          View
+          <span class="font-normal">
+            Summary of feedback for {{ selectedMonthName || "?" }}
+            {{ selectedYear || "Select Years" }}
+          </span>
+        </p>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex gap-4 text-sm mt-4 md:mt-0">
+        <select
+          v-model="selectedMonth"
+          class="p-2 border rounded-xl cursor-pointer"
+        >
+          <option value="">Select Month</option>
+          <option v-for="(m, index) in months" :key="index" :value="index + 1">
+            {{ m }}
+          </option>
+        </select>
+
+        <select
+          v-model="selectedYear"
+          class="p-2 border rounded-xl cursor-pointer"
+        >
+          <option value="">Select Years</option>
+          <option v-for="year in years" :key="year" :value="year">
+            {{ year }}
+          </option>
+        </select>
+
+        <button
+          @click="applyFilter"
+          :disabled="loading || !selectedMonth || !selectedYear"
+          class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-500 text-white text-sm hover:text-blue-700 px-4 py-2 rounded-xl hover:bg-white border hover:border-blue-900 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Apply Filter
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Cards + Sentiment Distribution -->
     <div
       v-if="filteredFeedbacks.length"
-      class="flex flex-col md:flex-row gap-6"
+      class="flex flex-col md:flex-row justify-between gap-6"
     >
       <!-- Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 flex-1">
+      <div class="grid grid-cols-2 gap-6 flex-1">
         <div
-          class="bg-white border rounded-2xl p-6 shadow-sm text-center flex flex-col justify-center items-center transition hover:shadow-sm -xl"
+          class="bg-white border rounded-2xl p-6 shadow-sm text-center flex flex-col justify-center items-center transition hover:shadow-lg"
         >
           <p
             class="uppercase tracking-wider text-gray-400 text-xs font-semibold"
@@ -93,7 +89,7 @@
         </div>
 
         <div
-          class="bg-white border rounded-2xl p-6 shadow-sm text-center flex flex-col justify-center items-center transition hover:shadow-sm -xl"
+          class="bg-white border rounded-2xl p-6 shadow-sm text-center flex flex-col justify-center items-center transition hover:shadow-lg"
         >
           <p
             class="uppercase tracking-wider text-gray-400 text-xs font-semibold"
@@ -106,7 +102,7 @@
         </div>
 
         <div
-          class="bg-white border rounded-2xl p-6 shadow-sm text-center flex flex-col justify-center items-center transition hover:shadow-sm -xl"
+          class="bg-white border rounded-2xl p-6 shadow-sm text-center flex flex-col justify-center items-center transition hover:shadow-lg"
         >
           <p
             class="uppercase tracking-wider text-gray-400 text-xs font-semibold"
@@ -119,7 +115,7 @@
         </div>
 
         <div
-          class="bg-white border rounded-2xl p-6 shadow-sm text-center flex flex-col justify-center items-center transition hover:shadow-sm -xl"
+          class="bg-white border rounded-2xl p-6 shadow-sm text-center flex flex-col justify-center items-center transition hover:shadow-lg"
         >
           <p
             class="uppercase tracking-wider text-gray-400 text-xs font-semibold"
@@ -132,287 +128,64 @@
         </div>
       </div>
 
-      <!-- Sentiment Chart -->
-      <div
-        class="bg-white shadow-sm border rounded-2xl flex-1 flex flex-col justify-center transition hover:shadow-sm -xl"
-      >
-        <h2
-          class="text-xl font-semibold text-gray-700 mb-4 text-center md:text-left px-4 py-4"
-        >
-          Sentiment Distribution
-        </h2>
-        <div class="h-80">
-          <Pie :data="chartData" :options="chartOptions" />
-        </div>
+      <!-- Sentiment Distribution -->
+      <div class="flex-1">
+        <sentimentDistribution :feedbacks="filteredFeedbacks" />
       </div>
     </div>
 
+    <!-- Charts & Tables Section -->
     <div
       v-if="filterApplied && filteredFeedbacks.length"
       class="flex flex-col md:flex-row gap-6 mt-6"
     >
-      <!-- Feedback by Office Table -->
-      <div class="bg-white shadow-sm border rounded-2xl p-6 flex-1">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">
-          Feedback by Office
-        </h3>
-        <div
-          class="h-[30vh] overflow-y-auto border border-gray-200 rounded-lg shadow-sm -sm"
-        >
-          <table
-            class="min-w-full border border-gray-200 rounded-lg overflow-hidden text-sm text-left"
-          >
-            <thead class="bg-blue-900 text-white text-sm tracking-wider">
-              <tr>
-                <th class="p-2 border-b uppercase text-xs font-semibold">
-                  Office
-                </th>
-                <th class="p-2 border-b uppercase text-xs font-semibold">
-                  Count
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(count, office) in feedbackByOffice"
-                :key="office"
-                class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50"
-              >
-                <td class="p-2 border-b">{{ office }}</td>
-                <td class="p-2 pl-6 border-b font-bold text-gray-800">
-                  {{ count }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <!-- Feedback by Office -->
+      <feedbackByOffice :feedbacks="filteredFeedbacks" class="flex-1" />
 
-      <!-- Feedback by Client Type Table -->
-      <div class="bg-white shadow-sm border rounded-2xl p-6 flex-1">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">
-          Feedback by Client Type
-        </h3>
-        <div
-          class="h-[30vh] overflow-y-auto border border-gray-200 rounded-lg shadow-sm -sm p-2"
-        >
-          <table
-            class="min-w-full border border-gray-200 rounded-lg overflow-hidden text-sm text-left"
-          >
-            <thead class="bg-blue-900 text-white text-sm tracking-wider">
-              <tr>
-                <th class="p-2 border-b uppercase text-xs font-semibold">
-                  Client Type
-                </th>
-                <th class="p-2 border-b uppercase text-xs font-semibold">
-                  Count
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(count, client) in feedbackByClientType"
-                :key="client"
-                class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50"
-              >
-                <td class="p-2 border-b">{{ client }}</td>
-                <td class="p-2 pl-6 border-b font-bold text-gray-800">
-                  {{ count }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <!-- Feedback by Client Type -->
+      <feedbackByClientType :feedbacks="filteredFeedbacks" class="flex-1" />
+    </div>
+    <div v-if="filteredFeedbacks.length">
+      <feedbackGraph :feedbacks="filteredFeedbacks" />
     </div>
     <!-- Detailed Feedback Table -->
-    <div
-      v-if="filteredFeedbacks.length"
-      class="bg-white shadow-sm border rounded-xl p-6 overflow-x-auto mt-2"
-    >
-      <h2 class="text-lg text-left font-semibold text-gray-700 mb-4">
-        Detailed Feedback
-      </h2>
-
-      <!-- Page Size Selector -->
-      <!-- Page Size Selector + Office Filter -->
-      <div class="flex justify-between items-center mb-2">
-        <div class="flex items-center gap-2">
-          <label class="text-gray-600 text-sm">Show:</label>
-          <select v-model.number="pageSize" class="p-1 border rounded-md">
-            <option :value="10">10</option>
-            <option :value="25">25</option>
-            <option :value="50">50</option>
-            <option :value="100">100</option>
-          </select>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-2">
-            <!-- <label class="text-gray-600 text-sm">Filter by Office:</label> -->
-            <select
-              v-model="selectedOffice"
-              class="p-1 py-2 border rounded-md cursor-pointer"
-            >
-              <option value="">Select Office</option>
-              <option
-                v-for="office in uniqueOffices"
-                :key="office"
-                :value="office"
-              >
-                {{ office }}
-              </option>
-            </select>
-          </div>
-          <div class="text-gray-600 text-sm">
-            Total Records: {{ filteredFeedbacks.length }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Table -->
-      <div
-        class="h-[40vh] overflow-y-auto border border-gray-200 rounded-lg shadow-sm -sm p-2"
-      >
-        <table
-          class="min-w-full border border-gray-200 rounded-lg overflow-hidden text-sm text-left"
-        >
-          <thead class="bg-blue-900 text-white text-sm tracking-wider">
-            <tr>
-              <th class="p-3 border-b uppercase text-xs font-semibold">
-                Office
-              </th>
-              <th class="p-3 border-b uppercase text-xs font-semibold">
-                Service Availed
-              </th>
-              <th class="p-3 border-b uppercase text-xs font-semibold">
-                Sentiment
-              </th>
-
-              <th class="p-3 border-b uppercase text-xs font-semibold">
-                Common Feedback
-              </th>
-              <th
-                class="p-3 border-b uppercase text-xs font-semibold text-center"
-              >
-                Score
-              </th>
-              <th class="p-3 border-b uppercase text-xs font-semibold">
-                Additional Feedback
-              </th>
-              <th
-                class="p-3 border-b uppercase text-xs font-semibold text-center"
-              >
-                Score
-              </th>
-              <th class="p-3 border-b uppercase text-xs font-semibold">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="item in paginatedFeedbacks"
-              :key="item.id"
-              class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50"
-            >
-              <td class="p-3 border-b">{{ item.office || "-" }}</td>
-              <td class="p-3 border-b">{{ item.serviceAvailed || "-" }}</td>
-              <td
-                class="p-3 border-b font-semibold"
-                :class="{
-                  'text-green-600': item.sentiment === 'Positive',
-                  'text-red-600': item.sentiment === 'Negative',
-                  'text-gray-600': item.sentiment === 'Neutral',
-                }"
-              >
-                {{ item.sentiment }}
-              </td>
-
-              <td class="p-3 border-b">
-                {{ getFirstSentence(item.feedback) }}
-              </td>
-              <td class="p-3 border-b text-center">
-                {{ item.additional_comment_sentimentScore }}
-              </td>
-              <td class="p-3 border-b">
-                {{ getRemainingSentences(item.feedback) }}
-              </td>
-              <td class="p-3 border-b text-center">
-                {{ item.sentimentScore }}
-              </td>
-              <td class="p-3 border-b">{{ formatDate(item.fileDate) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- Pagination -->
-      <div class="flex justify-end items-center gap-2 mt-4">
-        <!-- Previous Button -->
-        <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="flex items-center justify-center px-3 py-1 rounded-lg bg-white border shadow-sm -sm hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <icon :name="'back'" class="w-4 h-4" />
-        </button>
-
-        <!-- Page Numbers -->
-        <button
-          v-for="page in visiblePages"
-          :key="page"
-          @click="goToPage(page)"
-          :class="[
-            'px-2 py-1 rounded-lg border shadow-sm -sm transition hover:bg-blue-50',
-            page === currentPage
-              ? 'bg-blue-600 text-white shadow-sm -md'
-              : 'bg-white text-gray-700',
-          ]"
-        >
-          {{ page }}
-        </button>
-
-        <!-- Next Button -->
-        <button
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
-          class="flex items-center justify-center px-2 py-1 rounded-lg bg-white border shadow-sm -sm hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <icon :name="'next'" class="w-4 h-4" />
-        </button>
-      </div>
+    <div v-if="filteredFeedbacks.length">
+      <detailedFeedback :feedbacks="filteredFeedbacks" />
     </div>
-    <!-- Message when no data is available -->
+
+    <!-- No Data Message -->
     <div
       v-else-if="!filteredFeedbacks.length && !loading"
       class="text-gray-500 text-center py-10 text-lg font-medium mt-4"
     >
       No data available. Please select <strong>"Month"</strong> and
-      <strong>"Year"</strong> and click the <strong>"Filter"</strong> button.
+      <strong>"Year"</strong> and click the
+      <strong>"Apply Filter"</strong> button.
     </div>
   </div>
 </template>
 
 <script>
-import { Pie } from "vue-chartjs";
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from "chart.js";
-import icon from "@/assets/icon.vue";
-ChartJS.register(Title, Tooltip, Legend, ArcElement);
+import sentimentDistribution from "../sentiment-contents/sentiment-distribution.vue";
+import feedbackByClientType from "../sentiment-contents/feedback-by-client-type.vue";
+import feedbackByOffice from "../sentiment-contents/feedback-by-office.vue";
+import detailedFeedback from "../sentiment-contents/detailed-feedback.vue";
+import feedbackGraph from "../sentiment-contents/feedback-graph.vue";
 
 export default {
   name: "CustomerFeedbackReport",
-  components: { Pie, icon },
+  components: {
+    sentimentDistribution,
+    feedbackByOffice,
+    feedbackByClientType,
+    detailedFeedback,
+    feedbackGraph,
+  },
   data() {
     const now = new Date();
     return {
       feedbacks: [],
       filteredFeedbacks: [],
-      chartData: { labels: [], datasets: [] },
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: "bottom", labels: { font: { size: 12 } } },
-        },
-      },
       selectedMonth: "",
       selectedYear: "",
       months: [
@@ -433,74 +206,9 @@ export default {
       loading: false,
       progress: 0,
       filterApplied: false,
-      currentPage: 1,
-      pageSize: 10, // default entries per page
-      pageSizeOptions: [10, 25, 50, 100],
-      maxVisiblePages: 3,
-      selectedOffice: "",
     };
   },
   computed: {
-    formattedMonth() {
-      if (!this.selectedMonth || !this.selectedYear) return "All Time";
-      return `${this.months[this.selectedMonth - 1]} ${this.selectedYear}`;
-    },
-    feedbackByOffice() {
-      const counts = {};
-      this.filteredFeedbacks.forEach((f) => {
-        if (f.office) counts[f.office] = (counts[f.office] || 0) + 1;
-      });
-      return counts;
-    },
-    feedbackByClientType() {
-      const counts = {};
-      this.filteredFeedbacks.forEach((f) => {
-        if (f.clientType)
-          counts[f.clientType] = (counts[f.clientType] || 0) + 1;
-      });
-      return counts;
-    },
-    uniqueOffices() {
-      const offices = this.filteredFeedbacks
-        .map((f) => f.office)
-        .filter(Boolean);
-      return [...new Set(offices)];
-    },
-    paginatedFeedbacks() {
-      let data = this.filteredFeedbacks;
-
-      // Apply office filter
-      if (this.selectedOffice) {
-        data = data.filter((f) => f.office === this.selectedOffice);
-      }
-
-      const start = (this.currentPage - 1) * this.pageSize;
-      return data.slice(start, start + this.pageSize);
-    },
-    totalPages() {
-      let data = this.filteredFeedbacks;
-      if (this.selectedOffice) {
-        data = data.filter((f) => f.office === this.selectedOffice);
-      }
-      return Math.ceil(data.length / this.pageSize);
-    },
-    visiblePages() {
-      let pages = [];
-      let startPage = Math.max(this.currentPage - 1, 1);
-      let endPage = Math.min(
-        startPage + this.maxVisiblePages - 1,
-        this.totalPages
-      );
-
-      if (endPage - startPage + 1 < this.maxVisiblePages) {
-        startPage = Math.max(endPage - this.maxVisiblePages + 1, 1);
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-      return pages;
-    },
     selectedMonthName() {
       return this.selectedMonth
         ? this.months[this.selectedMonth - 1]
@@ -508,7 +216,7 @@ export default {
     },
     totalOffices() {
       const unique = new Set(
-        this.filteredFeedbacks.map((f) => f.office).filter(Boolean)
+        this.filteredFeedbacks.map((f) => f.office).filter(Boolean),
       );
       return unique.size;
     },
@@ -516,49 +224,29 @@ export default {
       if (!this.filteredFeedbacks.length) return 0;
       return (
         this.filteredFeedbacks.reduce(
-          (sum, f) => sum + Number(f.sentimentScore || 0),
-          0
+          (sum, f) => sum + Number(f.final_sentiment_score || 0),
+          0,
         ) / this.filteredFeedbacks.length
       );
     },
     mostCommonSentiment() {
       const counts = { Positive: 0, Negative: 0, Neutral: 0 };
       this.filteredFeedbacks.forEach(
-        (f) => (counts[f.sentiment] = (counts[f.sentiment] || 0) + 1)
+        (f) =>
+          (counts[f.final_sentiment_status] =
+            (counts[f.final_sentiment_status] || 0) + 1),
       );
-      return (
-        Object.entries(counts).reduce(
-          (a, b) => (a[1] > b[1] ? a : b),
-          [0, 0]
-        )[0] || "-"
-      );
-    },
-  },
-  watch: {
-    selectedOffice() {
-      this.currentPage = 1; // Reset page on office change
-    },
-    filteredFeedbacks() {
-      this.currentPage = 1; // Reset page when filter changes
-    },
-    pageSize() {
-      this.currentPage = 1; // Reset page when page size changes
+      return Object.entries(counts).reduce(
+        (max, entry) => (entry[1] > max[1] ? entry : max),
+        ["-", 0],
+      )[0];
     },
   },
   methods: {
-    goToPage(page) {
-      this.currentPage = page;
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) this.currentPage++;
-    },
-    prevPage() {
-      if (this.currentPage > 1) this.currentPage--;
-    },
     async fetchFeedbacks() {
       try {
         const res = await fetch(
-          process.env.VUE_APP_API_BASE_URL + "/customer-feedback"
+          process.env.VUE_APP_API_BASE_URL + "/customer-feedback",
         );
         this.feedbacks = await res.json();
       } catch (err) {
@@ -594,38 +282,7 @@ export default {
         return monthMatch && yearMatch;
       });
 
-      // update chart data
-      const counts = { Positive: 0, Negative: 0, Neutral: 0 };
-      this.filteredFeedbacks.forEach(
-        (f) => (counts[f.sentiment] = (counts[f.sentiment] || 0) + 1)
-      );
-      this.chartData = {
-        labels: ["Positive", "Negative", "Neutral"],
-        datasets: [
-          {
-            label: "Sentiment Distribution",
-            backgroundColor: ["#10B981", "#EF4444", "#6B7280"],
-            data: [counts.Positive, counts.Negative, counts.Neutral],
-          },
-        ],
-      };
-
       this.loading = false;
-    },
-    getFirstSentence(text) {
-      if (!text) return "-";
-      const sentences = text.split(".");
-      return sentences[0] ? sentences[0].trim() + "." : "-";
-    },
-    getRemainingSentences(text) {
-      if (!text) return "-";
-      const sentences = text.split(".");
-      if (sentences.length <= 1) return "-";
-      // Join all remaining sentences and trim whitespace
-      return sentences.slice(1).join(".").trim();
-    },
-    formatDate(dateStr) {
-      return new Date(dateStr).toLocaleDateString();
     },
   },
   mounted() {
@@ -635,5 +292,5 @@ export default {
 </script>
 
 <style scoped>
-/* Smooth progress bar animation */
+/* Add any custom styles if needed */
 </style>

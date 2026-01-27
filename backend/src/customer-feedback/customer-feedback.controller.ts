@@ -13,35 +13,30 @@ import { UpdateCustomerFeedbackDto } from './dto/update-customer-feedback.dto';
 
 @Controller('customer-feedback')
 export class CustomerFeedbackController {
-  constructor(
-    private readonly customerFeedbackService: CustomerFeedbackService,
-  ) {}
+  constructor(private readonly service: CustomerFeedbackService) {}
 
   @Post()
-  create(@Body() createCustomerFeedbackDto: CreateCustomerFeedbackDto) {
-    return this.customerFeedbackService.create(createCustomerFeedbackDto);
+  create(@Body() dto: CreateCustomerFeedbackDto) {
+    return this.service.create(dto);
   }
 
   @Get()
   findAll() {
-    return this.customerFeedbackService.findAll();
+    return this.service.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.customerFeedbackService.findOne(+id);
+    return this.service.findOne(+id);
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateCustomerFeedbackDto: UpdateCustomerFeedbackDto,
-  ) {
-    return this.customerFeedbackService.update(+id, updateCustomerFeedbackDto);
+  update(@Param('id') id: string, @Body() dto: UpdateCustomerFeedbackDto) {
+    return this.service.update(+id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.customerFeedbackService.remove(+id);
+    return this.service.remove(+id);
   }
 }

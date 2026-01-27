@@ -94,7 +94,7 @@
 
         <!-- Profile Dropdown -->
         <div
-          class="absolute top-[70px] z-50"
+          class="absolute top-[70px] right-[20px] z-50"
           ref="profileDropdown"
           v-if="isOpenProfile"
           @mouseleave="isOpenProfile = false"
@@ -163,7 +163,7 @@ export default {
     const filteredModules = computed(() => {
       if (!searchQuery.value) return modules; // show all when empty
       return modules.filter((module) =>
-        module.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        module.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
       );
     });
 
@@ -254,7 +254,7 @@ export default {
           process.env.VUE_APP_API_BASE_URL + "/auth/me",
           {
             withCredentials: true,
-          }
+          },
         );
 
         if (response.data) {

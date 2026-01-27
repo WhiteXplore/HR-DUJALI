@@ -1,20 +1,16 @@
-/* eslint-disable */
 <template>
   <div>
     <!-- Filter Header -->
     <div class="flex justify-between items-end mb-4">
       <div class="flex flex-col text-left">
         <h1 class="font-semibold tracking-wide text-md">Attendance Report</h1>
-        <p class="text-sm text-gray-500 mt-1">
-          View
-          <span class="font-normal">
-            Summary of feedback for {{ selectedMonthName || "?" }}
-            {{ selectedYear || "Select Years" }}
-          </span>
-        </p>
+        <p class="text-sm text-gray-500 mt-1">{{ reportHeaderText }}</p>
       </div>
+
       <div class="flex gap-4 text-sm">
+        <!-- Month Selector only if Monthly -->
         <select
+          v-if="filterType === 'monthly'"
           v-model="selectedMonth"
           class="p-2 border rounded-xl cursor-pointer"
         >
@@ -24,19 +20,33 @@
           </option>
         </select>
 
+        <!-- Year Selector always visible -->
         <select
           v-model="selectedYear"
           class="p-2 border rounded-xl cursor-pointer"
         >
-          <option value="">Select Years</option>
+          <option value="">Select Year</option>
           <option v-for="year in years" :key="year" :value="year">
             {{ year }}
           </option>
         </select>
 
+        <!-- Filter Type -->
+        <select
+          v-model="filterType"
+          class="p-2 border rounded-xl cursor-pointer"
+        >
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+
         <button
           @click="applyFilter"
-          :disabled="loading || !selectedMonth || !selectedYear"
+          :disabled="
+            loading ||
+            !selectedYear ||
+            (filterType === 'monthly' && !selectedMonth)
+          "
           class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-500 text-white text-sm hover:text-blue-700 px-4 py-2 rounded-xl hover:bg-white border hover:border-blue-900 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Apply Filter
@@ -75,18 +85,30 @@
 
     <!-- Attendance Table & Charts -->
     <div
-      class="p-4 space-y-6 h-[80vh] overflow-y-auto border rounded-2xl bg-gray-50"
+      class="p-4 space-y-6 h-[82.5vh] overflow-y-auto border rounded-2xl bg-gray-50"
     >
       <div v-if="filterApplied">
         <div
-          v-if="filteredMonthlyReport.length"
+          v-if="paginatedReport.length"
           class="bg-white rounded-md shadow p-4 space-y-4"
         >
           <!-- Employee Attendance Summary Header -->
+          <h3 class="text-md text-left font-semibold">
+            Employee Attendance Summary
+          </h3>
+
           <div
             class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4"
           >
-            <h3 class="text-md font-semibold">Employee Attendance Summary</h3>
+            <div class="flex items-center gap-2">
+              <label class="text-gray-600 text-sm">Show:</label>
+              <select v-model.number="pageSize" class="p-1 border rounded-md">
+                <option :value="10">10</option>
+                <option :value="25">25</option>
+                <option :value="50">50</option>
+                <option :value="100">100</option>
+              </select>
+            </div>
 
             <div
               class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
@@ -123,13 +145,13 @@
                   {{ key }} Absents ({{ range }})
                 </option>
               </select>
+
               <!-- Undertime Filter -->
               <select
                 v-model="selectedUndertimeRange"
                 class="p-2 border rounded-xl cursor-pointer"
               >
                 <option value="">All Undertime</option>
-
                 <option
                   v-for="(count, key) in undertimeSummary"
                   :key="key"
@@ -165,12 +187,9 @@
                 </thead>
                 <tbody class="text-gray-700 divide-y divide-gray-100 uppercase">
                   <tr
-                    v-for="employee in filteredMonthlyReport"
+                    v-for="employee in paginatedReport"
                     :key="employee.employee_id"
-                    :class="[
-                      getRowClass(employee.lates),
-                      'transition hover:bg-blue-50/50',
-                    ]"
+                    class="hover:bg-blue-50 transition-colors duration-200 even:bg-gray-50"
                   >
                     <td class="px-4 py-3 text-left">
                       {{ employee.employee_id }}
@@ -194,6 +213,79 @@
               </table>
             </div>
           </div>
+
+          <!-- Pagination -->
+          <div class="flex justify-between items-center mt-4 flex-wrap gap-2">
+            <div class="text-sm text-gray-600">
+              Showing
+              {{
+                filteredMonthlyReport.length === 0
+                  ? 0
+                  : (currentPage - 1) * pageSize + 1
+              }}
+              to
+              {{
+                Math.min(currentPage * pageSize, filteredMonthlyReport.length)
+              }}
+              of {{ filteredMonthlyReport.length }} entries
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button
+                @click="prevPage"
+                :disabled="currentPage === 1"
+                class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-blue-100 disabled:opacity-50"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              <button
+                v-for="page in totalPages"
+                :key="page"
+                @click="goToPage(page)"
+                :class="
+                  page === currentPage
+                    ? 'w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-semibold'
+                    : 'w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-blue-50'
+                "
+              >
+                {{ page }}
+              </button>
+
+              <button
+                @click="nextPage"
+                :disabled="currentPage === totalPages"
+                class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-blue-100 disabled:opacity-50"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Top Latecomers & Chart -->
@@ -206,58 +298,73 @@
               <div class="mb-4 flex justify-between items-center">
                 <h3 class="text-md font-semibold">Top 5 Latecomers</h3>
                 <h3 class="text-md font-semibold">
-                  Month of {{ formattedMonth }}
+                  <template v-if="filterType === 'monthly'"
+                    >Month of {{ formattedMonth }}</template
+                  >
+                  <template v-else-if="filterType === 'yearly'"
+                    >Year {{ selectedYear }}</template
+                  >
                 </h3>
               </div>
               <p class="text-gray-500 text-xs text-left mb-2">
-                Based on number of late records this month.
+                Based on number of late records.
               </p>
 
               <div class="overflow-x-auto">
-                <table
-                  class="min-w-full border border-gray-200 rounded-lg overflow-hidden text-sm"
+                <div
+                  class="h-[40vh] overflow-y-auto border border-gray-200 rounded-lg shadow-sm p-2"
                 >
-                  <thead class="bg-blue-900 text-white text-sm tracking-wider">
-                    <tr>
-                      <th class="px-3 py-2 text-left border-b border-gray-200">
-                        Name
-                      </th>
-                      <th class="px-4 py-3 text-center border-b">
-                        Days Present
-                      </th>
-                      <th class="px-4 py-3 text-center border-b">
-                        Total Hours
-                      </th>
-                      <th
-                        class="px-3 py-2 text-center border-b border-gray-200"
-                      >
-                        Lates
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(emp, index) in topLateComers"
-                      :key="emp.employee_id"
-                      :class="index % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
+                  <table
+                    class="min-w-full border border-gray-200 rounded-lg overflow-hidden text-sm"
+                  >
+                    <thead
+                      class="bg-blue-900 text-white text-sm tracking-wider"
                     >
-                      <td class="px-3 py-2 border-b border-gray-200 text-left">
-                        {{ emp.name }}
-                      </td>
-                      <td class="px-4 py-3 text-center">
-                        {{ emp.daysPresent }}
-                      </td>
-                      <td class="px-4 py-3 text-center">
-                        {{ emp.totalHours }}
-                      </td>
-                      <td
-                        class="px-3 py-2 text-center border-b border-gray-200"
+                      <tr>
+                        <th
+                          class="px-3 py-2 text-left border-b border-gray-200"
+                        >
+                          Name
+                        </th>
+                        <th class="px-4 py-3 text-center border-b">
+                          Days Present
+                        </th>
+                        <th class="px-4 py-3 text-center border-b">
+                          Total Hours
+                        </th>
+                        <th
+                          class="px-3 py-2 text-center border-b border-gray-200"
+                        >
+                          Lates
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(emp, index) in topLateComers"
+                        :key="emp.employee_id"
+                        :class="index % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                       >
-                        {{ emp.lates }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                        <td
+                          class="px-3 py-2 border-b border-gray-200 text-left"
+                        >
+                          {{ emp.name }}
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                          {{ emp.daysPresent }}
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                          {{ emp.totalHours }}
+                        </td>
+                        <td
+                          class="px-3 py-2 text-center border-b border-gray-200"
+                        >
+                          {{ emp.lates }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
@@ -283,8 +390,9 @@
         v-else-if="!filterApplied && !loading"
         class="text-gray-500 text-center py-10 text-lg font-medium mt-4"
       >
-        No data available. Please select <strong>"Month"</strong> and
-        <strong>"Year"</strong> and click <strong>"Apply Filter"</strong>.
+        No data available. Please select <strong>"Filter Type"</strong> and the
+        corresponding <strong>"Month"</strong> or <strong>"Year"</strong>, then
+        click <strong>"Apply Filter"</strong>.
       </div>
     </div>
 
@@ -292,7 +400,11 @@
     <printAttendanceReport
       v-if="showPrintModal"
       :show="showPrintModal"
-      :criteria="{ month: selectedMonth, year: selectedYear }"
+      :criteria="{
+        month: filterType === 'monthly' ? selectedMonth : null,
+        year: selectedYear,
+        filterType: filterType,
+      }"
       :report-data="
         filteredMonthlyReport.filter(
           (emp) => emp.daysAbsent > 0 || emp.lates > 0,
@@ -335,6 +447,7 @@ export default {
       monthlyReport: [],
       selectedMonth: "",
       selectedYear: "",
+      filterType: "monthly",
       months: [
         "January",
         "February",
@@ -350,13 +463,6 @@ export default {
         "December",
       ],
       years: Array.from({ length: 10 }, (_, i) => now.getFullYear() - i),
-      legendColors: {
-        0: "bg-green-300",
-        "1-3": "bg-blue-300",
-        "4-5": "bg-yellow-300",
-        "6-9": "bg-red-200",
-        "10+": "bg-red-500",
-      },
       loading: false,
       progress: 0,
       filterApplied: false,
@@ -364,32 +470,31 @@ export default {
       selectedLegend: "",
       selectedAbsentRange: "",
       selectedUndertimeRange: "",
+      legendColors: {
+        0: "bg-green-300",
+        "1-3": "bg-blue-300",
+        "4-5": "bg-yellow-300",
+        "6-9": "bg-red-200",
+        "10+": "bg-red-500",
+      },
       data_employee_profile: [],
+      pageSize: 10,
+      currentPage: 1,
     };
   },
   computed: {
-    selectedMonthName() {
-      return this.selectedMonth
-        ? this.months[this.selectedMonth - 1]
-        : "Select Month";
-    },
-    formattedMonth() {
-      return this.selectedMonth && this.selectedYear
-        ? `${this.months[this.selectedMonth - 1]} ${this.selectedYear}`
-        : "All Time";
-    },
     filteredMonthlyReport() {
       let filtered = this.monthlyReport;
 
-      if (this.selectedMonth)
+      // Filter by month/year
+      if (this.filterType === "monthly" && this.selectedMonth)
         filtered = filtered.filter(
           (e) => e.month === Number(this.selectedMonth),
         );
-
       if (this.selectedYear)
         filtered = filtered.filter((e) => e.year === Number(this.selectedYear));
 
-      // Lates filter
+      // Lates
       if (this.selectedLegend && this.selectedLegend !== "latest") {
         const range = {
           0: [0, 0],
@@ -398,13 +503,12 @@ export default {
           "6-9": [6, 9],
           "10+": [10, Infinity],
         }[this.selectedLegend];
-
         filtered = filtered.filter(
-          (emp) => emp.lates >= range[0] && emp.lates <= range[1],
+          (e) => e.lates >= range[0] && e.lates <= range[1],
         );
       }
 
-      // Absent filter
+      // Absents
       if (this.selectedAbsentRange) {
         const range = {
           0: [0, 0],
@@ -413,13 +517,12 @@ export default {
           "6-9": [6, 9],
           "10+": [10, Infinity],
         }[this.selectedAbsentRange];
-
         filtered = filtered.filter(
-          (emp) => emp.daysAbsent >= range[0] && emp.daysAbsent <= range[1],
+          (e) => e.daysAbsent >= range[0] && e.daysAbsent <= range[1],
         );
       }
 
-      // ✅ Undertime Hours filter
+      // Undertime
       if (this.selectedUndertimeRange) {
         const range = {
           0: [0, 0],
@@ -428,16 +531,20 @@ export default {
           "31-60": [31, 60],
           "60+": [61, Infinity],
         }[this.selectedUndertimeRange];
-
         filtered = filtered.filter(
-          (emp) =>
-            emp.totalUnderTime >= range[0] && emp.totalUnderTime <= range[1],
+          (e) => e.totalUnderTime >= range[0] && e.totalUnderTime <= range[1],
         );
       }
 
       return filtered;
     },
-
+    paginatedReport() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      return this.filteredMonthlyReport.slice(start, start + this.pageSize);
+    },
+    totalPages() {
+      return Math.ceil(this.filteredMonthlyReport.length / this.pageSize) || 1;
+    },
     tardySummary() {
       const summary = { 0: 0, "1-3": 0, "4-5": 0, "6-9": 0, "10+": 0 };
       this.filteredMonthlyReport.forEach(({ lates }) => {
@@ -461,14 +568,7 @@ export default {
       return summary;
     },
     undertimeSummary() {
-      const summary = {
-        0: 0,
-        "1-10": 0,
-        "11-30": 0,
-        "31-60": 0,
-        "60+": 0,
-      };
-
+      const summary = { 0: 0, "1-10": 0, "11-30": 0, "31-60": 0, "60+": 0 };
       this.filteredMonthlyReport.forEach(({ totalUnderTime }) => {
         if (totalUnderTime === 0) summary["0"]++;
         else if (totalUnderTime <= 10) summary["1-10"]++;
@@ -476,12 +576,10 @@ export default {
         else if (totalUnderTime <= 60) summary["31-60"]++;
         else summary["60+"]++;
       });
-
       return summary;
     },
-
     topLateComers() {
-      return this.filteredMonthlyReport
+      return [...this.filteredMonthlyReport]
         .filter((e) => e.lates > 0)
         .sort((a, b) => b.lates - a.lates)
         .slice(0, 5);
@@ -502,10 +600,10 @@ export default {
             ],
             backgroundColor: [
               "#34d399",
-              "#93c5fd",
-              "#fcd34d",
-              "#fca5a5",
+              "#60a5fa",
+              "#facc15",
               "#f87171",
+              "#b91c1c",
             ],
           },
         ],
@@ -514,52 +612,60 @@ export default {
     chartOptions() {
       return {
         responsive: true,
-        plugins: {
-          legend: {
-            position: "top",
-            labels: { color: "#374151", font: { size: 12 } },
-          },
-        },
-        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } },
       };
+    },
+    reportHeaderText() {
+      if (this.filterType === "monthly")
+        return this.selectedMonth && this.selectedYear
+          ? `Month: ${this.months[this.selectedMonth - 1]} ${this.selectedYear}`
+          : "Month: ?";
+      if (this.filterType === "yearly")
+        return this.selectedYear ? `Year of ${this.selectedYear}` : "Year: ?";
+      return "?";
+    },
+    formattedMonth() {
+      return this.selectedMonth
+        ? `${this.months[this.selectedMonth - 1]} ${this.selectedYear}`
+        : this.selectedYear
+        ? `Year of ${this.selectedYear}`
+        : "?";
     },
   },
   methods: {
-    getRowClass(lates) {
-      if (lates >= 1 && lates <= 3) return "bg-blue-100";
-      if (lates >= 4 && lates <= 5) return "bg-yellow-100";
-      if (lates >= 6 && lates <= 9) return "bg-red-100";
-      if (lates >= 10) return "bg-red-300";
-      return "bg-green-50";
+    async fetchEmployeeRecords() {
+      try {
+        const { data } = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`,
+        );
+        this.data_employee_profile = data || [];
+      } catch (err) {
+        console.error(err);
+      }
     },
-
     async fetchMonthlyReport() {
       try {
         if (!this.data_employee_profile.length)
           await this.fetchEmployeeRecords();
-
-        const { data: monthlyData } = await axios.get(
+        const { data } = await axios.get(
           "http://localhost:8000/attendance-record/monthly-attendance-report",
         );
-
-        // No need to fetch allRecords since we're not calculating undertime
-        this.monthlyReport = monthlyData
+        this.monthlyReport = data
           .map((emp) => {
             const [year, month] = emp.month_year.split("-").map(Number);
             const totalWorkdays = this.getTotalWorkdaysInMonth(year, month);
             const daysPresent = Number(emp.total_days_present);
-
             return {
               employee_id: emp.employee_id,
               name: emp.name,
-              attendance_id: emp.attendance_id,
               month,
               year,
               daysPresent,
               daysAbsent: totalWorkdays - daysPresent,
               totalHours: Number(emp.total_attendance_hours),
               lates: Number(emp.total_late_days),
-              totalUnderTime: Number(emp.total_undertime_hours), // <-- directly from API
+              totalUnderTime: Number(emp.total_undertime_hours),
             };
           })
           .filter((emp) =>
@@ -570,11 +676,10 @@ export default {
             ),
           );
       } catch (err) {
-        console.error("Failed to fetch monthly report:", err);
+        console.error(err);
         this.monthlyReport = [];
       }
     },
-
     getTotalWorkdaysInMonth(year, month) {
       const start = new Date(year, month - 1, 1),
         end = new Date(year, month, 0);
@@ -604,27 +709,25 @@ export default {
       this.filterApplied = false;
       await this.simulateProgress();
       await this.fetchMonthlyReport();
+      this.currentPage = 1;
       this.filterApplied = true;
       this.loading = false;
     },
     openPrintModal() {
       const printData = this.filteredMonthlyReport.filter(
-        (emp) => emp.daysAbsent > 0 || emp.lates > 0,
+        (e) => e.daysAbsent > 0 || e.lates > 0,
       );
       if (printData.length) this.showPrintModal = true;
       else this.$toast.info("No employees with absences or lates to print.");
     },
-    async fetchEmployeeRecords() {
-      try {
-        this.data_employee_profile =
-          (
-            await axios.get(
-              `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`,
-            )
-          ).data || [];
-      } catch (err) {
-        console.error(err);
-      }
+    prevPage() {
+      if (this.currentPage > 1) this.currentPage--;
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) this.currentPage++;
+    },
+    goToPage(page) {
+      this.currentPage = page;
     },
   },
   mounted() {

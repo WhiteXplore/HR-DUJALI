@@ -12,7 +12,20 @@
     <!-- Header with Search and Show Entries -->
     <div
       class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4"
-    ></div>
+    >
+      <div class="flex items-center gap-2 text-gray-700 text-sm">
+        Show
+        <select
+          v-model.number="itemsPerPage"
+          class="px-2 py-1 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        >
+          <option :value="10">10</option>
+          <option :value="25">25</option>
+          <option :value="50">50</option>
+        </select>
+        entries
+      </div>
+    </div>
 
     <!-- Table Container -->
     <div class="overflow-auto rounded-lg shadow bg-white h-[35vh] w-full">
@@ -77,41 +90,41 @@
         {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
         of {{ filteredData.length }} entries
       </div>
-      <div
-        v-if="totalPages > 1"
-        class="mt-4 flex justify-center items-center space-x-2"
-      >
-        <button
-          @click="changePage(currentPage - 1)"
-          :disabled="currentPage === 1"
-          class="px-3 py-1 rounded border bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <button
-          v-for="page in pageNumbers"
-          :key="page"
-          @click="changePage(page)"
-          :class="[
-            'px-3 py-1 rounded border',
-            page === currentPage
-              ? 'bg-blue-500 text-white'
-              : 'bg-white hover:bg-gray-100',
-          ]"
-        >
-          {{ page }}
-        </button>
-        <button
-          @click="changePage(currentPage + 1)"
-          :disabled="currentPage === totalPages"
-          class="px-3 py-1 rounded border bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
     </div>
 
     <!-- Pagination Buttons -->
+    <div
+      v-if="totalPages > 1"
+      class="mt-4 flex justify-center items-center space-x-2"
+    >
+      <button
+        @click="changePage(currentPage - 1)"
+        :disabled="currentPage === 1"
+        class="px-3 py-1 rounded border bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+      >
+        Prev
+      </button>
+      <button
+        v-for="page in pageNumbers"
+        :key="page"
+        @click="changePage(page)"
+        :class="[
+          'px-3 py-1 rounded border',
+          page === currentPage
+            ? 'bg-blue-500 text-white'
+            : 'bg-white hover:bg-gray-100',
+        ]"
+      >
+        {{ page }}
+      </button>
+      <button
+        @click="changePage(currentPage + 1)"
+        :disabled="currentPage === totalPages"
+        class="px-3 py-1 rounded border bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+      >
+        Next
+      </button>
+    </div>
   </div>
 </template>
 

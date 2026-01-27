@@ -363,7 +363,7 @@ export default {
       const matched = this.matchingServiceRecords.find(
         (r) =>
           r.first_name?.toLowerCase() === empFirst &&
-          r.last_name?.toLowerCase() === empLast
+          r.last_name?.toLowerCase() === empLast,
       );
 
       return matched?.service_id || null;
@@ -376,7 +376,7 @@ export default {
       if (!this.filteredServiceRecords.length || !this.employeeData) return "";
 
       const currentDesignationRecords = this.filteredServiceRecords.filter(
-        (r) => r.roa_designation === this.employeeData.present_designation
+        (r) => r.roa_designation === this.employeeData.present_designation,
       );
 
       if (!currentDesignationRecords.length) return "";
@@ -386,7 +386,7 @@ export default {
           const recordDate = new Date(record.period_from);
           return recordDate > new Date(latest.period_from) ? record : latest;
         },
-        currentDesignationRecords[0]
+        currentDesignationRecords[0],
       );
 
       const date = new Date(latestRecord.period_from);
@@ -402,7 +402,7 @@ export default {
         return "Present";
 
       const currentDesignationRecords = this.filteredServiceRecords.filter(
-        (r) => r.roa_designation === this.employeeData.present_designation
+        (r) => r.roa_designation === this.employeeData.present_designation,
       );
 
       if (!currentDesignationRecords.length) return "Present";
@@ -412,7 +412,7 @@ export default {
           const recordDate = new Date(record.period_from);
           return recordDate > new Date(latest.period_from) ? record : latest;
         },
-        currentDesignationRecords[0]
+        currentDesignationRecords[0],
       );
 
       if (!latestRecord.period_to) return "Present";
@@ -478,7 +478,7 @@ export default {
 
       // Fallback match by birthdate
       const birthMatches = this.matchingServiceRecords.filter(
-        (record) => record.birthdate === empBirthdate
+        (record) => record.birthdate === empBirthdate,
       );
 
       if (birthMatches.length) {
@@ -500,7 +500,7 @@ export default {
     openPrintableModal() {
       console.log(
         "Promotion Criteria being sent to PrintableModal:",
-        this.promotionCriteriaList
+        this.promotionCriteriaList,
       );
       this.showModal = true;
     },
@@ -513,13 +513,13 @@ export default {
       this.loading = true;
       try {
         const res = await axios.get(
-          `${process.env.VUE_APP_API_BASE_URL}/predictive/fetch-promotion`
+          `${process.env.VUE_APP_API_BASE_URL}/predictive/fetch-promotion`,
         );
 
         const matched = res.data.find(
           (emp) =>
             emp.first_name === this.selectedFirstName &&
-            emp.last_name === this.selectedLastName
+            emp.last_name === this.selectedLastName,
         );
 
         if (!matched) return;
@@ -536,7 +536,7 @@ export default {
     async fetchLearningRecords() {
       try {
         const ldRes = await axios.get(
-          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`,
         );
 
         const empFirst = this.selectedFirstName.toUpperCase();
@@ -545,7 +545,7 @@ export default {
         const matchedEmp = (ldRes.data || []).find(
           (emp) =>
             emp.first_name.toUpperCase() === empFirst &&
-            emp.last_name.toUpperCase() === empLast
+            emp.last_name.toUpperCase() === empLast,
         );
 
         if (!matchedEmp) {
@@ -601,7 +601,7 @@ export default {
         this.promotionCriteriaList = newVal || [];
         console.log(
           "Promotion Criteria received in viewPromotion:",
-          this.promotionCriteriaList
+          this.promotionCriteriaList,
         );
       },
     },

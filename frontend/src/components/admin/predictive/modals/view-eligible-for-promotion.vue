@@ -3,9 +3,9 @@
     <!-- Header -->
     <div class="w-full flex justify-between items-center mb-4">
       <div class="text-left">
-        <h1 class="text-md font-bold text-gray-800">Training Details</h1>
+        <h1 class="text-md font-bold text-gray-800">Promotion Details</h1>
         <p class="text-sm text-gray-500 mt-1">
-          View training information and eligible employees.
+          View promotion information and eligible employees.
         </p>
       </div>
 
@@ -86,7 +86,7 @@
       <!-- Eligible Employees Table Header -->
       <div class="flex items-end justify-between">
         <div>
-          <h3 class="text-md font-semibold text-gray-800 mt-4 text-left">
+          <h3 class="text-md font-semibold text-gray-800 text-left">
             Eligible Employees
           </h3>
           <p class="text-sm text-gray-500 mt-1 mb-3 text-left">
@@ -96,7 +96,7 @@
       </div>
 
       <!-- Eligible Employees Table -->
-      <div class="mt-5 border rounded-xl p-2 max-h-[53vh] overflow-y-auto">
+      <div class="border rounded-xl p-2 max-h-[53vh] overflow-y-auto">
         <div
           v-if="eligibleEmployees.length > 0"
           class="overflow-y-auto rounded-lg border"
@@ -202,7 +202,7 @@ export default {
 
       const criteria = this.promotionCriteria;
       const requiredLevels = (criteria.education_requirement || []).map((lvl) =>
-        lvl.toLowerCase()
+        lvl.toLowerCase(),
       );
 
       return this.data_promotion.filter((emp) => {
@@ -264,11 +264,11 @@ export default {
       const criteriaId = this.id || this.$route.params.id;
       axios
         .get(
-          `${process.env.VUE_APP_API_BASE_URL}/promotion-criteria/${criteriaId}`
+          `${process.env.VUE_APP_API_BASE_URL}/promotion-criteria/${criteriaId}`,
         )
         .then((res) => (this.promotionCriteria = res.data))
         .catch((err) =>
-          console.error("Failed to load promotion criteria", err)
+          console.error("Failed to load promotion criteria", err),
         );
     },
 

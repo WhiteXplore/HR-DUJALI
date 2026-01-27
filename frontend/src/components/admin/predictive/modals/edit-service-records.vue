@@ -282,7 +282,7 @@ export default {
       if (confirm("Delete this record?")) {
         axios
           .delete(
-            `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}/record/${record.record_id}`
+            `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}/record/${record.record_id}`,
           )
           .then(() => this.form.serviceRecords.splice(index, 1));
       }
@@ -302,7 +302,7 @@ export default {
       axios
         .patch(
           `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}`,
-          payload
+          payload,
         )
         .then(() => {
           toast.success("Record updated successfully!");
@@ -312,7 +312,7 @@ export default {
     },
     async fetchServiceRecords() {
       const { data } = await axios.get(
-        `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}`
+        `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}`,
       );
       Object.assign(this.form, data);
     },

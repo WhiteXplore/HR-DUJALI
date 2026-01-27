@@ -19,6 +19,28 @@
     <!-- Table -->
     <div class="text-[14px] bg-white rounded-xl mt-4">
       <div class="overflow-x-auto border p-2 rounded-xl">
+        <!-- Controls -->
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex items-center gap-2">
+            <select
+              v-model="itemsPerPage"
+              class="border px-2 py-1 rounded-full"
+              @change="changePage(1)"
+            >
+              <option v-for="n in [5, 10, 15, 20]" :key="n" :value="n">
+                {{ n }}
+              </option>
+            </select>
+            <span class="text-sm">Per page</span>
+          </div>
+
+          <input
+            v-model="searchQuery"
+            placeholder="Search"
+            class="border px-3 py-2 rounded-xl w-[250px]"
+            @input="changePage(1)"
+          />
+        </div>
         <table
           class="min-w-full table-fixed border-collapse text-text text-[13px]"
         >
@@ -35,7 +57,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="(training, index) in trainings"
+              v-for="(training, index) in paginatedTrainings"
               :key="training.training_id"
               :class="{ 'bg-blue-50 border-b': (index + 1) % 2 === 0 }"
             >
@@ -93,6 +115,43 @@
             </tr>
           </tbody>
         </table>
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-3 text-sm">
+          <span>
+            Showing {{ startIndex }} to {{ endIndex }} of
+            {{ filteredData.length }} entries
+          </span>
+
+          <div class="flex gap-1">
+            <button
+              @click="changePage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="px-2 py-1 border rounded"
+            >
+              ‹
+            </button>
+
+            <button
+              v-for="p in totalPages"
+              :key="p"
+              @click="changePage(p)"
+              :class="[
+                'px-3 py-1 rounded border',
+                currentPage === p ? 'bg-blue-600 text-white' : 'bg-gray-100',
+              ]"
+            >
+              {{ p }}
+            </button>
+
+            <button
+              @click="changePage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="px-2 py-1 border rounded"
+            >
+              ›
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -149,7 +208,7 @@
       v-if="showTrainingAttendeesModal"
       class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
     >
-      <div class="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6">
+      <div class="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-bold text-gray-800">
             Employees Who Already Attended "{{ selectedTraining?.title }}"
@@ -164,7 +223,7 @@
 
         <div
           v-if="trainingAttendees.length"
-          class="overflow-y-auto max-h-72 border rounded p-2"
+          class="overflow-y-auto max-h-72 border"
         >
           <table class="w-full text-sm text-left border-collapse">
             <thead class="bg-gray-100">
@@ -226,7 +285,9 @@ export default {
       employee_learning_development: [],
       eligibleEmployeesMap: {}, // ✅ NEW
       isTrainingTable: true,
-
+      searchQuery: "",
+      currentPage: 1,
+      itemsPerPage: 5,
       isAddTraining: false,
       isEditTraining: false,
       selectedTraining: null,
@@ -238,13 +299,52 @@ export default {
       trainingAttendees: [],
     };
   },
+  computed: {
+    filteredData() {
+      if (!this.searchQuery) return this.trainings;
+
+      const q = this.searchQuery.toLowerCase();
+      return this.trainings.filter((t) =>
+        [t.title, t.title_description, t.category]
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      );
+    },
+
+    totalPages() {
+      return Math.ceil(this.filteredData.length / this.itemsPerPage) || 1;
+    },
+
+    paginatedTrainings() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      return this.filteredData.slice(start, start + this.itemsPerPage);
+    },
+
+    startIndex() {
+      return this.filteredData.length
+        ? (this.currentPage - 1) * this.itemsPerPage + 1
+        : 0;
+    },
+
+    endIndex() {
+      return Math.min(
+        this.currentPage * this.itemsPerPage,
+        this.filteredData.length,
+      );
+    },
+  },
 
   methods: {
+    changePage(page) {
+      if (page < 1 || page > this.totalPages) return;
+      this.currentPage = page;
+    },
     /* ================= FETCH ================= */
     async fetchTrainings() {
       try {
         const res = await axios.get(
-          `${process.env.VUE_APP_API_BASE_URL}/available-trainings/get-training`
+          `${process.env.VUE_APP_API_BASE_URL}/available-trainings/get-training`,
         );
         this.trainings = res.data || [];
       } catch (err) {
@@ -255,12 +355,12 @@ export default {
       try {
         /* 1️⃣ Get learning & development records */
         const ldRes = await axios.get(
-          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`,
         );
 
         /* 2️⃣ Get eligible employees (department & designation) */
         const eligibleRes = await axios.get(
-          `${process.env.VUE_APP_API_BASE_URL}/upload/get-eligible-employees-trainings`
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-eligible-employees-trainings`,
         );
 
         /* 3️⃣ Map eligible employees by employee_id */
@@ -322,11 +422,11 @@ export default {
 
       try {
         await axios.delete(
-          `${process.env.VUE_APP_API_BASE_URL}/available-trainings/${this.recordToDelete.training_id}`
+          `${process.env.VUE_APP_API_BASE_URL}/available-trainings/${this.recordToDelete.training_id}`,
         );
 
         this.trainings = this.trainings.filter(
-          (t) => t.training_id !== this.recordToDelete.training_id
+          (t) => t.training_id !== this.recordToDelete.training_id,
         );
 
         toast.success("Training deleted successfully!");
@@ -363,8 +463,8 @@ export default {
             (record) =>
               normalize(record.title_learning_development) === currentTitle &&
               record.ld_from === currentFrom &&
-              record.ld_to === currentTo
-          )
+              record.ld_to === currentTo,
+          ),
       );
 
       this.showTrainingAttendeesModal = true;

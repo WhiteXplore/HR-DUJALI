@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsArray,
+  ValidateNested,
+  IsNumber,
+  IsIn,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class AnswerDto {
@@ -19,39 +26,63 @@ export class CreateCustomerFeedbackDto {
   @IsString()
   timeOfVisit: string;
 
-  @IsString()
   @IsOptional()
-  clientType: string;
-
   @IsString()
-  @IsOptional()
-  sex: string;
+  clientType?: string;
 
   @IsOptional()
+  @IsString()
+  sex?: string;
+
+  @IsOptional()
+  @IsString()
   age?: string;
 
   @IsOptional()
+  @IsString()
   serviceAvailed?: string;
 
   @IsOptional()
+  @IsString()
   municipality?: string;
 
   @IsOptional()
+  @IsString()
   feedback?: string;
 
+  // ✅ MAIN FEEDBACK SENTIMENT
   @IsOptional()
-  sentiment?: string;
+  @IsIn(['Positive', 'Neutral', 'Negative'])
+  sentiment_status?: 'Positive' | 'Neutral' | 'Negative';
 
   @IsOptional()
-  sentimentScore?: number;
+  @IsNumber()
+  sentiment_score?: number;
+
+  // ✅ ADDITIONAL / PREDEFINED COMMENT SENTIMENT
+  @IsOptional()
+  @IsIn(['Positive', 'Neutral', 'Negative'])
+  additional_sentiment_status?: 'Positive' | 'Neutral' | 'Negative';
 
   @IsOptional()
-  additional_comment_sentimentScore?: number;
+  @IsNumber()
+  additional_sentiment_score?: number;
 
+  // ✅ FINAL COMBINED SENTIMENT
+  @IsOptional()
+  @IsIn(['Positive', 'Neutral', 'Negative'])
+  final_sentiment_status?: 'Positive' | 'Neutral' | 'Negative';
+
+  @IsOptional()
+  @IsNumber()
+  final_sentiment_score?: number;
+
+  @IsArray()
   @ValidateNested({ each: true })
   @Type(() => AnswerDto)
   answers: AnswerDto[];
 
+  @IsArray()
   @ValidateNested({ each: true })
   @Type(() => AnswerDto)
   likertAnswers: AnswerDto[];

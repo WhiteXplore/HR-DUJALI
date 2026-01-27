@@ -15,7 +15,7 @@
             Attendance Report Preview
           </h2>
           <p class="text-sm text-gray-500">
-            Summary for {{ selectedMonthName }} {{ criteria.year || "?" }}
+            {{ reportHeaderText }}
           </p>
         </div>
         <!-- Close Button -->
@@ -25,14 +25,6 @@
         >
           ✕
         </button>
-        <!-- <div class="flex gap-2">
-          <button
-            @click="downloadPDF"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Download PDF
-          </button>
-        </div> -->
       </div>
 
       <!-- PDF Preview -->
@@ -66,9 +58,9 @@ export default {
 
   props: {
     show: Boolean,
-    criteria: { type: Object, required: true }, // {month, year}
-    reportData: { type: Array, default: () => [] }, // filteredMonthlyReport
-    topLateComers: { type: Array, default: () => [] }, // topLateComers
+    criteria: { type: Object, required: true }, // {month, year, filterType: 'monthly' | 'yearly'}
+    reportData: { type: Array, default: () => [] },
+    topLateComers: { type: Array, default: () => [] },
   },
 
   data() {
@@ -79,8 +71,8 @@ export default {
   },
 
   computed: {
-    selectedMonthName() {
-      const months = [
+    months() {
+      return [
         "January",
         "February",
         "March",
@@ -94,25 +86,36 @@ export default {
         "November",
         "December",
       ];
-      return this.criteria.month ? months[this.criteria.month - 1] : "?";
+    },
+    selectedMonthName() {
+      return this.criteria.month ? this.months[this.criteria.month - 1] : "?";
+    },
+    selectedYear() {
+      return this.criteria.year || "?";
+    },
+    reportHeaderText() {
+      if (this.criteria.filterType === "monthly") {
+        return `Month: ${this.selectedMonthName} ${this.selectedYear}`;
+      } else if (this.criteria.filterType === "yearly") {
+        return `Year of ${this.selectedYear}`;
+      } else {
+        return "?";
+      }
     },
   },
 
   watch: {
     reportData: {
       handler(newVal) {
-        console.log("Report Data changed:", newVal);
         if (this.show && newVal.length) {
           this.generatePreview();
         }
       },
       deep: true,
-      immediate: true, // runs immediately on mount
+      immediate: true,
     },
     show(val) {
-      if (!val) {
-        this.cleanupPdfUrl();
-      }
+      if (!val) this.cleanupPdfUrl();
     },
   },
 
@@ -245,9 +248,9 @@ export default {
       ];
 
       return {
-        pageSize: { width: 612, height: 936 }, // Folio size in points (8.5"x13")
+        pageSize: { width: 612, height: 936 },
         pageOrientation: "portrait",
-        pageMargins: [25, 20, 20, 25], // narrow margins
+        pageMargins: [25, 20, 20, 25],
         defaultStyle: { fontSize: 10, color: "#111827", font: "Roboto" },
         content: [
           { text: "Republic of the Philippines", style: "govHeader" },
@@ -263,7 +266,7 @@ export default {
                 type: "line",
                 x1: 0,
                 y1: 0,
-                x2: 572, // full width minus margins
+                x2: 572,
                 y2: 0,
                 lineWidth: 1,
                 lineColor: "#d1d5db",
@@ -278,13 +281,10 @@ export default {
             margin: [0, 0, 0, 5],
           },
           {
-            text: `Month: ${this.selectedMonthName} ${
-              this.criteria.year || ""
-            }`,
+            text: this.reportHeaderText,
             style: "subTitle",
             margin: [0, 0, 0, 10],
           },
-          // { text: "Employee Attendance Summary", style: "sectionHeader" },
           {
             table: {
               headerRows: 1,
@@ -306,12 +306,11 @@ export default {
               vLineWidth: () => 0.4,
               hLineColor: () => "#d1d5db",
               vLineColor: () => "#d1d5db",
-              paddingLeft: () => 4, // wider horizontal padding
+              paddingLeft: () => 4,
               paddingRight: () => 4,
-              paddingTop: () => 6, // taller row
+              paddingTop: () => 6,
               paddingBottom: () => 6,
             },
-
             margin: [0, 0, 0, 5],
           },
         ],
@@ -320,7 +319,6 @@ export default {
           govSubHeader: { fontSize: 10, alignment: "center" },
           reportTitle: { fontSize: 13, bold: true, alignment: "center" },
           subTitle: { fontSize: 10, alignment: "center" },
-          sectionHeader: { fontSize: 11, bold: true, margin: [0, 5, 0, 5] },
         },
       };
     },
@@ -328,12 +326,10 @@ export default {
     generatePreview() {
       if (!this.reportData.length) return;
       this.isGenerating = true;
-
       try {
         const docDefinition = this.buildDocDefinition();
-
         pdfMake.createPdf(docDefinition).getBlob((blob) => {
-          this.cleanupPdfUrl(); // revoke previous URL if any
+          this.cleanupPdfUrl();
           this.pdfUrl = URL.createObjectURL(blob);
           this.isGenerating = false;
         });
@@ -346,11 +342,11 @@ export default {
     downloadPDF() {
       if (!this.reportData.length) return;
       const docDefinition = this.buildDocDefinition();
-      pdfMake
-        .createPdf(docDefinition)
-        .download(
-          `Attendance_Report_${this.selectedMonthName}_${this.criteria.year}.pdf`
-        );
+      const fileName =
+        this.criteria.filterType === "monthly"
+          ? `Attendance_Report_${this.selectedMonthName}_${this.selectedYear}.pdf`
+          : `Attendance_Report_Year_${this.selectedYear}.pdf`;
+      pdfMake.createPdf(docDefinition).download(fileName);
     },
   },
 };

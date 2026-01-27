@@ -1,4 +1,3 @@
-// customer-feedback.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { FeedbackAnswer } from './feedback-answer.entity';
 import { LikertAnswer } from './likert-answer.entity';
@@ -18,43 +17,50 @@ export class CustomerFeedback {
   timeOfVisit: string;
 
   @Column({ nullable: true })
-  clientType: string;
+  clientType?: string;
 
   @Column({ nullable: true })
-  sex: string;
+  sex?: string;
 
   @Column({ nullable: true })
-  age: string;
+  age?: string;
 
   @Column({ nullable: true })
-  serviceAvailed: string;
+  serviceAvailed?: string;
 
   @Column({ nullable: true })
-  municipality: string;
+  municipality?: string;
 
-  @Column({ nullable: true, type: 'text' })
-  feedback: string;
+  @Column({ type: 'text', nullable: true })
+  feedback?: string;
 
+  // ✅ MAIN FEEDBACK SENTIMENT
   @Column({ nullable: true })
-  sentiment: string;
+  sentiment_status?: 'Positive' | 'Neutral' | 'Negative';
 
   @Column({ type: 'int', nullable: true })
-  sentimentScore: number;
+  sentiment_score?: number;
+
+  // ✅ ADDITIONAL / PREDEFINED COMMENT SENTIMENT
+  @Column({ nullable: true })
+  additional_sentiment_status?: 'Positive' | 'Neutral' | 'Negative';
 
   @Column({ type: 'int', nullable: true })
-  additional_comment_sentimentScore: number;
+  additional_sentiment_score?: number;
+
+  // ✅ FINAL COMBINED SENTIMENT
+  @Column({ nullable: true })
+  final_sentiment_status?: 'Positive' | 'Neutral' | 'Negative';
+
+  @Column({ type: 'int', nullable: true })
+  final_sentiment_score?: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fileDate: Date;
 
-  // ✅ Relationships
-  @OneToMany(() => FeedbackAnswer, (answer) => answer.feedback, {
-    cascade: true,
-  })
+  @OneToMany(() => FeedbackAnswer, (a) => a.feedback, { cascade: true })
   answers: FeedbackAnswer[];
 
-  @OneToMany(() => LikertAnswer, (likert) => likert.feedback, {
-    cascade: true,
-  })
+  @OneToMany(() => LikertAnswer, (l) => l.feedback, { cascade: true })
   likertAnswers: LikertAnswer[];
 }

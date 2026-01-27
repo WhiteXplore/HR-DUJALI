@@ -1,9 +1,9 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+  <div class="grid grid-cols-3 gap-6">
     <div
       v-for="(card, index) in cards"
       :key="index"
-      class="w-full h-[150px] rounded-2xl border hover:shadow-xl transition-all duration-300 p-5 flex flex-col justify-between bg-white relative overflow-hidden cursor-pointer"
+      class="w-full h-[150px] rounded-2xl border transition-all duration-300 p-5 flex flex-col justify-between bg-white relative overflow-hidden cursor-pointer"
     >
       <!-- Background Accent Circle -->
       <div
@@ -68,13 +68,13 @@ export default {
           bgColor: "bg-red-400",
           textColor: "text-red-800",
         },
-        {
-          name: "New Applicants",
-          count: 0,
-          icon: "users1",
-          bgColor: "bg-yellow-400",
-          textColor: "text-yellow-800",
-        },
+        // {
+        //   name: "New Applicants",
+        //   count: 0,
+        //   icon: "users1",
+        //   bgColor: "bg-yellow-400",
+        //   textColor: "text-yellow-800",
+        // },
       ],
     };
   },
@@ -85,22 +85,22 @@ export default {
     async getEmployeeCounts() {
       try {
         const response = await axios.get(
-          process.env.VUE_APP_API_BASE_URL + "/upload/get-all"
+          process.env.VUE_APP_API_BASE_URL + "/upload/get-all",
         );
         const employees = response.data;
 
         const activeCount = employees.filter(
-          (emp) => emp.employment_status === "Active"
+          (emp) => emp.employment_status === "Active",
         ).length;
         const inactiveCount = employees.filter(
-          (emp) => emp.employment_status !== "Active"
+          (emp) => emp.employment_status !== "Active",
         ).length;
 
         this.cards[0].count = employees.length;
         this.cards[1].count = activeCount;
         this.cards[2].count = inactiveCount;
         this.cards[3].count = employees.filter(
-          (emp) => !emp.employment_status
+          (emp) => !emp.employment_status,
         ).length; // New Applicants
       } catch (error) {
         console.error("Error fetching employees:", error);

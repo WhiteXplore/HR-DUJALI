@@ -21,7 +21,7 @@
         <div class="flex items-center gap-2">
           <select
             v-model="itemsPerPage"
-            class="border px-2 py-1 rounded"
+            class="border px-2 py-1 rounded-full"
             @change="changePage(1)"
           >
             <option v-for="n in [5, 10, 15, 20]" :key="n" :value="n">
@@ -33,8 +33,8 @@
 
         <input
           v-model="searchQuery"
-          placeholder="Search age / experience..."
-          class="border px-3 py-2 rounded w-[250px]"
+          placeholder="Search"
+          class="border px-3 py-2 rounded-xl w-[250px]"
           @input="changePage(1)"
         />
       </div>
@@ -101,17 +101,28 @@
                 </td>
 
                 <td class="px-2 py-1 flex justify-center gap-1">
+                  <!-- Edit -->
                   <button
                     class="p-2 py-1 h-8 border-2 border-green-200 hover:bg-green-300 text-green-700 rounded-lg flex gap-1"
                     @click="openEditCriteria(item)"
                   >
                     <icon name="edit" /> Edit
                   </button>
+
+                  <!-- View -->
                   <button
                     class="p-2 py-1 h-8 border-2 border-blue-200 hover:bg-blue-300 text-blue-700 rounded-lg flex gap-1"
                     @click="goToViewEligibleForPromotion(item)"
                   >
                     <icon name="eye" /> View
+                  </button>
+
+                  <!-- Delete -->
+                  <button
+                    class="p-2 py-1 h-8 border-2 border-red-200 hover:bg-red-300 text-red-700 rounded-lg flex gap-1"
+                    @click="openDeleteModal(item)"
+                  >
+                    <icon name="delete" /> Delete
                   </button>
                 </td>
               </tr>
@@ -162,6 +173,48 @@
       </div>
     </div>
   </div>
+  <div
+    v-if="showDeleteModal"
+    class="fixed inset-0 bg-gray-800 bg-opacity-30 flex justify-center items-center z-50"
+  >
+    <div
+      class="rounded-xl shadow-lg w-[300px] md:w-[400px] bg-white py-6 px-4 flex flex-col items-center"
+    >
+      <div
+        class="rounded-full w-16 h-16 md:w-20 md:h-20 flex justify-center items-center bg-red-300 animate-pulse"
+      >
+        <icon
+          name="question"
+          class="w-8 h-8 md:w-10 md:h-10 text-white flex justify-center items-center"
+        />
+      </div>
+
+      <h1 class="text-[14px] md:text-[16px] font-semibold mt-4">
+        Delete Confirmation
+      </h1>
+
+      <p class="mt-2 text-[12px] md:text-[13px] text-center">
+        Are you sure you want to delete this record? This action cannot be
+        undone.
+      </p>
+
+      <div class="tracking-wide flex gap-2 mt-6">
+        <button
+          class="bg-red-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
+          @click="closeDeleteModal"
+        >
+          No, Cancel
+        </button>
+
+        <button
+          class="bg-green-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
+          @click="confirmDeleteCriteria"
+        >
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Add Modal -->
   <!-- Add Modal -->
@@ -186,6 +239,10 @@ export default {
       isTable: true,
       showAddCriteriaModal: false,
 
+      // ✅ DELETE MODAL STATE
+      showDeleteModal: false,
+      deleteTarget: null,
+
       promotionCriteriaList: [],
       currentPage: 1,
       itemsPerPage: 10,
@@ -202,14 +259,14 @@ export default {
       return this.promotionCriteriaList.filter(
         (item) =>
           String(item.age_requirement).includes(q) ||
-          String(item.work_experience_requirement).includes(q)
+          String(item.work_experience_requirement).includes(q),
       );
     },
 
     totalPages() {
       return Math.max(
         1,
-        Math.ceil(this.filteredData.length / this.itemsPerPage)
+        Math.ceil(this.filteredData.length / this.itemsPerPage),
       );
     },
 
@@ -227,7 +284,7 @@ export default {
     endIndex() {
       return Math.min(
         this.currentPage * this.itemsPerPage,
-        this.filteredData.length
+        this.filteredData.length,
       );
     },
   },
@@ -264,6 +321,39 @@ export default {
           this.promotionCriteriaList = res.data || [];
         })
         .catch(console.error);
+    },
+    openDeleteModal(item) {
+      this.deleteTarget = item;
+      this.showDeleteModal = true;
+    },
+
+    closeDeleteModal() {
+      this.showDeleteModal = false;
+      this.deleteTarget = null;
+    },
+
+    confirmDeleteCriteria() {
+      if (!this.deleteTarget) return;
+
+      axios
+        .delete(
+          `${process.env.VUE_APP_API_BASE_URL}/promotion-criteria/${this.deleteTarget.id}`,
+        )
+        .then(() => {
+          this.fetchPromotionCriteria();
+
+          // pagination safety
+          if (this.currentPage > this.totalPages) {
+            this.currentPage = this.totalPages;
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Failed to delete promotion criteria");
+        })
+        .finally(() => {
+          this.closeDeleteModal();
+        });
     },
   },
 
