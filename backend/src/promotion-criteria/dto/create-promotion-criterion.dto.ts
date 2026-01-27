@@ -1,6 +1,11 @@
-import { IsArray, IsInt, IsOptional } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreatePromotionCriterionDto {
+  // ✅ NEW
+  @IsOptional()
+  @IsString()
+  department?: string;
+
   @IsOptional()
   @IsInt()
   age_requirement?: number;

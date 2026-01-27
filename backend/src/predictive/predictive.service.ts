@@ -50,7 +50,7 @@ SELECT
     COALESCE(MAX(lt.ld_number_of_hours), 0) AS total_ld_hours_rendered,
     COALESCE(MAX(dld.total_unique_ld_titles), 0) AS total_count_of_learning_development,
 
-    -- Total attendance hours in 24-hour format
+    -- Total attendance hours
     COALESCE(MAX(att_hours.total_attendance_hours), 0) AS total_attendance_hours
 
 FROM hris.service_of_record s
@@ -74,7 +74,7 @@ LEFT JOIN (
            END) AS max_level_rank
     FROM hris.educational_table
     GROUP BY first_table_id
-) AS edu_rank ON p.first_table_id = edu_rank.first_table_id
+) edu_rank ON p.first_table_id = edu_rank.first_table_id
 
 LEFT JOIN hris.educational_table e
     ON e.first_table_id = edu_rank.first_table_id
@@ -88,7 +88,7 @@ LEFT JOIN hris.educational_table e
             ELSE -1
          END) = edu_rank.max_level_rank
 
--- Latest ROA info
+-- Latest ROA
 LEFT JOIN (
     SELECT ra1.service_id, ra1.roa_designation, ra1.roa_status
     FROM hris.record_of_appointment ra1
@@ -101,45 +101,56 @@ LEFT JOIN (
         ) AS latest_period
         FROM hris.record_of_appointment
         WHERE roa_designation IS NOT NULL
-          AND (period_to REGEXP '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' OR period_to = 'present')
         GROUP BY service_id
-    ) ra2 ON ra1.service_id = ra2.service_id
-       AND (CASE 
-                WHEN ra1.period_to = 'present' THEN CURDATE()
-                ELSE STR_TO_DATE(ra1.period_to, '%m/%d/%Y')
-           END) = ra2.latest_period
+    ) ra2 
+      ON ra1.service_id = ra2.service_id
+     AND (CASE 
+            WHEN ra1.period_to = 'present' THEN CURDATE()
+            ELSE STR_TO_DATE(ra1.period_to, '%m/%d/%Y')
+          END) = ra2.latest_period
 ) latest_roa ON latest_roa.service_id = s.service_id
 
--- Aggregate LD hours
+-- LD hours
 LEFT JOIN (
     SELECT first_table_id, SUM(ld_number_of_hours) AS ld_number_of_hours
     FROM hris.learning_table
     GROUP BY first_table_id
 ) lt ON lt.first_table_id = p.first_table_id
 
--- Count distinct LD titles
+-- LD count
 LEFT JOIN (
     SELECT first_table_id, COUNT(DISTINCT title_learning_development) AS total_unique_ld_titles
     FROM hris.learning_table
     GROUP BY first_table_id
 ) dld ON dld.first_table_id = p.first_table_id
 
--- Attendance hours in 24-hour format
+-- ✅ FIXED Attendance Hours (NO collation issue)
 LEFT JOIN (
     SELECT 
         ar.employee_id,
         SUM(
             LEAST(
-                IF(ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL, TIMESTAMPDIFF(SECOND, ard.in_am, ard.out_am), 0) +
+                IF(ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL,
+                    TIMESTAMPDIFF(SECOND, ard.in_am, ard.out_am),
+                    0
+                ) +
                 IF(ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL,
                     TIMESTAMPDIFF(
                         SECOND,
-                        CASE WHEN TIME_FORMAT(ard.in_pm, '%H:%i:%s') < '12:00:00' THEN ADDTIME(ard.in_pm, '12:00:00') ELSE ard.in_pm END,
-                        CASE WHEN TIME_FORMAT(ard.out_pm, '%H:%i:%s') < '12:00:00' THEN ADDTIME(ard.out_pm, '12:00:00') ELSE ard.out_pm END
+                        CASE 
+                            WHEN ard.in_pm < '12:00:00'
+                            THEN ADDTIME(ard.in_pm, '12:00:00')
+                            ELSE ard.in_pm
+                        END,
+                        CASE 
+                            WHEN ard.out_pm < '12:00:00'
+                            THEN ADDTIME(ard.out_pm, '12:00:00')
+                            ELSE ard.out_pm
+                        END
                     ),
                     0
                 ),
-                8*3600
+                8 * 3600
             )
         ) / 3600 AS total_attendance_hours
     FROM hris.attendance_records_data ard

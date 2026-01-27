@@ -65,21 +65,23 @@ export class AttendanceRecordService {
 
   async getMonthlyAttendanceReports() {
     const sql = `
-       CREATE OR REPLACE VIEW hris.vw_monthly_attendance_report AS
+    CREATE OR REPLACE VIEW hris.vw_monthly_attendance_report AS
+
 WITH RECURSIVE calendar AS (
-    -- Generate all dates in the month based on the minimum date in records
     SELECT DATE_FORMAT(MIN(date), '%Y-%m-01') AS day_date
     FROM hris.attendance_records_data
+
     UNION ALL
+
     SELECT DATE_ADD(day_date, INTERVAL 1 DAY)
     FROM calendar
-    WHERE DATE_ADD(day_date, INTERVAL 1 DAY) <= LAST_DAY((SELECT MIN(date) FROM hris.attendance_records_data))
+    WHERE DATE_ADD(day_date, INTERVAL 1 DAY)
+          <= (SELECT DATE(MAX(date)) FROM hris.attendance_records_data)
 ),
 weekdays AS (
-    -- Only include Monday-Friday
     SELECT day_date
     FROM calendar
-    WHERE DAYOFWEEK(day_date) NOT IN (1, 7)  -- 1=Sunday, 7=Saturday
+    WHERE DAYOFWEEK(day_date) NOT IN (1, 7)
 )
 SELECT 
     ar_main.employee_id,
@@ -87,93 +89,181 @@ SELECT
     MIN(ar_main.attendance_id) AS attendance_id,
     DATE_FORMAT(wd.day_date, '%Y-%m') AS month_year,
 
-    -- Days present
+    -- Total days present (any punch present counts)
     COUNT(DISTINCT CASE
         WHEN ard.in_am IS NOT NULL OR ard.in_pm IS NOT NULL
         THEN wd.day_date
     END) AS total_days_present,
 
-    -- Days absent = weekdays without attendance or with all NULLs
-    COUNT(DISTINCT CASE
-        WHEN ard.attendance_id IS NULL 
-             OR (ard.in_am IS NULL AND ard.out_am IS NULL AND ard.in_pm IS NULL AND ard.out_pm IS NULL)
+    -- Total days absent
+    COUNT(DISTINCT wd.day_date)
+    - COUNT(DISTINCT CASE
+        WHEN ard.in_am IS NOT NULL OR ard.in_pm IS NOT NULL
         THEN wd.day_date
-    END) AS total_days_absent,
+      END) AS total_days_absent,
 
-    -- Total worked hours capped at 8h/day
+    -- Total Attendance Hours (capped 4 hours per half-day)
     ROUND(
         SUM(
-            LEAST(
-                (
-                    IF(ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL,
-                        TIME_TO_SEC(ard.out_am) - TIME_TO_SEC(ard.in_am),
-                        0
+            CASE
+                WHEN ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                THEN LEAST(TIME_TO_SEC(ard.out_am) - TIME_TO_SEC(ard.in_am), 4*3600)
+                ELSE 0
+            END
+            +
+            CASE
+                WHEN ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL
+                THEN LEAST(
+                    TIME_TO_SEC(
+                        CASE WHEN HOUR(ard.out_pm) < 12 THEN ADDTIME(ard.out_pm, '12:00:00') ELSE ard.out_pm END
                     )
-                    +
-                    IF(ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL,
-                        (CASE WHEN HOUR(ard.in_pm) < 12 THEN TIME_TO_SEC(ard.in_pm) + 12*3600 ELSE TIME_TO_SEC(ard.in_pm) END)
-                        -
-                        (CASE WHEN HOUR(ard.out_pm) < 12 THEN TIME_TO_SEC(ard.out_pm) + 12*3600 ELSE TIME_TO_SEC(ard.out_pm) END)
-                        * -1,
-                        0
-                    )
-                ),
-                8*3600
-            )
+                    -
+                    TIME_TO_SEC(
+                        CASE WHEN HOUR(ard.in_pm) < 12 THEN ADDTIME(ard.in_pm, '12:00:00') ELSE ard.in_pm END
+                    ),
+                    4*3600
+                )
+                ELSE 0
+            END
         ) / 3600, 2
     ) AS total_attendance_hours,
-    -- Total undertime hours
--- Total undertime hours (FIXED 4H BLOCK LOGIC)
+
+    -- Total Actual Work Hours (not capped)
+    ROUND(
+        SUM(
+            CASE
+                WHEN ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                THEN TIME_TO_SEC(ard.out_am) - TIME_TO_SEC(ard.in_am)
+                ELSE 0
+            END
+            +
+            CASE
+                WHEN ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL
+                THEN TIME_TO_SEC(
+                        CASE WHEN HOUR(ard.out_pm) < 12 THEN ADDTIME(ard.out_pm, '12:00:00') ELSE ard.out_pm END
+                     )
+                     -
+                     TIME_TO_SEC(
+                        CASE WHEN HOUR(ard.in_pm) < 12 THEN ADDTIME(ard.in_pm, '12:00:00') ELSE ard.in_pm END
+                     )
+                ELSE 0
+            END
+        ) / 3600, 2
+    ) AS total_actual_work_hours,
+
+    -- Total Undertime Hours (only if both AM and PM exist)
+    ROUND(
+        SUM(
+            CASE
+                WHEN ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                 AND ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL THEN
+                    GREATEST(
+                        8 - (
+                            (TIME_TO_SEC(ard.out_am) - TIME_TO_SEC(ard.in_am))
+                            +
+                            (TIME_TO_SEC(
+                                CASE WHEN HOUR(ard.out_pm) < 12 THEN ADDTIME(ard.out_pm, '12:00:00') ELSE ard.out_pm END
+                             )
+                             -
+                             TIME_TO_SEC(
+                                CASE WHEN HOUR(ard.in_pm) < 12 THEN ADDTIME(ard.in_pm, '12:00:00') ELSE ard.in_pm END
+                             )
+                            )
+                        ) / 3600,
+                        0
+                    )
+                ELSE 0
+            END
+        ), 2
+    ) AS total_undertime_hours,
+    
+    -- Total Overtime Hours
 ROUND(
-    SUM(
-        CASE
-            -- Full absence = not undertime
-            WHEN ard.attendance_id IS NULL
-              OR (ard.in_am IS NULL AND ard.out_am IS NULL
-              AND ard.in_pm IS NULL AND ard.out_pm IS NULL)
-            THEN 0
+    GREATEST(
+        SUM(
+            CASE
+                WHEN ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                     AND ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL
+                THEN 
+                    ((TIME_TO_SEC(ard.out_am) - TIME_TO_SEC(ard.in_am))
+                     +
+                     (TIME_TO_SEC(
+                         CASE WHEN HOUR(ard.out_pm) < 12 THEN ADDTIME(ard.out_pm,'12:00:00') ELSE ard.out_pm END
+                     ) - TIME_TO_SEC(
+                         CASE WHEN HOUR(ard.in_pm) < 12 THEN ADDTIME(ard.in_pm,'12:00:00') ELSE ard.in_pm END
+                     ))
+                    ) / 3600 - 8
+                WHEN (ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                      AND (ard.in_pm IS NULL OR ard.out_pm IS NULL))
+                      OR (ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL
+                          AND (ard.in_am IS NULL OR ard.out_am IS NULL))
+                THEN 
+                    ((CASE WHEN ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                           THEN TIME_TO_SEC(ard.out_am) - TIME_TO_SEC(ard.in_am)
+                           ELSE 0 END
+                     +
+                     CASE WHEN ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL
+                           THEN TIME_TO_SEC(
+                                    CASE WHEN HOUR(ard.out_pm)<12 THEN ADDTIME(ard.out_pm,'12:00:00') ELSE ard.out_pm END
+                                )
+                                -
+                                TIME_TO_SEC(
+                                    CASE WHEN HOUR(ard.in_pm)<12 THEN ADDTIME(ard.in_pm,'12:00:00') ELSE ard.in_pm END
+                                )
+                           ELSE 0 END
+                    ) / 3600 - 4)  -- Half day expected = 4h
+                ELSE 0
+            END
+        ),
+        0
+    ), 2
+) AS total_overtime_hours,
 
-            ELSE
-                -- AM undertime (4h if incomplete)
-                (CASE
-                    WHEN ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
-                    THEN 0
-                    ELSE 4
-                END)
 
-                +
-
-                -- PM undertime (4h if incomplete)
-                (CASE
-                    WHEN ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL
-                    THEN 0
-                    ELSE 4
-                END)
-        END
-    ),
-    2
-) AS total_undertime_hours,
-
-
-
-    -- Late days
+    -- Total Late Days
     SUM(
         CASE 
             WHEN (ard.in_am IS NOT NULL AND ard.in_am > '08:02:00')
-              OR (ard.in_pm IS NOT NULL AND ard.in_pm > '13:02:00')
+              OR (ard.in_pm IS NOT NULL AND (
+                    CASE WHEN HOUR(ard.in_pm) < 12 THEN ADDTIME(ard.in_pm, '12:00:00') ELSE ard.in_pm END
+                 ) > '13:02:00')
             THEN 1 ELSE 0
         END
-    ) AS total_late_days
+    ) AS total_late_days,
+
+    -- Official Work Hours per Month (number of weekdays * 8h)
+    COUNT(DISTINCT wd.day_date) * 8 AS official_work_hours_per_month,
+
+    -- Final Total Days Present (full day = 1, half day = 0.5 if only AM or PM complete)
+    ROUND(
+        SUM(
+            CASE
+                WHEN ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                 AND ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL THEN 1
+                WHEN (ard.in_am IS NOT NULL AND ard.out_am IS NOT NULL
+                      AND (ard.in_pm IS NULL OR ard.out_pm IS NULL))
+                  OR (ard.in_pm IS NOT NULL AND ard.out_pm IS NOT NULL
+                      AND (ard.in_am IS NULL OR ard.out_am IS NULL))
+                THEN 0.5
+                ELSE 0
+            END
+        ), 2
+    ) AS total_days_present_final
 
 FROM hris.attendance_records ar_main
--- Join weekdays to include all possible dates
 CROSS JOIN weekdays wd
--- Left join attendance data per employee per day
 LEFT JOIN hris.attendance_records_data ard
     ON ard.attendance_id = ar_main.attendance_id
    AND DATE(ard.date) = wd.day_date
+
 GROUP BY ar_main.employee_id, ar_main.name, month_year
 ORDER BY ar_main.employee_id, month_year;
+
+
+
+
+
+
 
 
     `;

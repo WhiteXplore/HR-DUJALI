@@ -11,6 +11,10 @@ export class PromotionCriterion {
   @PrimaryGeneratedColumn()
   id: number;
 
+  // ✅ NEW
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  department: string;
+
   @Column({ type: 'int', nullable: true })
   age_requirement: number;
 
