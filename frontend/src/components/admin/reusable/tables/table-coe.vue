@@ -1,7 +1,7 @@
 <template>
   <div v-if="isTable">
     <div class="text-sm flex justify-between">
-      <div class="text-[13px] text-text mt-4 font-regular">
+      <div class="text-[14px] text-text mt-4 font-regular">
         Pages / Certifiate of Employment
       </div>
       <div
@@ -48,7 +48,7 @@
         <div class="w-full mt-3 rounded-t-lg overflow-x-auto" v-if="isTable">
           <div class="overflow-y-auto max-h-[550px]">
             <table
-              class="min-w-full table-fixed border-collapse text-text text-[13px]"
+              class="min-w-full table-fixed border-collapse text-text text-[14px]"
             >
               <thead
                 class="bg-Green text-gray-700 tracking-wider font-regular sticky top-0 z-10"
@@ -174,7 +174,7 @@ export default {
 
       const filtered = this.data_service_records.filter((record) => {
         const matchEmployee = this.data_employee_profile.find(
-          (emp) => emp.employee_id === record.employee_id
+          (emp) => emp.employee_id === record.employee_id,
         );
 
         if (!matchEmployee) return false;
@@ -230,7 +230,7 @@ export default {
         .catch((error) => {
           console.error(
             "There was an error fetching the service records:",
-            error
+            error,
           );
         });
     },
@@ -243,7 +243,7 @@ export default {
         .catch((error) => {
           console.error(
             "There was an error fetching the service records:",
-            error
+            error,
           );
         });
     },

@@ -6,7 +6,7 @@
       class="rounded-xl shadow-lg bg-white fixed top-20 transition-all duration-300"
       :class="step === 1 ? 'w-[50vw]' : 'w-full max-w-7xl'"
     >
-      <div class="text-text1 text-[13px] rounded-xl">
+      <div class="text-text1 text-[14px] rounded-xl">
         <!-- Header -->
         <div
           class="w-full p-5 py-3 bg-green-600 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"

@@ -38,6 +38,13 @@
           </div>
 
           <div class="flex gap-2">
+            <span class="font-medium text-gray-600">Department:</span>
+            <span class="font-semibold text-gray-800">
+              {{ promotionCriteria.department }}
+            </span>
+          </div>
+
+          <div class="flex gap-2">
             <span class="font-medium text-gray-600">Work Experience:</span>
             <span class="font-semibold text-gray-800">
               {{ promotionCriteria.work_experience_requirement ?? 0 }} yrs
@@ -202,8 +209,12 @@ export default {
 
       const criteria = this.promotionCriteria;
       const requiredLevels = (criteria.education_requirement || []).map((lvl) =>
-        lvl.toLowerCase(),
+        lvl.toLowerCase().trim(),
       );
+
+      const criteriaDepartment = (criteria.department || "")
+        .toLowerCase()
+        .trim();
 
       return this.data_promotion.filter((emp) => {
         const age = Number(emp.age) || 0;
@@ -211,7 +222,8 @@ export default {
         const commCount = Number(emp.total_count_of_learning_development) || 0;
         const commHours = Number(emp.total_ld_hours_rendered) || 0;
         const attendance = Number(emp.total_attendance_hours) || 0;
-        const level = (emp.level || "").toLowerCase();
+        const level = (emp.level || "").toLowerCase().trim();
+        const empDepartment = (emp.department || "").toLowerCase().trim();
 
         const meetsAge = age >= (Number(criteria.age_requirement) || 0);
         const meetsExperience =
@@ -225,13 +237,17 @@ export default {
         const meetsEducation =
           !requiredLevels.length || requiredLevels.includes(level);
 
+        const meetsDepartment =
+          !criteriaDepartment || empDepartment === criteriaDepartment;
+
         return (
           meetsAge &&
           meetsExperience &&
           meetsCommCount &&
           meetsCommHours &&
           meetsAttendance &&
-          meetsEducation
+          meetsEducation &&
+          meetsDepartment
         );
       });
     },

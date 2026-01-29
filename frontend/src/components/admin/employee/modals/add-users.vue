@@ -24,7 +24,7 @@
       <!-- Form -->
       <form
         @submit.prevent="submitForm"
-        class="flex flex-col gap-3 text-left p-4 text-[13px]"
+        class="flex flex-col gap-3 text-left p-4 text-[14px]"
       >
         <div class="flex gap-2 items-center">
           <!-- First Name -->
@@ -235,7 +235,7 @@ export default {
         if (!this.isEditMode || (this.isEditMode && this.form.password)) {
           if (!this.validatePassword(this.form.password)) {
             toast.error(
-              "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+              "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
             );
             return;
           }
@@ -251,13 +251,13 @@ export default {
         if (this.isEditMode) {
           await axios.put(
             `${process.env.VUE_APP_API_BASE_URL}/auth/user/${this.user.id}`,
-            payload
+            payload,
           );
           toast.success("User updated successfully!");
         } else {
           await axios.post(
             `${process.env.VUE_APP_API_BASE_URL}/auth/register`,
-            payload
+            payload,
           );
           toast.success("User added successfully!");
         }

@@ -39,7 +39,7 @@
         </p>
         <p
           :class="{
-            'text-[13px] font-medium': isExpanded,
+            'text-[14px] font-medium': isExpanded,
             hidden: !isExpanded,
           }"
         >
@@ -50,7 +50,7 @@
       <div v-if="isExpanded" class="w-full h-0.5 bg-[#fbfbfb] mt-4"></div>
 
       <!-- Dynamic Menu -->
-      <div class="flex flex-col mt-6 gap-2 tracking-wide text-[13px] w-full">
+      <div class="flex flex-col mt-6 gap-2 tracking-wide text-[14px] w-full">
         <template v-for="section in filteredSections" :key="section.name">
           <div v-if="isExpanded" class="text-md text-white mt-2 text-left">
             {{ section.name }}
@@ -320,7 +320,7 @@ export default {
               // 3. FILTER CHILDREN (IF ANY)
               if (item.children) {
                 const filteredChildren = item.children.filter(
-                  (child) => !child.role || child.role.includes(this.user.role)
+                  (child) => !child.role || child.role.includes(this.user.role),
                 );
 
                 if (filteredChildren.length === 0) return null;
@@ -379,7 +379,7 @@ export default {
           process.env.VUE_APP_API_BASE_URL + "/auth/me",
           {
             withCredentials: true,
-          }
+          },
         );
         if (response.data) this.user = response.data;
         else this.$router.push("/");

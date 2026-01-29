@@ -41,7 +41,7 @@
         </div>
 
         <!-- Reminders -->
-        <div class="mt-3 text-[13px] flex justify-between text-left">
+        <div class="mt-3 text-[14px] flex justify-between text-left">
           <div>
             <p class="text-gray-600">Accepted Files: .csv</p>
             <p class="text-green-700">example.csv</p>
@@ -131,7 +131,7 @@ export default {
                 headers: {
                   "Content-Type": "application/json",
                 },
-              }
+              },
             )
             .then((response) => {
               toast.success("Employee profiles uploaded successfully!");
@@ -197,7 +197,7 @@ export default {
             last_name: this.sanitize(row["Last Name"]),
             suffix: this.sanitize(row["Suffix"]),
             birthdate: this.formatBirthdate(
-              this.sanitize(row["Date of Birth"])
+              this.sanitize(row["Date of Birth"]),
             ),
             place_of_birth: this.sanitize(row["Place of Birth"]),
             gender: this.sanitize(row["Sex"]),
@@ -255,7 +255,7 @@ export default {
             level: this.sanitize(level),
             name_of_school: this.sanitize(row["Name of School"]),
             basic_education: this.sanitize(
-              row["Basic Education/Degree Course"]
+              row["Basic Education/Degree Course"],
             ),
             educ_from: this.sanitize(row["Educ From"]),
             educ_to: this.sanitize(row["Educ To"]),
@@ -277,7 +277,7 @@ export default {
         if (title_learning_development && currentEmployee) {
           currentEmployee.learningRecords.push({
             title_learning_development: this.sanitize(
-              title_learning_development
+              title_learning_development,
             ),
             ld_from: this.sanitize(row["Ld From"]),
             ld_to: this.sanitize(row["Ld To"]),

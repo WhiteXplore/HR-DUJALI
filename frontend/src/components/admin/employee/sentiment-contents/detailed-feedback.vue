@@ -4,9 +4,8 @@
       Detailed Feedback
     </h2>
 
-    <!-- Controls: Page size + Search + Total -->
-    <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
-      <!-- Page size selector -->
+    <!-- Controls -->
+    <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
       <div class="flex items-center gap-2">
         <label class="text-gray-600 text-sm">Show:</label>
         <select v-model.number="pageSize" class="p-1 border rounded-md">
@@ -17,95 +16,74 @@
         </select>
       </div>
 
-      <!-- Search input -->
       <div class="flex items-center gap-2">
         <div class="relative">
           <span
             class="absolute inset-y-0 left-0 flex items-center pl-2 text-gray-400"
+            >🔍</span
           >
-            <!-- Magnifying glass icon -->
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"
-              />
-            </svg>
-          </span>
           <input
-            type="text"
             v-model="searchQuery"
             placeholder="Search feedback..."
-            class="pl-8 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-sm w-60 sm:w-80"
+            class="pl-8 pr-3 py-2 border rounded-lg text-sm w-60"
           />
         </div>
-        <!-- Total records -->
-        <div class="text-sm p-2 px-3 rounded-full bg-blue-800 text-white">
+
+        <div class="text-sm px-3 py-2 rounded-full bg-blue-800 text-white">
           Total Records: {{ filteredFeedbacks.length }}
         </div>
       </div>
     </div>
 
     <!-- Table -->
-    <div
-      class="h-[40vh] overflow-y-auto border border-gray-200 rounded-lg shadow-sm p-2"
-    >
-      <table
-        class="min-w-full border border-gray-200 rounded-lg overflow-hidden text-sm text-left"
-      >
-        <thead class="bg-blue-900 text-white text-sm tracking-wider">
+    <div class="h-[40vh] overflow-y-auto border rounded-lg">
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-blue-900 text-white">
           <tr>
-            <th class="p-3 border-b uppercase text-xs font-semibold">Date</th>
-            <th class="p-3 border-b uppercase text-xs font-semibold">Office</th>
-            <th class="p-3 border-b uppercase text-xs font-semibold">
-              Service Availed
-            </th>
-            <th class="p-3 border-b uppercase text-xs font-semibold">
-              Common Feedback
-            </th>
-            <th class="p-3 border-b uppercase text-xs font-semibold">
-              Sentiment
-            </th>
-            <th
-              class="p-3 border-b uppercase text-xs font-semibold text-center"
-            >
-              Score
-            </th>
+            <th class="p-3">Date</th>
+            <th class="p-3">Office</th>
+            <th class="p-3">Service</th>
+            <th class="p-3">Feedback</th>
+            <th class="p-3">Sentiment</th>
+            <th class="p-3 text-center">Score</th>
+            <th class="p-3 text-center">Action</th>
           </tr>
         </thead>
+
         <tbody>
           <tr
             v-for="item in paginatedFeedbacks"
             :key="item.id"
-            class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50"
+            class="border-b hover:bg-gray-50"
           >
-            <td class="p-3 border-b">{{ formatDate(item.fileDate) }}</td>
-            <td class="p-3 border-b">{{ item.office || "-" }}</td>
-            <td class="p-3 border-b">{{ item.serviceAvailed || "-" }}</td>
-            <td class="p-3 border-b">{{ getFirstSentence(item.feedback) }}</td>
+            <td class="p-3">{{ formatDate(item.fileDate) }}</td>
+            <td class="p-3">{{ item.office }}</td>
+            <td class="p-3">{{ item.serviceAvailed }}</td>
+            <td class="p-3">{{ getFirstSentence(item.feedback) }}</td>
+
             <td
-              class="p-3 border-b font-semibold"
-              :class="{
-                'text-green-600': item.final_sentiment_status === 'Positive',
-                'text-red-600': item.final_sentiment_status === 'Negative',
-                'text-gray-600': item.final_sentiment_status === 'Neutral',
-              }"
+              class="p-3 font-semibold"
+              :class="sentimentColor(item.final_sentiment_status)"
             >
               {{ item.final_sentiment_status }}
             </td>
-            <td class="p-3 border-b text-center">
+
+            <td class="p-3 text-center">
               {{ item.final_sentiment_score }}
             </td>
+
+            <td class="p-3 text-center">
+              <button
+                @click="openModal(item)"
+                class="px-3 py-1 rounded-full text-xs bg-blue-600 text-white hover:bg-blue-700"
+              >
+                View
+              </button>
+            </td>
           </tr>
+
           <tr v-if="filteredFeedbacks.length === 0">
-            <td colspan="6" class="text-center p-4 text-gray-500">
+            <td colspan="7" class="text-center p-4 text-gray-500">
               No records found.
             </td>
           </tr>
@@ -113,78 +91,177 @@
       </table>
     </div>
 
-    <!-- Pagination + Showing entries -->
-    <div class="flex justify-between items-center mt-4 flex-wrap gap-2">
-      <!-- Showing entries -->
-      <div class="text-sm text-gray-600">
-        Showing
-        {{
-          filteredFeedbacks.length === 0 ? 0 : (currentPage - 1) * pageSize + 1
-        }}
-        to
-        {{ Math.min(currentPage * pageSize, filteredFeedbacks.length) }}
-        of {{ filteredFeedbacks.length }} entries
-      </div>
+    <!-- Pagination Info -->
+    <div class="text-sm text-gray-600 mt-4">
+      Showing
+      {{
+        filteredFeedbacks.length === 0 ? 0 : (currentPage - 1) * pageSize + 1
+      }}
+      to
+      {{ Math.min(currentPage * pageSize, filteredFeedbacks.length) }}
+      of {{ filteredFeedbacks.length }} entries
+    </div>
 
-      <!-- Pagination buttons -->
-      <div class="flex items-center gap-2 flex-wrap">
-        <!-- Prev button as arrow -->
-        <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-blue-100 disabled:opacity-50"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+    <!-- MODAL -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+    >
+      <div
+        class="bg-white rounded-2xl w-[95%] max-w-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-3 mb-6">
+          <h3 class="font-semibold text-lg text-gray-800">Feedback Analysis</h3>
+          <button
+            @click="showModal = false"
+            class="text-gray-400 hover:text-gray-700 text-lg"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
+            ✕
+          </button>
+        </div>
 
-        <!-- Page numbers as circles -->
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          @click="goToPage(page)"
-          :class="
-            page === currentPage
-              ? 'w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white font-semibold'
-              : 'w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-blue-50'
-          "
-        >
-          {{ page }}
-        </button>
+        <!-- Meta Info -->
+        <div class="grid grid-cols-2 gap-4 text-sm mb-6">
+          <div class="flex flex-col">
+            <p class="text-xs text-left text-gray-500 mb-1">Office</p>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="font-medium text-gray-800">
+                {{ selectedFeedback.office }}
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <p class="text-xs text-left text-gray-500 mb-1">Service</p>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="font-medium text-gray-800">
+                {{ selectedFeedback.serviceAvailed }}
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <!-- Next button as arrow -->
-        <button
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
-          class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-blue-100 disabled:opacity-50"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+        <!-- Full Feedback -->
+        <div class="mb-6">
+          <p class="text-xs text-gray-500 mb-2 font-semibold text-left">
+            Client Feedback
+          </p>
+          <div
+            class="bg-gray-100 p-4 rounded-lg text-sm text-gray-800 leading-relaxed text-left"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
+            {{ selectedFeedback.feedback }}
+          </div>
+        </div>
+
+        <!-- Sentiment Summary -->
+        <div
+          class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-8 flex justify-between items-center"
+        >
+          <div>
+            <p class="text-xs text-gray-500 mb-1">Final Sentiment</p>
+            <span
+              class="inline-flex px-3 py-1 rounded-full text-sm font-semibold"
+              :class="sentimentBadge(selectedFeedback.final_sentiment_status)"
+            >
+              {{ selectedFeedback.final_sentiment_status }}
+            </span>
+          </div>
+
+          <div class="text-right">
+            <p class="text-xs text-gray-500 mb-1">Score</p>
+            <p class="text-2xl font-bold text-gray-800">
+              {{ selectedFeedback.final_sentiment_score }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Survey Answers -->
+        <div v-if="selectedFeedback.answers?.length" class="mb-8">
+          <p class="text-sm font-semibold text-gray-700 mb-3 text-left">
+            Citizen’s Charter Awareness
+          </p>
+
+          <div class="overflow-hidden border rounded-lg">
+            <table class="min-w-full text-sm text-left">
+              <thead class="bg-gray-100 text-gray-600">
+                <tr>
+                  <th class="p-3 font-medium">Question</th>
+                  <th class="p-3 font-medium text-center w-[180px]">
+                    Response
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr
+                  v-for="a in selectedFeedback.answers"
+                  :key="a.id"
+                  class="border-t"
+                >
+                  <td class="p-3 text-gray-700">
+                    {{ a.question }}
+                  </td>
+
+                  <td class="p-3 text-center">
+                    <span
+                      class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
+                    >
+                      {{ getLikertLabel(a.value) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Likert Evaluation -->
+        <div v-if="selectedFeedback.likertAnswers?.length" class="mb-8">
+          <p class="text-sm font-semibold text-gray-700 mb-3 text-left">
+            Service Evaluation
+          </p>
+
+          <div class="overflow-hidden border rounded-lg">
+            <table class="min-w-full text-sm text-left">
+              <thead class="bg-gray-100 text-gray-600">
+                <tr>
+                  <th class="p-3 font-medium">Statement</th>
+                  <th class="p-3 font-medium text-center w-[180px]">Rating</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr
+                  v-for="l in selectedFeedback.likertAnswers"
+                  :key="l.id"
+                  class="border-t hover:bg-gray-50"
+                >
+                  <td class="p-3 text-gray-700">
+                    {{ l.question }}
+                  </td>
+
+                  <td class="p-3 text-center">
+                    <span
+                      class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
+                    >
+                      {{ getLikertLabel(l.value) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-right border-t pt-4">
+          <button
+            @click="showModal = false"
+            class="px-5 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm font-medium"
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -201,52 +278,70 @@ export default {
       currentPage: 1,
       pageSize: 10,
       searchQuery: "",
+      showModal: false,
+      selectedFeedback: null,
+      likertChoices: [
+        { value: "1", label: "Strongly Disagree", icon: "strongly-disagree" },
+        { value: "2", label: "Disagree", icon: "disagree" },
+        {
+          value: "3",
+          label: "Neither Agree nor Disagree",
+          icon: "neutral",
+        },
+        { value: "4", label: "Agree", icon: "agree" },
+        { value: "5", label: "Strongly Agree", icon: "strongly-agree" },
+        { value: "6", label: "N/A", icon: "na" },
+      ],
     };
   },
   computed: {
-    // Filter feedbacks based on search query
     filteredFeedbacks() {
       if (!this.searchQuery) return this.feedbacks;
-
-      const query = this.searchQuery.toLowerCase();
-      return this.feedbacks.filter((f) => {
-        return (
-          (f.office && f.office.toLowerCase().includes(query)) ||
-          (f.serviceAvailed &&
-            f.serviceAvailed.toLowerCase().includes(query)) ||
-          (f.feedback && f.feedback.toLowerCase().includes(query)) ||
-          (f.final_sentiment_status &&
-            f.final_sentiment_status.toLowerCase().includes(query))
-        );
-      });
+      const q = this.searchQuery.toLowerCase();
+      return this.feedbacks.filter((f) =>
+        [f.office, f.serviceAvailed, f.feedback, f.final_sentiment_status].some(
+          (v) => v && v.toLowerCase().includes(q),
+        ),
+      );
     },
-    // Paginated feedbacks
     paginatedFeedbacks() {
       const start = (this.currentPage - 1) * this.pageSize;
       return this.filteredFeedbacks.slice(start, start + this.pageSize);
     },
-    // Total pages
-    totalPages() {
-      return Math.ceil(this.filteredFeedbacks.length / this.pageSize) || 1;
-    },
   },
   methods: {
-    formatDate(dateStr) {
-      return new Date(dateStr).toLocaleDateString();
+    openModal(item) {
+      this.selectedFeedback = item;
+      this.showModal = true;
     },
+
+    formatDate(d) {
+      return new Date(d).toLocaleDateString();
+    },
+
     getFirstSentence(text) {
-      if (!text) return "-";
-      const sentences = text.split(".");
-      return sentences[0] ? sentences[0].trim() + "." : "-";
+      return text ? text.split(".")[0] + "." : "-";
     },
-    goToPage(page) {
-      this.currentPage = page;
+
+    sentimentColor(status) {
+      return {
+        Positive: "text-green-600",
+        Negative: "text-red-600",
+        Neutral: "text-gray-600",
+      }[status];
     },
-    nextPage() {
-      if (this.currentPage < this.totalPages) this.currentPage++;
+
+    sentimentBadge(status) {
+      return {
+        Positive: "bg-green-100 text-green-700",
+        Negative: "bg-red-100 text-red-700",
+        Neutral: "bg-gray-200 text-gray-700",
+      }[status];
     },
-    prevPage() {
-      if (this.currentPage > 1) this.currentPage--;
+
+    getLikertLabel(value) {
+      const found = this.likertChoices.find((c) => c.value === value);
+      return found ? found.label : value;
     },
   },
   watch: {

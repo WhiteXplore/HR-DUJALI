@@ -40,7 +40,7 @@
         </div>
 
         <!-- Accepted Files Info -->
-        <div class="mt-3 text-[13px] flex justify-between text-left">
+        <div class="mt-3 text-[14px] flex justify-between text-left">
           <div>
             <p class="text-gray-600">Accepted Files: .xlsx, .xls</p>
             <p class="text-green-700">example.xlsx</p>
@@ -137,16 +137,16 @@ export default {
 
             // Extract personal info
             const fullNameRow = rows.find((r) =>
-              this.cellStr(r[0]).toLowerCase().includes("name")
+              this.cellStr(r[0]).toLowerCase().includes("name"),
             );
             const dobRow = rows.find((r) =>
-              this.cellStr(r[0]).toLowerCase().includes("date of birth")
+              this.cellStr(r[0]).toLowerCase().includes("date of birth"),
             );
             const pobRow = rows.find((r) =>
-              this.cellStr(r[0]).toLowerCase().includes("place of birth")
+              this.cellStr(r[0]).toLowerCase().includes("place of birth"),
             );
             const empRow = rows.find((r) =>
-              this.cellStr(r[0]).toLowerCase().includes("employee id")
+              this.cellStr(r[0]).toLowerCase().includes("employee id"),
             );
 
             const fullName = fullNameRow?.[2] || "";
@@ -167,7 +167,7 @@ export default {
             const startIndex = rows.findIndex(
               (r) =>
                 this.cellStr(r[0]).toLowerCase().includes("from") &&
-                this.cellStr(r[1]).toLowerCase().includes("to")
+                this.cellStr(r[1]).toLowerCase().includes("to"),
             );
 
             if (startIndex !== -1) {
@@ -220,7 +220,7 @@ export default {
         this.payload = await this.parseExcel();
         await axios.post(
           process.env.VUE_APP_API_BASE_URL + "/service-of-records/bulk-import",
-          this.payload
+          this.payload,
         );
         toast.success("Employees uploaded successfully!");
         this.closeModal();

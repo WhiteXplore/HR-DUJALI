@@ -1,7 +1,7 @@
 <template>
   <div v-if="isTable">
     <div class="text-sm flex justify-between">
-      <div class="text-[13px] text-text mt-4 font-regular">
+      <div class="text-[14px] text-text mt-4 font-regular">
         Pages / Attendance Records
       </div>
 
@@ -109,7 +109,7 @@
 
           <div class="overflow-y-auto max-h-[550px]">
             <table
-              class="min-w-full table-fixed border-collapse text-text text-[13px]"
+              class="min-w-full table-fixed border-collapse text-text text-[14px]"
             >
               <thead
                 class="bg-Green text-gray-700 tracking-wider font-regular sticky top-0 z-10"
@@ -239,7 +239,7 @@
     <h1 class="text-[14px] md:text-[16px] font-semibold mt-4">
       Delete Confirmation
     </h1>
-    <p class="mt-2 text-[12px] md:text-[13px] text-center">
+    <p class="mt-2 text-[12px] md:text-[14px] text-center">
       Are you sure you want to delete this record? This action cannot be undone.
     </p>
 
@@ -249,13 +249,13 @@
     <!-- Buttons -->
     <div class="tracking-wide flex gap-2 mt-4">
       <button
-        class="bg-red-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
+        class="bg-red-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
         @click="showDeleteModal = false"
       >
         No, Cancel
       </button>
       <button
-        class="bg-green-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
+        class="bg-green-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
         @click="confirmDelete"
       >
         Yes, Delete
@@ -324,60 +324,59 @@ export default {
         .map((emp) => emp.employee_id);
     },
     filteredData() {
-      if (!this.data_attendance_records || !this.data_employee_profile)
+      if (!this.data_attendance_records || !this.data_employee_profile) {
         return [];
+      }
+
+      // 🚫 RULE 0: DO NOT SHOW DATA unless Month & Year are selected
+      if (!this.selectedMonthValue || !this.selectedYear) {
+        return [];
+      }
 
       const query = this.searchQuery.toLowerCase().trim();
 
-      return this.data_attendance_records
-        .map((record) => {
-          // Attach employment_status from employee profile
-          const employee = this.data_employee_profile.find(
-            (emp) => emp.employee_id === record.employee_id
-          );
+      // Build lookup map for employment status
+      const employeeStatusMap = {};
+      this.data_employee_profile.forEach((emp) => {
+        employeeStatusMap[emp.employee_id] = emp.employment_status;
+      });
 
-          // Treat null or empty employment_status as InActive
-          let employment_status = employee?.employment_status;
-          if (!employment_status) employment_status = "InActive";
+      return this.data_attendance_records.filter((record) => {
+        const employment_status =
+          employeeStatusMap[record.employee_id] || "InActive";
 
-          return {
-            ...record,
-            employment_status,
-          };
-        })
-        .filter((record) => {
-          // Filter InActive employees
-          if (!this.showInactive && record.employment_status !== "Active")
-            return false;
+        // 🚫 RULE 1: Show Inactive toggle logic
+        if (this.showInactive) {
+          if (employment_status !== "InActive") return false;
+        } else {
+          if (employment_status !== "Active") return false;
+        }
 
-          // Filter by selected month/year
-          if (this.selectedMonthValue && this.selectedYear) {
-            const hasRecordInMonth = record.records.some((r) => {
-              if (!r.date) return false;
-              const recordDate = new Date(r.date);
-              const recordMonth = String(recordDate.getMonth() + 1).padStart(
-                2,
-                "0"
-              );
-              const recordYear = recordDate.getFullYear();
-              return (
-                recordMonth === this.selectedMonthValue &&
-                recordYear === Number(this.selectedYear)
-              );
-            });
-            if (!hasRecordInMonth) return false;
-          }
+        // 🚫 RULE 2: Month + Year must match record dates
+        const hasRecordInMonth = record.records?.some((r) => {
+          if (!r.date) return false;
 
-          // Search filter
-          if (!query) return true;
+          const d = new Date(r.date);
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const year = d.getFullYear();
+
           return (
-            record.name.toLowerCase().includes(query) ||
-            (record.attendance_id &&
-              record.attendance_id.toString().includes(query))
+            month === this.selectedMonthValue &&
+            year === Number(this.selectedYear)
           );
         });
-    },
 
+        if (!hasRecordInMonth) return false;
+
+        // 🚫 RULE 3: Search filter
+        if (!query) return true;
+
+        return (
+          record.name?.toLowerCase().includes(query) ||
+          record.attendance_id?.toString().includes(query)
+        );
+      });
+    },
     totalPages() {
       return Math.ceil(this.filteredData.length / this.itemsPerPage) || 1;
     },
@@ -456,7 +455,7 @@ export default {
         .catch((error) => {
           console.error(
             "There was an error fetching the service records:",
-            error
+            error,
           );
         });
     },
@@ -471,7 +470,7 @@ export default {
       axios
         .delete(
           process.env.VUE_APP_API_BASE_URL +
-            `/attendance-record/${this.recordToDelete.attendance_id}`
+            `/attendance-record/${this.recordToDelete.attendance_id}`,
         )
         .then(() => {
           this.showDeleteModal = false;

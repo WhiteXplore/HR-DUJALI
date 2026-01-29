@@ -40,7 +40,7 @@
         </div>
 
         <!-- Reminders -->
-        <div class="mt-3 text-[13px] flex justify-between text-left">
+        <div class="mt-3 text-[14px] flex justify-between text-left">
           <div>
             <p class="text-gray-600">Accepted Files: .csv</p>
             <p class="text-green-700">example.csv</p>
@@ -215,7 +215,7 @@ export default {
                   r.SchdIn === rowObj.SchdIn &&
                   r.SchdOut === rowObj.SchdOut &&
                   r.LogIn === rowObj.LogIn &&
-                  r.LogOut === rowObj.LogOut
+                  r.LogOut === rowObj.LogOut,
               );
 
               if (!exists) {
@@ -288,7 +288,7 @@ export default {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(finalPayload),
-            }
+            },
           );
           if (!response.ok) throw new Error("Upload failed");
 

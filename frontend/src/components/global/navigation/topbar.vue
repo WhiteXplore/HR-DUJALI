@@ -74,7 +74,7 @@
           <!-- Profile Picture -->
           <div
             ref="profileIcon"
-            class="text-[13px] cursor-pointer hover:border-green-600 border-2 rounded-full z-20"
+            class="text-[14px] cursor-pointer hover:border-green-600 border-2 rounded-full z-20"
             @click="toggleOpenProfile"
           >
             <img
@@ -86,7 +86,7 @@
         </div>
         <!-- User Info -->
         <div class="text-left">
-          <h1 class="text-[13px] font-semibold">
+          <h1 class="text-[14px] font-semibold">
             {{ user.last_name }}, {{ user.first_name || "Guest" }}
           </h1>
           <h2 class="text-[12px]">{{ user.role || "No Role" }}</h2>

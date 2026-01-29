@@ -486,15 +486,52 @@ export default {
     filteredMonthlyReport() {
       let filtered = this.monthlyReport;
 
-      // Filter by month/year
-      if (this.filterType === "monthly" && this.selectedMonth)
+      // Filter by year
+      if (this.selectedYear) {
+        filtered = filtered.filter((e) => e.year === Number(this.selectedYear));
+      }
+
+      // ============================
+      // ✅ YEARLY AGGREGATION
+      // ============================
+      if (this.filterType === "yearly") {
+        const grouped = {};
+
+        filtered.forEach((e) => {
+          if (!grouped[e.employee_id]) {
+            grouped[e.employee_id] = {
+              employee_id: e.employee_id,
+              name: e.name,
+              daysPresent: 0,
+              daysAbsent: 0,
+              totalHours: 0,
+              lates: 0,
+              totalUnderTime: 0,
+            };
+          }
+
+          grouped[e.employee_id].daysPresent += e.daysPresent;
+          grouped[e.employee_id].daysAbsent += e.daysAbsent;
+          grouped[e.employee_id].totalHours += e.totalHours;
+          grouped[e.employee_id].lates += e.lates;
+          grouped[e.employee_id].totalUnderTime += e.totalUnderTime;
+        });
+
+        return Object.values(grouped);
+      }
+
+      // ============================
+      // MONTHLY (existing behavior)
+      // ============================
+      if (this.filterType === "monthly" && this.selectedMonth) {
         filtered = filtered.filter(
           (e) => e.month === Number(this.selectedMonth),
         );
-      if (this.selectedYear)
-        filtered = filtered.filter((e) => e.year === Number(this.selectedYear));
+      }
 
-      // Lates
+      // ----------------------------
+      // Existing filters still work
+      // ----------------------------
       if (this.selectedLegend && this.selectedLegend !== "latest") {
         const range = {
           0: [0, 0],
@@ -503,12 +540,12 @@ export default {
           "6-9": [6, 9],
           "10+": [10, Infinity],
         }[this.selectedLegend];
+
         filtered = filtered.filter(
           (e) => e.lates >= range[0] && e.lates <= range[1],
         );
       }
 
-      // Absents
       if (this.selectedAbsentRange) {
         const range = {
           0: [0, 0],
@@ -517,12 +554,12 @@ export default {
           "6-9": [6, 9],
           "10+": [10, Infinity],
         }[this.selectedAbsentRange];
+
         filtered = filtered.filter(
           (e) => e.daysAbsent >= range[0] && e.daysAbsent <= range[1],
         );
       }
 
-      // Undertime
       if (this.selectedUndertimeRange) {
         const range = {
           0: [0, 0],
@@ -531,6 +568,7 @@ export default {
           "31-60": [31, 60],
           "60+": [61, Infinity],
         }[this.selectedUndertimeRange];
+
         filtered = filtered.filter(
           (e) => e.totalUnderTime >= range[0] && e.totalUnderTime <= range[1],
         );

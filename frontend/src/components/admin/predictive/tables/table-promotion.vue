@@ -2,7 +2,7 @@
   <div v-if="isTable">
     <!-- Header -->
     <div class="text-sm flex justify-between items-center">
-      <div class="text-[13px] text-text mt-4">
+      <div class="text-[14px] text-text mt-4">
         Pages / Promotion Eligibility
       </div>
 
@@ -43,7 +43,7 @@
       <div class="w-full mt-3 rounded-t-lg overflow-x-auto">
         <div class="overflow-y-auto max-h-[550px]">
           <table
-            class="min-w-full table-fixed border-collapse text-text text-[13px]"
+            class="min-w-full table-fixed border-collapse text-text text-[14px]"
           >
             <thead
               class="border-b text-gray-700 tracking-wider font-regular sticky top-0 z-10"
@@ -51,7 +51,8 @@
               <tr>
                 <th class="px-3 py-2">#</th>
                 <th class="px-3 py-2">Age</th>
-                <th class="px-3 py-2 w-[30%]">Education</th>
+                <th class="px-3 py-2 w-[15%]">Department</th>
+                <th class="px-3 py-2 w-[20%]">Education</th>
                 <th class="px-3 py-2">Experience (yrs)</th>
                 <th class="px-3 py-2">Commendations</th>
                 <th class="px-3 py-2">Comm. Hours</th>
@@ -71,7 +72,7 @@
                 </td>
 
                 <td class="px-2 py-1">{{ item.age_requirement }}</td>
-
+                <td class="px-2 py-1">{{ item.department }}</td>
                 <td class="px-2 py-1">
                   <div class="flex flex-wrap gap-1 justify-center">
                     <span
@@ -193,21 +194,21 @@
         Delete Confirmation
       </h1>
 
-      <p class="mt-2 text-[12px] md:text-[13px] text-center">
+      <p class="mt-2 text-[12px] md:text-[14px] text-center">
         Are you sure you want to delete this record? This action cannot be
         undone.
       </p>
 
       <div class="tracking-wide flex gap-2 mt-6">
         <button
-          class="bg-red-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
+          class="bg-red-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
           @click="closeDeleteModal"
         >
           No, Cancel
         </button>
 
         <button
-          class="bg-green-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
+          class="bg-green-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
           @click="confirmDeleteCriteria"
         >
           Yes, Delete

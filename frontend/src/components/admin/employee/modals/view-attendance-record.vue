@@ -1,6 +1,5 @@
 <template>
   <div class="mt-4 overflow-x-auto border p-2 rounded-xl" v-if="isOpenView">
-    <!-- Main Content -->
     <div class="p-2">
       <div class="flex justify-between">
         <div
@@ -16,6 +15,7 @@
           <button @click="downloadAttendancePDF">Download PDFs</button>
         </div>
       </div>
+
       <div class="max-h-screen h-[80vh] overflow-auto">
         <div ref="attendanceReport" class="bg-white p-5 text-gray-900 relative">
           <div v-if="matchingRecord && matchingRecord.length">
@@ -67,7 +67,6 @@
                     <th rowspan="2" class="border px-2 py-2">In</th>
                     <th colspan="2" class="border px-2 py-2">Break</th>
                     <th rowspan="2" class="border px-2 py-2">Out</th>
-                    <!-- <th rowspan="2" class="border px-2 py-2"></th> -->
                     <th rowspan="2" class="border px-2 py-2">AHW</th>
                     <th rowspan="2" class="border px-2 py-2">OHW</th>
                     <th rowspan="2" class="border px-2 py-2">OT</th>
@@ -86,7 +85,7 @@
                     :key="employee.employee_id"
                   >
                     <tr
-                      v-for="record in employee.records"
+                      v-for="record in getFullMonthRecords(employee)"
                       :key="employee.employee_id + '-' + record.date"
                       class="text-center hover:bg-gray-50"
                     >
@@ -96,52 +95,55 @@
                       <td class="border px-2 py-2">
                         {{ getDayName(record.date) }}
                       </td>
+                      <td class="border px-2 py-2">{{ record.in_am || "" }}</td>
                       <td class="border px-2 py-2">
-                        {{ formatTimeTo12Hour(record.in_am, false) }}
+                        {{ record.out_am || "" }}
                       </td>
+                      <td class="border px-2 py-2">{{ record.in_pm || "" }}</td>
                       <td class="border px-2 py-2">
-                        {{ formatTimeTo12Hour(record.out_am, false) }}
+                        {{ record.out_pm || "" }}
                       </td>
-                      <td class="border px-2 py-2">
-                        {{ formatTimeTo12Hour(record.in_pm, true) }}
-                      </td>
-                      <td class="border px-2 py-2">
-                        {{ formatTimeTo12Hour(record.out_pm, true) }}
-                      </td>
-                      <!-- <td class="border px-2 py-2">-</td> -->
                       <td class="border px-2 py-2">
                         {{
-                          displayZeroAsEmpty(getRawHoursFormatted(record), true)
+                          record.in_am || record.in_pm
+                            ? displayZeroAsEmpty(
+                                getRawHoursFormatted(record),
+                                true,
+                              )
+                            : ""
                         }}
                       </td>
-
                       <td class="border px-2 py-2">
-                        <span v-if="getRawHours(record) > 0">
-                          {{ displayZeroAsEmpty("8.0") }}
-                        </span>
-                      </td>
-
-                      <td class="border px-2 py-2">
-                        <span v-if="getRawHours(record) > 8">
-                          {{ displayZeroAsEmpty(getOvertime(record)) }}
-                        </span>
-                      </td>
-
-                      <td class="border px-2 py-2">
-                        {{ displayZeroAsEmpty(getLateness(record)) }}
+                        <span v-if="record.in_am || record.in_pm">8.00</span>
                       </td>
                       <td class="border px-2 py-2">
-                        <span v-if="getRawHours(record) > 0">
-                          {{ displayZeroAsEmpty(getUndertime(record)) }}
-                        </span>
+                        <span v-if="getRawHours(record) > 8">{{
+                          getOvertime(record)
+                        }}</span>
                       </td>
-
                       <td class="border px-2 py-2">
-                        {{ getStatusForDay(record) }}
+                        {{
+                          record.in_am || record.in_pm
+                            ? getLateness(record)
+                            : ""
+                        }}
+                      </td>
+                      <td class="border px-2 py-2">
+                        <span v-if="record.in_am || record.in_pm">{{
+                          getUndertime(record)
+                        }}</span>
+                      </td>
+                      <td class="border px-2 py-2">
+                        {{
+                          record.in_am || record.in_pm
+                            ? getStatusForDay(record)
+                            : ""
+                        }}
                       </td>
                     </tr>
                   </template>
                 </tbody>
+                <!-- Footer remains the same -->
                 <tfoot>
                   <template
                     v-for="employee in matchingRecord"
@@ -157,11 +159,14 @@
                         Actual Hours Worked (AHW):
                       </td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ totalAHW(employee).toFixed(2) }}
+                        {{
+                          getMonthlySummary(employee)
+                            ?.total_actual_work_hours ?? "0.00"
+                        }}
                       </td>
                       <td colspan="2" class="border px-2 py-1">Late (LT):</td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ totalLate(employee).toFixed(2) }}
+                        {{ getMonthlySummary(employee)?.total_late_days ?? 0 }}
                       </td>
                       <td colspan="3" class="border px-2 py-1"></td>
                     </tr>
@@ -170,13 +175,19 @@
                         Official Hours Worked (OHW):
                       </td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ (employee.records.length * 8).toFixed(2) }}
+                        {{
+                          getMonthlySummary(employee)
+                            ?.official_work_hours_per_month ?? "0.00"
+                        }}
                       </td>
                       <td colspan="2" class="border px-2 py-1">
                         Undertime (UT):
                       </td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ totalUT(employee).toFixed(2) }}
+                        {{
+                          getMonthlySummary(employee)?.total_undertime_hours ??
+                          "0.00"
+                        }}
                       </td>
                       <td colspan="3" class="border px-2 py-1"></td>
                     </tr>
@@ -185,13 +196,18 @@
                         Overtime (OT):
                       </td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ totalOT(employee).toFixed(2) }}
+                        {{
+                          getMonthlySummary(employee)?.total_overtime_hours ??
+                          "0.00"
+                        }}
                       </td>
                       <td colspan="2" class="border px-2 py-1">
                         Days Present (DP):
                       </td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ totalPresentDays(employee) }}
+                        {{
+                          getMonthlySummary(employee)?.total_days_present ?? 0
+                        }}
                       </td>
                       <td colspan="3" class="border px-2 py-1"></td>
                     </tr>
@@ -207,8 +223,22 @@
                       <td colspan="2" class="border px-2 py-1">
                         {{
                           (
-                            totalPresentDays(employee) * 8 +
-                            totalOT(employee)
+                            parseFloat(
+                              getMonthlySummary(employee)
+                                ?.total_days_present_final ?? 0,
+                            ) *
+                              8 +
+                            Math.max(
+                              0,
+                              parseFloat(
+                                getMonthlySummary(employee)
+                                  ?.total_actual_work_hours ?? 0,
+                              ) -
+                                parseFloat(
+                                  getMonthlySummary(employee)
+                                    ?.official_work_hours_per_month ?? 0,
+                                ),
+                            )
                           ).toFixed(2)
                         }}
                       </td>
@@ -217,18 +247,22 @@
                       </td>
                       <td colspan="2" class="border px-2 py-1">
                         {{
-                          (totalLate(employee) + totalUT(employee)).toFixed(2)
+                          (
+                            parseFloat(
+                              getMonthlySummary(employee)?.total_late_days ?? 0,
+                            ) +
+                            parseFloat(
+                              getMonthlySummary(employee)
+                                ?.total_undertime_hours ?? 0,
+                            )
+                          ).toFixed(2)
                         }}
                       </td>
                       <td colspan="3" class="border px-2 py-1">
                         Total Days Present:
                         {{
-                          (
-                            (totalAHW(employee) -
-                              totalLate(employee) -
-                              totalUT(employee)) /
-                            8
-                          ).toFixed(2)
+                          getMonthlySummary(employee)
+                            ?.total_days_present_final ?? 0
                         }}
                       </td>
                     </tr>
@@ -251,6 +285,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
 pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
+
 export default {
   name: "ViewServiceRecords",
   props: {
@@ -261,34 +296,88 @@ export default {
     return {
       isOpenView: true,
       matchingRecord: [],
-      isDownloadAlertOpen: false,
+      monthlyReport: [],
     };
   },
   watch: {
-    "$route.params.date": "fetchAttendanceRecords",
-    attendanceId: "fetchAttendanceRecords",
+    attendanceId: "fetchData",
+    "$route.params.date": "fetchData",
   },
   methods: {
-    getAllDatesInMonth(month, year) {
-      const dates = [];
-      const date = new Date(year, month - 1, 1);
-      while (date.getMonth() === month - 1) {
-        dates.push(new Date(date));
-        date.setDate(date.getDate() + 1);
-      }
-      return dates;
+    fetchData() {
+      this.fetchAttendanceRecords();
+      this.fetchMonthlyAttendanceReport();
     },
-    getFullMonthRecords(employee, month, year) {
+
+    // ------------------ Attendance API -------------------
+    fetchAttendanceRecords() {
+      if (!this.attendanceId) return;
+
+      axios
+        .get(
+          `${process.env.VUE_APP_API_BASE_URL}/attendance-record/${this.attendanceId}`,
+        )
+        .then((res) => {
+          let data = Array.isArray(res.data) ? res.data : [res.data];
+
+          this.matchingRecord = data.map((emp) => {
+            const recordsByMonth = {};
+            emp.records.forEach((rec) => {
+              if (!recordsByMonth[rec.month_year])
+                recordsByMonth[rec.month_year] = [];
+              recordsByMonth[rec.month_year].push(rec);
+            });
+            return { ...emp, recordsByMonth };
+          });
+        })
+        .catch(() => {
+          this.matchingRecord = [];
+        });
+    },
+
+    fetchMonthlyAttendanceReport() {
+      if (!this.attendanceId) return;
+
+      const selectedMonth = this.$route.params.date;
+      if (!selectedMonth) return;
+      const [year, month] = selectedMonth.split("-").map(Number);
+
+      axios
+        .get(
+          `${process.env.VUE_APP_API_BASE_URL}/attendance-record/monthly-attendance-report`,
+          {
+            params: { employee_id: this.attendanceId, year, month },
+          },
+        )
+        .then((res) => {
+          this.monthlyReport = Array.isArray(res.data) ? res.data : [res.data];
+        })
+        .catch(() => {
+          this.monthlyReport = [];
+        });
+    },
+
+    getMonthlySummary(employee) {
+      const selectedMonthYear = this.$route.params.date;
+      return this.monthlyReport.find(
+        (rec) =>
+          rec.employee_id === employee.employee_id &&
+          rec.month_year === selectedMonthYear,
+      );
+    },
+
+    getFullMonthRecords(employee) {
+      const selectedMonthYear = this.$route.params.date;
+      if (!selectedMonthYear) return employee.records;
+
+      const [year, month] = selectedMonthYear.split("-").map(Number);
       const allDates = this.getAllDatesInMonth(month, year);
 
-      // map existing records by date string
       const recordsMap = {};
       employee.records.forEach((rec) => {
-        const key = new Date(rec.date).toDateString();
-        recordsMap[key] = rec;
+        recordsMap[new Date(rec.date).toDateString()] = rec;
       });
 
-      // return full month with empty records for missing days
       return allDates.map((d) => {
         const key = d.toDateString();
         return (
@@ -303,11 +392,108 @@ export default {
       });
     },
 
+    getAllDatesInMonth(month, year) {
+      const dates = [];
+      const date = new Date(year, month - 1, 1);
+      while (date.getMonth() === month - 1) {
+        dates.push(new Date(date));
+        date.setDate(date.getDate() + 1);
+      }
+      return dates;
+    },
+
+    toggleBack() {
+      this.$emit("back-to-table-attendance");
+      this.$router.push({ name: "attendance-records" });
+    },
+
+    formatDate(date) {
+      return new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    },
+
+    getDayName(date) {
+      return new Date(date).toLocaleDateString("en-US", { weekday: "short" });
+    },
+
+    parseTimeToDate(timeStr, isPM = false) {
+      if (!timeStr || timeStr === "-") return null;
+      let [hour, minute] = timeStr.split(":").map(Number);
+      if (isPM && hour < 12) hour += 12;
+      const d = new Date();
+      d.setHours(hour, minute, 0, 0);
+      return d;
+    },
+
+    formatTimeTo12Hour(timeStr, isPM = false) {
+      if (!timeStr || timeStr === "-") return "";
+      let [hour, minute] = timeStr.split(":").map(Number);
+      if (isPM && hour < 12) hour += 12;
+      const ampm = hour >= 12 ? "PM" : "AM";
+      hour = hour % 12 || 12;
+      return `${hour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+    },
+
+    getRawDuration(start, end, isPMStart = false, isPMEnd = false) {
+      const s = this.parseTimeToDate(start, isPMStart);
+      const e = this.parseTimeToDate(end, isPMEnd);
+      if (!s || !e) return 0;
+      let dur = (e - s) / (1000 * 60 * 60);
+      if (dur < 0) dur += 24;
+      return dur;
+    },
+
+    getRawHours(record) {
+      const am = this.getRawDuration(record.in_am, record.out_am, false, false);
+      const pm = this.getRawDuration(record.in_pm, record.out_pm, true, true);
+      return am + pm;
+    },
+
+    getRawHoursFormatted(record) {
+      return this.getRawHours(record).toFixed(2);
+    },
+
+    getOvertime(record) {
+      const total = this.getRawHours(record);
+      return total > 8 ? (total - 8).toFixed(2) : "0";
+    },
+
+    getUndertime(record) {
+      if (this.getStatusForDay(record) === "Absent") return 0;
+      const total = this.getRawHours(record);
+      return total < 8 ? (8 - total).toFixed(2) : "0";
+    },
+
+    getLateness(record) {
+      if (this.getStatusForDay(record) === "Absent") return 0;
+      const inTime = this.parseTimeToDate(record.in_am);
+      const expected = new Date();
+      expected.setHours(8, 0, 0, 0);
+      if (!inTime) return 0;
+      const diff = (inTime - expected) / (1000 * 60);
+      return diff > 0 ? (diff / 60).toFixed(2) : 0;
+    },
+
+    getStatusForDay(record) {
+      if (!record.in_am && !record.out_pm) return "Absent";
+      const total = this.getRawHours(record);
+      return total < 8 ? "Undertime" : "Present";
+    },
+
+    displayZeroAsEmpty(value, isAHW = false) {
+      if (value === 0 || value === "0" || value === "0.00") return "";
+      return isAHW ? parseFloat(value).toFixed(2) : value;
+    },
+
     downloadAttendancePDF() {
       const employee = this.matchingRecord[0];
       if (!employee) return;
 
       const numCols = 12;
+      const monthlySummary = this.getMonthlySummary(employee) || {};
 
       // --- Table Header ---
       const tableBody = [
@@ -327,91 +513,102 @@ export default {
         ],
       ];
 
-      // --- Employee Attendance Rows ---
-      employee.records.forEach((rec) => {
+      // --- Employee Attendance Rows (Full Month) ---
+      const allRecords = this.getFullMonthRecords(employee);
+      allRecords.forEach((rec) => {
+        const dateObj =
+          rec.date instanceof Date ? rec.date : new Date(rec.date);
+        const hasData = rec.in_am || rec.out_pm || rec.in_pm || rec.out_am;
+
+        const rawHours = hasData ? this.getRawHours(rec) : 0;
+        const ahw = hasData
+          ? this.displayZeroAsEmpty(this.getRawHoursFormatted(rec), true)
+          : "";
+        const ohw = hasData && rawHours > 0 ? "8.00" : "";
+        const ot = hasData && rawHours > 8 ? this.getOvertime(rec) : "";
+        const lt = hasData ? this.getLateness(rec) : "";
+        const ut = hasData && rawHours > 0 ? this.getUndertime(rec) : "";
+        const remarks = hasData ? this.getStatusForDay(rec) : "";
+
         tableBody.push([
-          new Date(rec.date).getDate(), // just day number
-          this.getDayName(rec.date),
-          this.formatTimeTo12Hour(rec.in_am),
-          this.formatTimeTo12Hour(rec.out_am),
-          this.formatTimeTo12Hour(rec.in_pm, true),
-          this.formatTimeTo12Hour(rec.out_pm, true),
-          this.displayZeroAsEmpty(this.getRawHoursFormatted(rec), true),
-          rec ? "8.00" : "",
-          this.getRawHours(rec) > 8 ? this.getOvertime(rec) : "",
-          this.getLateness(rec),
-          this.getRawHours(rec) > 0 ? this.getUndertime(rec) : "",
-          this.getStatusForDay(rec),
+          dateObj.getDate(),
+          this.getDayName(dateObj),
+          hasData ? this.formatTimeTo12Hour(rec.in_am, false) : "",
+          hasData ? this.formatTimeTo12Hour(rec.out_am, false) : "",
+          hasData ? this.formatTimeTo12Hour(rec.in_pm, true) : "",
+          hasData ? this.formatTimeTo12Hour(rec.out_pm, true) : "",
+          ahw,
+          ohw,
+          ot,
+          lt,
+          ut,
+          remarks,
         ]);
       });
 
-      // --- Helper to add summary rows with colSpan ---
+      // --- Helper to safely add summary rows ---
       const addSummaryRow = (cells) => {
         const row = [];
         cells.forEach((cell) => {
           if (cell.colSpan && cell.colSpan > 1) {
             row.push(cell);
-            for (let i = 1; i < cell.colSpan; i++) row.push({ _span: true });
+            for (let i = 1; i < cell.colSpan; i++)
+              row.push({ text: "", _span: true });
           } else {
-            row.push(cell);
+            row.push(cell || { text: "" });
           }
         });
-        while (row.length < numCols) row.push({ text: "" });
+        while (row.length < numCols) row.push({ text: "", _span: true });
         tableBody.push(row);
       };
 
-      // --- Summary Rows ---
-      addSummaryRow([{ text: "Gross", colSpan: numCols, alignment: "center" }]);
+      // --- Add Summary Rows ---
+      addSummaryRow([
+        { text: "Gross", colSpan: numCols, alignment: "center", bold: true },
+      ]);
       addSummaryRow([
         { text: "Actual Hours Worked (AHW)", colSpan: 4 },
-        { text: this.totalAHW(employee).toFixed(2), colSpan: 2 },
+        { text: monthlySummary?.total_actual_work_hours ?? "0.00", colSpan: 2 },
         { text: "Late (LT)", colSpan: 2 },
-        { text: this.totalLate(employee).toFixed(2), colSpan: 2 },
+        { text: monthlySummary?.total_late_days ?? "0", colSpan: 2 },
         { text: "" },
       ]);
       addSummaryRow([
         { text: "Official Hours Worked (OHW)", colSpan: 4 },
-        { text: (employee.records.length * 8).toFixed(2), colSpan: 2 },
+        {
+          text: monthlySummary?.official_work_hours_per_month ?? "0.00",
+          colSpan: 2,
+        },
         { text: "Undertime (UT)", colSpan: 2 },
-        { text: this.totalUT(employee).toFixed(2), colSpan: 2 },
+        { text: monthlySummary?.total_undertime_hours ?? "0.00", colSpan: 2 },
         { text: "" },
       ]);
       addSummaryRow([
         { text: "Overtime (OT)", colSpan: 4 },
-        { text: this.totalOT(employee).toFixed(2), colSpan: 2 },
+        { text: monthlySummary?.total_overtime_hours ?? "0.00", colSpan: 2 },
         { text: "Days Present (DP)", colSpan: 2 },
-        { text: this.totalPresentDays(employee), colSpan: 2 },
+        { text: monthlySummary?.total_days_present ?? "0", colSpan: 2 },
         { text: "" },
       ]);
-      addSummaryRow([{ text: "Net", colSpan: numCols, alignment: "center" }]);
+      addSummaryRow([
+        { text: "Net", colSpan: numCols, alignment: "center", bold: true },
+      ]);
       addSummaryRow([
         { text: "Total Hours Worked [(DP×8) + OT]", colSpan: 4 },
-        {
-          text: (
-            this.totalPresentDays(employee) * 8 +
-            this.totalOT(employee)
-          ).toFixed(2),
-          colSpan: 2,
-        },
+        { text: monthlySummary?.total_hours_worked ?? "0.00", colSpan: 2 },
         { text: "Total Deductions (LT + UT)", colSpan: 2 },
+        { text: monthlySummary?.total_deductions ?? "0.00", colSpan: 2 },
         {
-          text: (this.totalLate(employee) + this.totalUT(employee)).toFixed(2),
-          colSpan: 2,
-        },
-        {
-          text: `Total Days Present: ${(
-            (this.totalAHW(employee) -
-              this.totalLate(employee) -
-              this.totalUT(employee)) /
-            8
-          ).toFixed(2)}`,
+          text: `Total Days Present: ${
+            monthlySummary?.total_days_present_final ?? 0
+          }`,
           colSpan: 2,
         },
       ]);
 
       // --- PDF Definition ---
       const docDefinition = {
-        pageSize: { width: 612, height: 936 }, // long bond 8.5"x14"
+        pageSize: { width: 612, height: 936 },
         pageOrientation: "portrait",
         pageMargins: [30, 40, 30, 40],
         content: [
@@ -423,60 +620,31 @@ export default {
             columns: [
               {
                 text: [
-                  { text: "Full Name: ", bold: false }, // label normal
-                  { text: employee.name, bold: true }, // value bold
+                  { text: "Full Name: " },
+                  { text: employee.name, bold: true },
                 ],
                 alignment: "left",
                 margin: [0, 5, 0, 5],
               },
               {
                 text: [
-                  { text: "Employee ID: ", bold: false }, // label normal
-                  { text: employee.employee_id, bold: true }, // value bold
+                  { text: "Employee ID: " },
+                  { text: employee.employee_id, bold: true },
                 ],
                 alignment: "right",
                 margin: [0, 5, 0, 5],
               },
             ],
           },
-          // Certification
           {
-            text: "This certifies that the employee named above has rendered attendance as recorded below. Each entry corresponds to the actual time the employee checked in and out during the period of service.",
+            text: "This certifies that the employee named above has rendered attendance as recorded below.",
             margin: [0, 0, 0, 15],
             fontSize: 9,
           },
-
-          // Legend
-          {
-            columns: [
-              { text: "AHW - Actual Hours Worked", fontSize: 9 },
-              { text: "OHW - Official Hours Worked", fontSize: 9 },
-              { text: "OT - Overtime", fontSize: 9 },
-              { text: "LT - Lates", fontSize: 9 },
-              { text: "UT - Undertime", fontSize: 9 },
-            ],
-            columnGap: 20,
-            margin: [0, 0, 0, 20],
-          },
-
-          // Attendance Table
           {
             table: {
               headerRows: 1,
-              widths: [
-                25, // Date
-                30, // Day
-                35, // In
-                45, // Out (AM)
-                45, // In (PM)
-                45, // Out (PM)
-                40, // AHW
-                40, // OHW
-                30, // OT
-                30, // LT
-                30, // UT
-                80, // Remarks
-              ],
+              widths: [25, 30, 35, 45, 45, 45, 40, 40, 30, 30, 30, 80],
               body: tableBody,
             },
             layout: {
@@ -509,168 +677,10 @@ export default {
         .createPdf(docDefinition)
         .download(`${employee.name}-Attendance.pdf`);
     },
-    displayZeroAsEmpty(value, isAHW = false) {
-      if (value === 0 || value === "0" || value === "0.00") {
-        return isAHW ? "" : "";
-      }
-      return isAHW ? parseFloat(value).toFixed(2) : value;
-    },
-    toggleBack() {
-      this.$emit("back-to-table-attendance");
-      this.$router.push({ name: "attendance-records" });
-    },
-    showDownloadAlert() {
-      this.isDownloadAlertOpen = true;
-    },
-    fetchAttendanceRecords() {
-      if (!this.attendanceId) return;
-
-      const selectedMonth = this.$route.params.date;
-      if (!selectedMonth) return;
-
-      const [year, month] = selectedMonth.split("-").map(Number);
-
-      axios
-        .get(
-          process.env.VUE_APP_API_BASE_URL +
-            `/attendance-record/${this.attendanceId}`
-        )
-        .then((res) => {
-          let data = Array.isArray(res.data) ? res.data : [res.data];
-          this.matchingRecord = data.map((emp) => {
-            // Map existing records
-            const recordsMap = {};
-            emp.records.forEach((r) => {
-              const key = new Date(r.date).toDateString();
-              recordsMap[key] = r;
-            });
-
-            // Fill all dates in month
-            const fullMonthRecords = [];
-            const date = new Date(year, month - 1, 1);
-            while (date.getMonth() === month - 1) {
-              const key = date.toDateString();
-              fullMonthRecords.push(
-                recordsMap[key] || {
-                  date: new Date(date),
-                  in_am: null,
-                  out_am: null,
-                  in_pm: null,
-                  out_pm: null,
-                }
-              );
-              date.setDate(date.getDate() + 1);
-            }
-
-            return { ...emp, records: fullMonthRecords };
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-          this.matchingRecord = [];
-        });
-    },
-
-    formatDate(date) {
-      return new Date(date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    },
-    getDayName(date) {
-      return new Date(date).toLocaleDateString("en-US", { weekday: "short" });
-    },
-    parseTimeToDate(timeStr, isPM = false) {
-      if (!timeStr || timeStr === "-") return null;
-      let [hour, minute] = timeStr.split(":").map(Number);
-      if (isPM && hour < 12) hour += 12;
-      const d = new Date();
-      d.setHours(hour, minute, 0, 0);
-      return d;
-    },
-    formatTimeTo12Hour(timeStr, isPM = false) {
-      if (!timeStr || timeStr === "-" || timeStr === null) return ""; // empty instead of "-"
-      let [hour, minute] = timeStr
-        .replace(/\s*(AM|PM)$/i, "")
-        .split(":")
-        .map(Number);
-      if (isPM && hour < 12) hour += 12;
-      const ampm = hour >= 12 ? "PM" : "AM";
-      hour = hour % 12 || 12;
-      return `${hour}:${minute.toString().padStart(2, "0")} ${ampm}`;
-    },
-    getRawDuration(start, end, isPMStart = false, isPMEnd = false) {
-      const s = this.parseTimeToDate(start, isPMStart);
-      const e = this.parseTimeToDate(end, isPMEnd);
-      if (!s || !e) return 0;
-      let dur = (e - s) / (1000 * 60 * 60);
-      if (dur < 0) dur += 24;
-      return dur;
-    },
-    getRawHours(record) {
-      const am = this.getRawDuration(record.in_am, record.out_am, false, false);
-      const pm = this.getRawDuration(record.in_pm, record.out_pm, true, true);
-      return am + pm;
-    },
-    getRawHoursFormatted(record) {
-      return this.getRawHours(record).toFixed(2); // ensures 2 decimal places
-    },
-    getOvertime(record) {
-      const total = this.getRawHours(record);
-      return total > 8 ? (total - 8).toFixed(2) : "0";
-    },
-    getUndertime(record) {
-      // If the employee was absent, no undertime should be recorded
-      if (this.getStatusForDay(record) === "Absent") return 0;
-
-      const total = this.getRawHours(record);
-      return total < 8 ? (8 - total).toFixed(2) : "0";
-    },
-    getLateness(record) {
-      if (this.getStatusForDay(record) === "Absent") return 0;
-
-      const inTime = this.parseTimeToDate(record.in_am);
-      const expected = new Date();
-      expected.setHours(8, 0, 0, 0);
-      if (!inTime) return 0;
-      const diff = (inTime - expected) / (1000 * 60);
-      return diff > 0 ? (diff / 60).toFixed(2) : 0;
-    },
-    getStatusForDay(record) {
-      if (!record.in_am && !record.out_pm) return "";
-      const total = this.getRawHours(record);
-      return total < 8 ? "Undertime" : "Present";
-    },
-    totalAHW(employee) {
-      return employee.records.reduce((sum, r) => sum + this.getRawHours(r), 0);
-    },
-    totalLate(employee) {
-      return employee.records.reduce(
-        (sum, r) => sum + parseFloat(this.getLateness(r)),
-        0
-      );
-    },
-    totalOT(employee) {
-      return employee.records.reduce(
-        (sum, r) => sum + parseFloat(this.getOvertime(r)),
-        0
-      );
-    },
-    totalUT(employee) {
-      return employee.records.reduce(
-        (sum, r) => sum + parseFloat(this.getUndertime(r)),
-        0
-      );
-    },
-    totalPresentDays(employee) {
-      return employee.records.filter(
-        (r) => this.getStatusForDay(r) === "Present"
-      ).length;
-    },
   },
+
   mounted() {
-    this.fetchAttendanceRecords();
+    this.fetchData();
   },
 };
 </script>

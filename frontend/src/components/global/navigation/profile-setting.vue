@@ -5,7 +5,7 @@
       v-if="isProfileMenuOpen"
       @mouseenter="isProfileMenuOpen = true"
       @mouseleave="isProfileMenuOpen = false"
-      class="bg-white shadow-lg w-full h-full p-3 text-[13px] cursor-pointer rounded-md inset-0 z-50 border"
+      class="bg-white shadow-lg w-full h-full p-3 text-[14px] cursor-pointer rounded-md inset-0 z-50 border"
       @click.stop
     >
       <div class="space-y-2 w-[150px]">

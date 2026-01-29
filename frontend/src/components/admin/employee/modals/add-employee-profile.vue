@@ -4,7 +4,7 @@
     class="fixed inset-0 bg-gray-800 bg-opacity-30 flex justify-center items-center z-50 w-min-screen"
   >
     <div class="rounded-[15px] shadow-lg fixed top-20">
-      <div class="w-auto bg-white text-[13px] rounded-[15px] shadow-lg">
+      <div class="w-auto bg-white text-[14px] rounded-[15px] shadow-lg">
         <div
           class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
         >
@@ -26,7 +26,7 @@
           <div
             @click="toggleSection('personal')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'personal',
             }"
             class="cursor-pointer"
@@ -36,7 +36,7 @@
           <div
             @click="toggleSection('address')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'address',
             }"
             class="cursor-pointer"
@@ -47,7 +47,7 @@
           <div
             @click="toggleSection('education')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'education',
             }"
             class="cursor-pointer"
@@ -58,7 +58,7 @@
           <div
             @click="toggleSection('civil')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'civil',
             }"
             class="cursor-pointer"
@@ -68,7 +68,7 @@
           <div
             @click="toggleSection('learning')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'learning',
             }"
             class="cursor-pointer"
@@ -79,7 +79,7 @@
           <div
             @click="toggleSection('others')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'others',
             }"
             class="cursor-pointer"
@@ -542,7 +542,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -664,7 +664,7 @@
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
               <table
-                class="min-w-full text-[13px] border border-gray-300 rounded-t-xl"
+                class="min-w-full text-[14px] border border-gray-300 rounded-t-xl"
               >
                 <thead class="bg-blue-500 text-white">
                   <tr>
@@ -768,7 +768,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -879,7 +879,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -925,7 +925,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -971,7 +971,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -1191,7 +1191,7 @@ export default {
         try {
           const response = await axios.post(
             process.env.VUE_APP_API_BASE_URL + "/upload/add-data",
-            formData
+            formData,
           );
           toast.success("Employee added successfully!");
           this.$emit("refresh-employees");
@@ -1204,7 +1204,7 @@ export default {
         } catch (error) {
           console.error(
             "Error during form submission:",
-            error.response || error
+            error.response || error,
           );
           if (error.response?.data?.message) {
             alert("Server Error: " + error.response.data.message);
@@ -1257,7 +1257,7 @@ export default {
       }
       if (this.form.is_dual_citizen && isEmpty(this.form.citizenship)) {
         this.validationErrors.push(
-          "Citizenship is required when dual citizen is checked."
+          "Citizenship is required when dual citizen is checked.",
         );
       }
       if (isEmpty(this.form.gsis_id)) {
@@ -1337,17 +1337,17 @@ export default {
       this.form.educationalRecords.forEach((record, index) => {
         if (isEmpty(record.level)) {
           this.validationErrors.push(
-            `Educational record #${index + 1}: Level is required.`
+            `Educational record #${index + 1}: Level is required.`,
           );
         }
         if (isEmpty(record.name_of_school)) {
           this.validationErrors.push(
-            `Educational record #${index + 1}: Name of School is required.`
+            `Educational record #${index + 1}: Name of School is required.`,
           );
         }
         if (isEmpty(record.basic_education)) {
           this.validationErrors.push(
-            `Educational record #${index + 1}: Basic Education is required.`
+            `Educational record #${index + 1}: Basic Education is required.`,
           );
         }
         // Add more fields if needed
@@ -1357,32 +1357,32 @@ export default {
       this.form.civilRecords.forEach((record, index) => {
         if (isEmpty(record.career_service)) {
           this.validationErrors.push(
-            `Civil record #${index + 1}: Career Service is required.`
+            `Civil record #${index + 1}: Career Service is required.`,
           );
         }
         if (isEmpty(record.rating)) {
           this.validationErrors.push(
-            `Civil record #${index + 1}: Rating is required.`
+            `Civil record #${index + 1}: Rating is required.`,
           );
         }
         if (isEmpty(record.date_of_exam)) {
           this.validationErrors.push(
-            `Civil record #${index + 1}: Date of Exam is required.`
+            `Civil record #${index + 1}: Date of Exam is required.`,
           );
         }
         if (isEmpty(record.place_of_exam)) {
           this.validationErrors.push(
-            `Civil record #${index + 1}: Place of Exam is required.`
+            `Civil record #${index + 1}: Place of Exam is required.`,
           );
         }
         if (isEmpty(record.license_number)) {
           this.validationErrors.push(
-            `Civil record #${index + 1}: License Number is required.`
+            `Civil record #${index + 1}: License Number is required.`,
           );
         }
         if (isEmpty(record.license_validity)) {
           this.validationErrors.push(
-            `Civil record #${index + 1}: License Validity is required.`
+            `Civil record #${index + 1}: License Validity is required.`,
           );
         }
       });
@@ -1391,32 +1391,32 @@ export default {
       this.form.learningRecords.forEach((record, index) => {
         if (isEmpty(record.title_learning_development)) {
           this.validationErrors.push(
-            `Learning record #${index + 1}: Title is required.`
+            `Learning record #${index + 1}: Title is required.`,
           );
         }
         if (isEmpty(record.ld_from)) {
           this.validationErrors.push(
-            `Learning record #${index + 1}: From date is required.`
+            `Learning record #${index + 1}: From date is required.`,
           );
         }
         if (isEmpty(record.ld_to)) {
           this.validationErrors.push(
-            `Learning record #${index + 1}: To date is required.`
+            `Learning record #${index + 1}: To date is required.`,
           );
         }
         if (isEmpty(record.ld_number_of_hours)) {
           this.validationErrors.push(
-            `Learning record #${index + 1}: Number of hours is required.`
+            `Learning record #${index + 1}: Number of hours is required.`,
           );
         }
         if (isEmpty(record.type_of_ld)) {
           this.validationErrors.push(
-            `Learning record #${index + 1}: Type is required.`
+            `Learning record #${index + 1}: Type is required.`,
           );
         }
         if (isEmpty(record.ld_conducted_sponsor)) {
           this.validationErrors.push(
-            `Learning record #${index + 1}: Conducted/Sponsor is required.`
+            `Learning record #${index + 1}: Conducted/Sponsor is required.`,
           );
         }
       });
@@ -1425,7 +1425,7 @@ export default {
       this.form.specialSkillsRecords.forEach((record, index) => {
         if (isEmpty(record.special_skills)) {
           this.validationErrors.push(
-            `Special skills record #${index + 1}: Skill is required.`
+            `Special skills record #${index + 1}: Skill is required.`,
           );
         }
       });
@@ -1434,7 +1434,7 @@ export default {
       this.form.nonAcadRecords.forEach((record, index) => {
         if (isEmpty(record.non_academic)) {
           this.validationErrors.push(
-            `Non-academic record #${index + 1}: Field is required.`
+            `Non-academic record #${index + 1}: Field is required.`,
           );
         }
       });
@@ -1443,7 +1443,7 @@ export default {
       this.form.membershipRecords.forEach((record, index) => {
         if (isEmpty(record.membership)) {
           this.validationErrors.push(
-            `Membership record #${index + 1}: Membership is required.`
+            `Membership record #${index + 1}: Membership is required.`,
           );
         }
       });

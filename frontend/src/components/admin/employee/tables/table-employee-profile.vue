@@ -1,7 +1,7 @@
 <template>
   <div v-if="isTable">
     <div class="text-sm flex justify-between">
-      <div class="text-[13px] text-text mt-4 font-regular">
+      <div class="text-[14px] text-text mt-4 font-regular">
         Pages / Employee Profiles
       </div>
       <div class="flex gap-2">
@@ -57,7 +57,7 @@
         <div class="w-full mt-3 rounded-t-lg overflow-x-auto">
           <div class="overflow-y-auto max-h-[550px]">
             <table
-              class="min-w-full table-fixed border-collapse text-text text-[13px]"
+              class="min-w-full table-fixed border-collapse text-text text-[14px]"
             >
               <thead
                 class="bg-Green text-gray-700 tracking-wider font-regular sticky top-0 z-10"
@@ -232,7 +232,7 @@
     <h1 class="text-[14px] md:text-[16px] font-semibold mt-4">
       Delete Confirmation
     </h1>
-    <p class="mt-2 text-[12px] md:text-[13px] text-center">
+    <p class="mt-2 text-[12px] md:text-[14px] text-center">
       Are you sure you want to delete this record? This action cannot be undone.
     </p>
 
@@ -242,13 +242,13 @@
     <!-- Buttons -->
     <div class="tracking-wide flex gap-2 mt-4">
       <button
-        class="bg-red-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
+        class="bg-red-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
         @click="showDeleteModal = false"
       >
         No, Cancel
       </button>
       <button
-        class="bg-green-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
+        class="bg-green-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
         @click="confirmDelete"
       >
         Yes, Delete
@@ -300,7 +300,7 @@ export default {
           item.student_id?.toLowerCase().includes(query) ||
           item.first_name?.toLowerCase().includes(query) ||
           item.last_name?.toLowerCase().includes(query) ||
-          item.program_course?.toLowerCase().includes(query)
+          item.program_course?.toLowerCase().includes(query),
       );
     },
     totalPages() {
@@ -344,7 +344,7 @@ export default {
         .catch((error) => {
           console.error(
             "There was an error fetching the service records:",
-            error
+            error,
           );
         });
     },
@@ -359,7 +359,7 @@ export default {
       axios
         .delete(
           process.env.VUE_APP_API_BASE_URL +
-            `/upload/delete-record/${this.recordToDelete.first_table_id}`
+            `/upload/delete-record/${this.recordToDelete.first_table_id}`,
         )
         .then((response) => {
           console.log("Record deleted:", response.data);

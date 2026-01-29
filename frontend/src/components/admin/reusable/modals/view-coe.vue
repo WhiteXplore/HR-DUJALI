@@ -66,7 +66,7 @@
                         ? formatDate(
                             matchingRecord.serviceRecords[
                               matchingRecord.serviceRecords.length - 1
-                            ].period_from
+                            ].period_from,
                           )
                         : "N/A"
                     }}
@@ -162,19 +162,19 @@
         <h1 class="text-[14px] md:text-[16px] font-semibold mt-4">
           Download PDF?
         </h1>
-        <p class="mt-2 text-[12px] md:text-[13px]">
+        <p class="mt-2 text-[12px] md:text-[14px]">
           Are you sure you want to download the certificate?
         </p>
         <div class="w-full h-[1px] rounded-md bg-gray-200 mt-4"></div>
         <div class="tracking-wide flex gap-2 mt-4">
           <button
-            class="bg-red-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
+            class="bg-red-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
             @click="cancelDownload"
           >
             No, Cancel
           </button>
           <button
-            class="bg-green-400 p-2 px-3 text-[11px] md:text-[13px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
+            class="bg-green-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
             @click="confirmDownload"
           >
             Yes, Download
@@ -221,7 +221,7 @@ export default {
       axios
         .get(
           process.env.VUE_APP_API_BASE_URL +
-            `/service-of-records/${this.serviceId}`
+            `/service-of-records/${this.serviceId}`,
         )
         .then((response) => {
           this.matchingRecord = response.data || null;

@@ -90,7 +90,7 @@
 
               <!-- Legend -->
               <div
-                class="mt-4 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-[13px] flex flex-wrap gap-x-20 text-center justify-center"
+                class="mt-4 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-[14px] flex flex-wrap gap-x-20 text-center justify-center"
               >
                 <div><strong>AHW</strong> - Actual Hours Worked</div>
                 <div><strong>OHW</strong> - Official Hours Worked</div>
@@ -102,7 +102,7 @@
               <!-- Attendance Table -->
               <div class="overflow-auto">
                 <table
-                  class="min-w-full border border-gray-300 text-[13px] mt-5"
+                  class="min-w-full border border-gray-300 text-[14px] mt-5"
                 >
                   <thead>
                     <tr class="bg-gray-50 text-center">
@@ -179,7 +179,7 @@
                     >
                       <td colspan="13" class="border px-2 py-1">Gross</td>
                     </tr>
-                    <tr class="text-[13px] text-center border">
+                    <tr class="text-[14px] text-center border">
                       <td colspan="4" class="border px-2 py-1">
                         Actual Hours Worked (AHW):
                       </td>
@@ -192,7 +192,7 @@
                       </td>
                       <td colspan="3" class="border px-2 py-1"></td>
                     </tr>
-                    <tr class="text-[13px] text-center border">
+                    <tr class="text-[14px] text-center border">
                       <td colspan="4" class="border px-2 py-1">
                         Official Hours Worked (OHW):
                       </td>
@@ -207,7 +207,7 @@
                       </td>
                       <td colspan="3" class="border px-2 py-1"></td>
                     </tr>
-                    <tr class="text-[13px] text-center border">
+                    <tr class="text-[14px] text-center border">
                       <td colspan="4" class="border px-2 py-1">
                         Overtime (OT):
                       </td>
@@ -227,7 +227,7 @@
                     >
                       <td colspan="13" class="border px-2 py-1">Net</td>
                     </tr>
-                    <tr class="text-[13px] text-center font-semibold border">
+                    <tr class="text-[14px] text-center font-semibold border">
                       <td colspan="4" class="border px-2 py-1">
                         Total Hours Worked [(DP×8) + OT]
                       </td>
@@ -368,7 +368,7 @@ export default {
       try {
         const response = await axios.get(
           process.env.VUE_APP_API_BASE_URL + "/auth/me",
-          { withCredentials: true }
+          { withCredentials: true },
         );
         if (response.data) {
           this.user = response.data;
@@ -477,19 +477,19 @@ export default {
     totalLate(emp) {
       return emp.records.reduce(
         (sum, r) => sum + parseFloat(this.getLateness(r)),
-        0
+        0,
       );
     },
     totalOT(emp) {
       return emp.records.reduce(
         (sum, r) => sum + parseFloat(this.getOvertime(r)),
-        0
+        0,
       );
     },
     totalUT(emp) {
       return emp.records.reduce(
         (sum, r) => sum + parseFloat(this.getUndertime(r)),
-        0
+        0,
       );
     },
     totalPresentDays(emp) {

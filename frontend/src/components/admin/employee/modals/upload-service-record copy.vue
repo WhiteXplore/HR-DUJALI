@@ -3,7 +3,7 @@
     class="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center z-50 w-screen"
   >
     <div class="rounded-xl shadow-lg w-full max-w-7xl bg-white">
-      <div class="w-auto bg-white text-[13px] rounded-[15px] shadow-lg">
+      <div class="w-auto bg-white text-[14px] rounded-[15px] shadow-lg">
         <div
           class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
         >
@@ -480,7 +480,7 @@ export default {
       try {
         const response = await axios.post(
           process.env.VUE_APP_API_BASE_URL + "/service-of-records/add-service",
-          this.form
+          this.form,
         );
 
         console.log("Data successfully submitted:", response.data);

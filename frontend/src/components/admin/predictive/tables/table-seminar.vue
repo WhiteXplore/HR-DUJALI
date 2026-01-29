@@ -40,7 +40,7 @@
         </div>
 
         <!-- Reminders -->
-        <div class="mt-3 text-[13px] flex justify-between text-left">
+        <div class="mt-3 text-[14px] flex justify-between text-left">
           <div>
             <p class="text-gray-600">Accepted Files: .csv</p>
             <p class="text-green-700">example.csv</p>
@@ -256,7 +256,7 @@ const uploadAttendanceRecords = async () => {
     }
     console.log(
       "Payload going to backend:",
-      JSON.stringify(finalPayload, null, 2)
+      JSON.stringify(finalPayload, null, 2),
     );
 
     // Send to API
@@ -267,7 +267,7 @@ const uploadAttendanceRecords = async () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(finalPayload),
-        }
+        },
       );
       if (!response.ok) throw new Error("Upload failed");
       alert("Attendance uploaded successfully!");

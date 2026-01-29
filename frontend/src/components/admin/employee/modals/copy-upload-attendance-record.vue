@@ -40,7 +40,7 @@
         </div>
 
         <!-- Reminders -->
-        <div class="mt-3 text-[13px] flex justify-between text-left">
+        <div class="mt-3 text-[14px] flex justify-between text-left">
           <div>
             <p class="text-gray-600">Accepted Files: .csv</p>
             <p class="text-green-700">example.csv</p>
@@ -138,7 +138,7 @@ export default {
             "out_pm",
           ];
           const missingFields = requiredFields.filter(
-            (field) => !results.meta.fields.includes(field)
+            (field) => !results.meta.fields.includes(field),
           );
 
           if (missingFields.length) {
@@ -210,8 +210,8 @@ export default {
               (r.in_am !== null ||
                 r.out_am !== null ||
                 r.in_pm !== null ||
-                r.out_pm !== null)
-          )
+                r.out_pm !== null),
+          ),
       );
 
       if (!this.groupedData.length) {
@@ -226,12 +226,12 @@ export default {
       try {
         console.log(
           "Data sent to API:",
-          JSON.stringify(this.groupedData, null, 2)
+          JSON.stringify(this.groupedData, null, 2),
         );
 
         const response = await axios.post(
           process.env.VUE_APP_API_BASE_URL + "/attendance-record/bulk",
-          this.groupedData
+          this.groupedData,
         );
         this.$emit("refresh");
         this.$emit("close");

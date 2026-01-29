@@ -7,7 +7,7 @@
       class="rounded-xl shadow-lg bg-white fixed top-20 transition-all duration-300"
       :class="step === 1 ? 'w-[50vw]' : 'w-full max-w-7xl'"
     >
-      <div class="text-[13px] rounded-xl">
+      <div class="text-[14px] rounded-xl">
         <!-- Header -->
         <div
           class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-xl flex justify-between items-center"
@@ -285,7 +285,7 @@ export default {
 
       await axios.post(
         `${process.env.VUE_APP_API_BASE_URL}/service-of-records/add-service`,
-        this.form
+        this.form,
       );
 
       alert("Service record successfully added!");

@@ -3,7 +3,7 @@
     class="fixed inset-0 bg-gray-800 bg-opacity-30 flex justify-center items-center z-50 w-min-screen"
   >
     <div class="rounded-[15px] shadow-lg fixed top-20">
-      <div class="w-auto bg-white text-[13px] rounded-[15px] shadow-lg">
+      <div class="w-auto bg-white text-[14px] rounded-[15px] shadow-lg">
         <div
           class="w-full p-5 py-3 bg-blue-900 text-white rounded-t-[15px] flex justify-between items-center border-b shadow"
         >
@@ -25,7 +25,7 @@
           <div
             @click="toggleSection('personal')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'personal',
             }"
             class="cursor-pointer"
@@ -35,7 +35,7 @@
           <div
             @click="toggleSection('address')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'address',
             }"
             class="cursor-pointer"
@@ -46,7 +46,7 @@
           <div
             @click="toggleSection('education')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'education',
             }"
             class="cursor-pointer"
@@ -57,7 +57,7 @@
           <div
             @click="toggleSection('civil')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'civil',
             }"
             class="cursor-pointer"
@@ -67,7 +67,7 @@
           <div
             @click="toggleSection('learning')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'learning',
             }"
             class="cursor-pointer"
@@ -78,7 +78,7 @@
           <div
             @click="toggleSection('others')"
             :class="{
-              'text-blue-500 hover:text-red-900 text-[13px] border-b-2 pb-1 border-blue-500 ':
+              'text-blue-500 hover:text-red-900 text-[14px] border-b-2 pb-1 border-blue-500 ':
                 activeSection === 'others',
             }"
             class="cursor-pointer"
@@ -529,7 +529,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -651,7 +651,7 @@
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
               <table
-                class="min-w-full text-[13px] border border-gray-300 rounded-t-xl"
+                class="min-w-full text-[14px] border border-gray-300 rounded-t-xl"
               >
                 <thead class="bg-blue-500 text-white">
                   <tr>
@@ -755,7 +755,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -866,7 +866,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -912,7 +912,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -958,7 +958,7 @@
             class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
           >
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -1181,13 +1181,13 @@ export default {
 
       console.log(
         "🟦 UPDATE PAYLOAD SENT TO BACKEND:",
-        JSON.parse(JSON.stringify(formData))
+        JSON.parse(JSON.stringify(formData)),
       );
 
       try {
         const response = await axios.patch(
           process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`,
-          formData
+          formData,
         );
 
         console.log("🟩 BACKEND RESPONSE:", response.data);
@@ -1203,7 +1203,7 @@ export default {
       } catch (error) {
         console.error(
           "❌ Error during form submission:",
-          error.response || error
+          error.response || error,
         );
         if (error.response?.data?.message) {
           alert("Server Error: " + error.response.data.message);
@@ -1304,7 +1304,7 @@ export default {
     async fetchEmployeeRecords() {
       try {
         const response = await axios.get(
-          process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`
+          process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`,
         );
         if (response.data) {
           this.form = {

@@ -1,6 +1,6 @@
 <template>
   <div class="w-full flex items-center justify-between mb-2">
-    <div class="text-[13px] text-text mt-4 font-regular">
+    <div class="text-[14px] text-text mt-4 font-regular">
       Pages / Promotion Eligibility
     </div>
     <div
@@ -288,7 +288,7 @@ export default {
       const numToRoman = ["", "I", "II", "III", "IV", "V"];
       return (this.employeeData?.present_designation || "").replace(
         /\b(I{1,3})\b/g,
-        (match) => numToRoman[(romanToNum[match] || 1) + 1] || "IV+"
+        (match) => numToRoman[(romanToNum[match] || 1) + 1] || "IV+",
       );
     },
     formattedBirthdate() {
@@ -310,12 +310,12 @@ export default {
       this.loading = true;
       try {
         const res = await axios.get(
-          process.env.VUE_APP_API_BASE_URL + "/predictive/fetch-promotion"
+          process.env.VUE_APP_API_BASE_URL + "/predictive/fetch-promotion",
         );
         const matched = res.data.find(
           (emp) =>
             emp.first_name === this.selectedFirstName &&
-            emp.last_name === this.selectedLastName
+            emp.last_name === this.selectedLastName,
         );
         const eligibleDesignations = [
           "Administrative Aide I (Utility Worker I)",
@@ -465,7 +465,7 @@ export default {
             educ: /college|tertiary|secondary/i.test(matched.level),
             exp: matched.total_years_experience >= 5,
             designation: eligibleDesignations.includes(
-              matched.present_designation
+              matched.present_designation,
             ),
 
             ldCount: matched.total_count_of_learning_development >= 3,

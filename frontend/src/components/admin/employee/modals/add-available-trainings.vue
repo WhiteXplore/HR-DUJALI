@@ -5,7 +5,7 @@
     <div class="rounded-[15px] shadow-lg">
       <form
         @submit.prevent="saveTraining"
-        class="w-auto bg-white text-[13px] rounded-[15px] shadow-lg"
+        class="w-auto bg-white text-[14px] rounded-[15px] shadow-lg"
         ref="trainingForm"
       >
         <!-- Header -->
@@ -379,7 +379,7 @@ export default {
         }));
         this.form.educational_level = this.educationalLevels.map((e) => e.name);
         this.form.employment_status = this.employmentStatuses.map(
-          (e) => e.name
+          (e) => e.name,
         );
       } else if (newVal === "Specialized") {
         this.form.training_position = [];
@@ -409,7 +409,7 @@ export default {
       if (
         this.selectedPosition &&
         !this.form.training_position.some(
-          (p) => p.name === this.selectedPosition
+          (p) => p.name === this.selectedPosition,
         )
       ) {
         this.form.training_position.push({ name: this.selectedPosition });
@@ -418,7 +418,7 @@ export default {
     },
     removePosition(pos) {
       this.form.training_position = this.form.training_position.filter(
-        (p) => p.name !== pos.name
+        (p) => p.name !== pos.name,
       );
     },
     addEmploymentStatus() {
@@ -432,7 +432,7 @@ export default {
     },
     removeEmploymentStatus(status) {
       this.form.employment_status = this.form.employment_status.filter(
-        (s) => s !== status
+        (s) => s !== status,
       );
     },
 
@@ -447,7 +447,7 @@ export default {
     },
     removeEducation(level) {
       this.form.educational_level = this.form.educational_level.filter(
-        (l) => l !== level
+        (l) => l !== level,
       );
     },
     fetchService() {
@@ -459,7 +459,7 @@ export default {
             ...new Set(
               allRecords
                 .map((r) => r.roa_designation?.trim())
-                .filter((r) => r && r !== "N/A")
+                .filter((r) => r && r !== "N/A"),
             ),
           ];
           this.service_positions = uniquePositions.map((pos) => ({
@@ -485,7 +485,7 @@ export default {
                 .split(",")
                 .map((s) => s.trim());
               this.form.employment_status = this.employmentStatuses.filter(
-                (e) => selectedStatuses.includes(e.name)
+                (e) => selectedStatuses.includes(e.name),
               );
             }
 
@@ -494,7 +494,7 @@ export default {
                 .split(",")
                 .map((s) => s.trim());
               this.form.educational_level = this.educationalLevels.filter((e) =>
-                selectedLevels.includes(e.name)
+                selectedLevels.includes(e.name),
               );
             }
           }
@@ -532,12 +532,12 @@ export default {
         if (this.editData && this.editData.training_id) {
           await axios.patch(
             `${process.env.VUE_APP_API_BASE_URL}/available-trainings/update-training/${this.editData.training_id}`,
-            payload
+            payload,
           );
         } else {
           await axios.post(
             `${process.env.VUE_APP_API_BASE_URL}/available-trainings/add-training`,
-            payload
+            payload,
           );
         }
 

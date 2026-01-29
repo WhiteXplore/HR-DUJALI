@@ -1,7 +1,7 @@
 <template>
   <div v-if="isTable">
     <div class="text-sm flex justify-between">
-      <div class="text-[13px] text-text mt-4 font-regular">
+      <div class="text-[14px] text-text mt-4 font-regular">
         Pages / Seminar Eligibility
       </div>
     </div>
@@ -41,7 +41,7 @@
         <div class="w-full mt-3 rounded-t-lg overflow-x-auto">
           <div class="overflow-y-auto max-h-[550px]">
             <table
-              class="min-w-full table-fixed border-collapse text-text text-[13px]"
+              class="min-w-full table-fixed border-collapse text-text text-[14px]"
             >
               <thead
                 class="bg-Green text-gray-700 tracking-wider font-regular sticky top-0 z-10"
@@ -200,7 +200,7 @@ export default {
           item.first_name?.toLowerCase().includes(query) ||
           item.last_name?.toLowerCase().includes(query) ||
           item.place_of_birth?.toLowerCase().includes(query) ||
-          item.present_designation?.toLowerCase().includes(query)
+          item.present_designation?.toLowerCase().includes(query),
       );
     },
     totalPages() {
@@ -238,7 +238,7 @@ export default {
         .catch((error) => {
           console.error(
             "There was an error fetching the service records:",
-            error
+            error,
           );
         });
     },

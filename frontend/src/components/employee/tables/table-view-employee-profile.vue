@@ -7,7 +7,7 @@
       <div class="flex flex-col flex-1">
         <!-- Tabs -->
         <div class="flex justify-between items-center bg-white shadow-sm py-3">
-          <div class="flex gap-5 text-gray-700 font-semibold text-[13px]">
+          <div class="flex gap-5 text-gray-700 font-semibold text-[14px]">
             <div
               @click="toggleSection('personal')"
               :class="{
@@ -178,7 +178,7 @@
         >
           <div v-if="matchingRecord" class="text-gray-900 w-full rounded-md">
             <div class="overflow-x-auto rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">LEVEL</th>
@@ -235,7 +235,7 @@
         >
           <div v-if="matchingRecord" class="text-gray-900 w-full rounded-md">
             <div class="overflow-x-auto rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -291,7 +291,7 @@
         >
           <div v-if="matchingRecord" class="text-gray-900 w-full rounded-md">
             <div class="overflow-x-auto rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -362,7 +362,7 @@
         >
           <div v-if="matchingRecord" class="text-gray-900 w-full rounded-md">
             <div class="overflow-x-auto rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -386,7 +386,7 @@
 
           <div v-if="matchingRecord" class="text-gray-900 w-full rounded-md">
             <div class="overflow-x-auto rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -410,7 +410,7 @@
 
           <div v-if="matchingRecord" class="text-gray-900 w-full rounded-md">
             <div class="overflow-x-auto rounded-t-xl">
-              <table class="min-w-full text-[13px] border border-gray-300">
+              <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
@@ -525,7 +525,7 @@ export default {
       try {
         const response = await axios.get(
           process.env.VUE_APP_API_BASE_URL + "/auth/me",
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         if (response.data) {
@@ -542,7 +542,7 @@ export default {
     async fetchEmployeeRecords(employeeId) {
       try {
         const response = await axios.get(
-          process.env.VUE_APP_API_BASE_URL + "/upload/get-all"
+          process.env.VUE_APP_API_BASE_URL + "/upload/get-all",
         );
 
         const allRecords = response.data || [];

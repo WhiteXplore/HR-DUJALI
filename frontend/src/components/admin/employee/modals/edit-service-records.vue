@@ -7,7 +7,7 @@
       class="rounded-xl shadow-lg bg-white fixed top-20 transition-all duration-300"
       :class="step === 1 ? 'w-[50vw]' : 'w-full max-w-7xl'"
     >
-      <div class="text-[13px] rounded-xl">
+      <div class="text-[14px] rounded-xl">
         <!-- Header -->
         <div
           class="w-full p-5 py-3 bg-green-600 text-white rounded-t-xl flex justify-between items-center"
@@ -275,7 +275,7 @@ export default {
 
       axios
         .delete(
-          `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}/record/${record.record_id}`
+          `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}/record/${record.record_id}`,
         )
         .then(() => {
           this.form.serviceRecords.splice(index, 1);
@@ -290,7 +290,7 @@ export default {
       axios
         .patch(
           `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}`,
-          this.form
+          this.form,
         )
         .then(() => {
           toast.success("Service Record Updated");
@@ -301,7 +301,7 @@ export default {
 
     async fetchServiceRecords() {
       const { data } = await axios.get(
-        `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}`
+        `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.serviceId}`,
       );
       Object.assign(this.form, data);
     },
