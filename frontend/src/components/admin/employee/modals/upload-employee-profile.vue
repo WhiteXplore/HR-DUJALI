@@ -105,51 +105,70 @@ export default {
     closeModal() {
       this.isOpen = false;
     },
-    submitData() {
+    async submitData() {
       if (!this.file) return;
 
+      // Parse CSV
       Papa.parse(this.file, {
         header: true,
         skipEmptyLines: true,
-        complete: (results) => {
+        complete: async (results) => {
           const parsed = results.data;
           const structured = this.structureData(parsed);
           console.log("Structured JSON:", structured);
 
-          // Convert structured JSON to a Blob and save it locally
-          // const jsonBlob = new Blob([JSON.stringify(structured, null, 2)], {
-          //   type: "application/json",
-          // });
-          // saveus.saveAs(jsonBlob, "employee_profiles.json");
+          try {
+            // 1. Fetch existing employees from backend
+            const existingRes = await axios.get(
+              process.env.VUE_APP_API_BASE_URL + "/upload/get-all",
+            );
+            const existingEmployees = existingRes.data || [];
 
-          // Then send to backend
-          axios
-            .post(
-              process.env.VUE_APP_API_BASE_URL + "/upload/upload-data",
-              structured,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              },
-            )
-            .then((response) => {
-              toast.success("Employee profiles uploaded successfully!");
-              this.$emit("refresh-employees");
-              this.resetForm();
-              if (response.status === 200) {
-                setTimeout(() => {
-                  this.closeModal();
-                }, 1100);
-              }
-            })
-            .catch((error) => {
-              console.error(error);
-              alert("Error submitting employee profiles.");
+            // 2. Create a Set of unique keys for existing employees
+            const existingKeys = new Set(
+              existingEmployees.map(
+                (e) =>
+                  `${e.first_name.toLowerCase()}_${e.last_name.toLowerCase()}_${
+                    e.birthdate || "N/A"
+                  }`,
+              ),
+            );
+
+            // 3. Filter out employees that already exist
+            const newEmployees = structured.filter((emp) => {
+              const key = `${emp.first_name.toLowerCase()}_${emp.last_name.toLowerCase()}_${
+                emp.birthdate || "N/A"
+              }`;
+              return !existingKeys.has(key);
             });
+
+            if (!newEmployees.length) {
+              toast.info("All employees from this CSV already exist!");
+              return;
+            }
+
+            // 4. Upload only new employees
+            const uploadRes = await axios.post(
+              process.env.VUE_APP_API_BASE_URL + "/upload/upload-data",
+              newEmployees,
+              { headers: { "Content-Type": "application/json" } },
+            );
+
+            toast.success("New employee profiles uploaded successfully!");
+            this.$emit("refresh-employees");
+            this.resetForm();
+
+            if (uploadRes.status === 200) {
+              setTimeout(() => this.closeModal(), 1100);
+            }
+          } catch (error) {
+            console.error(error);
+            toast.error("Error checking or uploading employee profiles.");
+          }
         },
       });
     },
+
     resetForm() {
       this.file = null;
       this.dragging = false;
