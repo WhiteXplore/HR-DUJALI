@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white shadow-sm border rounded-2xl p-4 flex flex-col justify-center transition hover:shadow-sm -xl"
+    class="bg-white shadow-sm border rounded-2xl p-4 flex flex-col justify-center transition hover:shadow-sm"
   >
     <h2
       class="text-xl font-semibold text-gray-700 mb-4 text-center md:text-left"
@@ -16,6 +16,9 @@
           <tr>
             <th class="p-2 border-b uppercase text-xs font-semibold">Office</th>
             <th class="p-2 border-b uppercase text-xs font-semibold">Count</th>
+            <th class="p-2 border-b uppercase text-xs font-semibold">
+              Most Common Sentiment
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -27,6 +30,12 @@
             <td class="p-2 border-b">{{ item.office }}</td>
             <td class="p-2 pl-6 border-b font-bold text-gray-800">
               {{ item.count }}
+            </td>
+            <td
+              class="p-2 border-b font-semibold text-center"
+              :class="sentimentColor(item.mostCommonSentiment)"
+            >
+              {{ item.mostCommonSentiment }}
             </td>
           </tr>
         </tbody>
@@ -42,17 +51,50 @@ export default {
     feedbacks: { type: Array, required: true },
   },
   computed: {
-    // Returns an array of { office, count } objects, sorted descending by count
     sortedCountsByOffice() {
-      const counts = {};
+      const officeData = {};
+
+      // Aggregate feedbacks by office
       this.feedbacks.forEach((f) => {
-        if (f.office) counts[f.office] = (counts[f.office] || 0) + 1;
+        if (!f.office) return;
+
+        if (!officeData[f.office]) {
+          officeData[f.office] = { count: 0, sentiments: {} };
+        }
+
+        officeData[f.office].count += 1;
+
+        const sentiment = f.final_sentiment_status || "Neutral";
+        officeData[f.office].sentiments[sentiment] =
+          (officeData[f.office].sentiments[sentiment] || 0) + 1;
       });
 
-      // Convert object to array and sort by count descending
-      return Object.entries(counts)
-        .map(([office, count]) => ({ office, count }))
-        .sort((a, b) => b.count - a.count);
+      // Convert to array and calculate most common sentiment
+      const result = Object.entries(officeData).map(([office, data]) => {
+        const mostCommonSentiment = Object.entries(data.sentiments).reduce(
+          (max, [sentiment, count]) =>
+            count > max.count ? { sentiment, count } : max,
+          { sentiment: "-", count: 0 },
+        ).sentiment;
+
+        return {
+          office,
+          count: data.count,
+          mostCommonSentiment,
+        };
+      });
+
+      // Sort descending by count
+      return result.sort((a, b) => b.count - a.count);
+    },
+  },
+  methods: {
+    sentimentColor(status) {
+      return {
+        Positive: "text-green-600",
+        Negative: "text-red-600",
+        Neutral: "text-gray-600",
+      }[status];
     },
   },
 };

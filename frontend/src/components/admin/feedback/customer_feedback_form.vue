@@ -942,7 +942,7 @@ export default {
           // ======================
           // NEGATIVE (strong)
           // ======================
-          confusing: -5,
+
           unclear: -6,
           delay: -6,
           delays: -6,
@@ -982,6 +982,7 @@ export default {
           // ======================
           // NEUTRAL (true two)
           // ======================
+          confusing: 2,
           adequate: 2,
           acceptable: 2,
           average: 2,

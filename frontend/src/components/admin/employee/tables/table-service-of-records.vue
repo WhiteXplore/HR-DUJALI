@@ -64,9 +64,16 @@
               >
                 <tr>
                   <th class="w-[50px] px-5 py-3 text-center border-b">ID</th>
-                  <th class="px-2 py-3 text-left border-b">Full Name</th>
-                  <th class="px-2 py-3 text-left border-b">Department</th>
-                  <th class="px-2 py-3 text-left border-b">Designation</th>
+                  <th class="px-2 py-3 text-left border-b w-[20%]">
+                    Full Name
+                  </th>
+                  <th class="px-2 py-3 text-left border-b w-[25%]">
+                    Department
+                  </th>
+                  <th class="px-2 py-3 text-left border-b w-[25%]">
+                    Designation
+                  </th>
+                  <th class="px-2 py-3 text-center border-b w-[20%]">Status</th>
                   <th class="px-2 py-3 text-left border-b">Actions</th>
                 </tr>
               </thead>
@@ -90,6 +97,26 @@
                     {{ data_service_records.latestDesignation }}
                   </td>
 
+                  <td class="px-2 py-1 border-b text-center">
+                    <span
+                      :class="[
+                        'px-2 py-1 rounded-full text-white text-xs font-semibold',
+                        data_service_records.service_status === 'Verified'
+                          ? 'bg-green-500'
+                          : data_service_records.service_status === 'Pending'
+                          ? 'bg-yellow-400'
+                          : data_service_records.service_status === 'Rejected'
+                          ? 'bg-red-500'
+                          : 'bg-gray-400',
+                      ]"
+                    >
+                      {{
+                        data_service_records.service_status ||
+                        "Not Yet Verified"
+                      }}
+                    </span>
+                  </td>
+
                   <td class="px-2 py-2 border-b">
                     <div class="flex gap-1">
                       <router-link
@@ -104,7 +131,12 @@
                         class="p-2 py-1 h-8 border-2 border-green-200 hover:bg-green-300 text-green-700 rounded-lg flex gap-1"
                         @click="toggleEdit(data_service_records)"
                       >
-                        <icon name="edit" /> Edit
+                        <icon name="edit" /> Edit</button
+                      ><button
+                        class="p-2 py-1 h-8 border-2 border-yellow-300 hover:bg-yellow-300 text-yellow-700 rounded-lg flex gap-1"
+                        @click="verifyRecord(data_service_records)"
+                      >
+                        <icon name="check-circle" /> Verified
                       </button>
 
                       <button
@@ -320,6 +352,29 @@ export default {
     },
   },
   methods: {
+    verifyRecord(record) {
+      if (!record || !record.service_id) return;
+
+      axios
+        .patch(
+          `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${record.service_id}/verify`,
+        )
+        .then(() => {
+          toast.success("Record verified successfully!", { autoClose: 2000 });
+
+          // Update the local data_service_records so UI updates immediately
+          const index = this.data_service_records.findIndex(
+            (r) => r.service_id === record.service_id,
+          );
+          if (index !== -1) {
+            this.data_service_records[index].service_status = "Verified";
+          }
+        })
+        .catch((err) => {
+          console.error("Verification failed:", err);
+          toast.error("Failed to verify record.");
+        });
+    },
     toggleUploadData() {
       this.isUploadData = !this.isUploadData;
     },

@@ -1163,9 +1163,10 @@ export default {
     },
 
     async submitData() {
+      // Make a shallow copy of your form
       const formData = { ...this.form };
 
-      // Replace empty strings with undefined (so backend ignores them)
+      // Replace empty strings with undefined (backend ignores them)
       Object.keys(formData).forEach((key) => {
         if (
           formData[key] === "" &&
@@ -1179,14 +1180,22 @@ export default {
       // Format birthdate
       formData.birthdate = this.formatBirthdate(this.form.birthdate);
 
+      // ⚡ Ensure all related records arrays exist
+      formData.educationalRecords = formData.educationalRecords || [];
+      formData.civilRecords = formData.civilRecords || [];
+      formData.learningRecords = formData.learningRecords || []; // Important!
+      formData.specialSkillsRecords = formData.specialSkillsRecords || [];
+      formData.nonAcadRecords = formData.nonAcadRecords || [];
+      formData.membershipRecords = formData.membershipRecords || [];
+
       console.log(
-        "🟦 UPDATE PAYLOAD SENT TO BACKEND:",
+        "🟦 PAYLOAD SENT TO BACKEND:",
         JSON.parse(JSON.stringify(formData)),
       );
 
       try {
         const response = await axios.patch(
-          process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`,
+          `${process.env.VUE_APP_API_BASE_URL}/upload/${this.employeeId}`,
           formData,
         );
 
@@ -1212,7 +1221,6 @@ export default {
         }
       }
     },
-
     resetForm() {
       Object.keys(this.form).forEach((key) => {
         if (Array.isArray(this.form[key])) {

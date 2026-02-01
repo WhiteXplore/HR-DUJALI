@@ -441,23 +441,14 @@ export class UploadService {
 
     // 🔹 Update Learning Records (append mode)
     if (Array.isArray(updateUploadDto.learningRecords)) {
-      const existingLearning = await this.fifthTableRepository.find({
-        where: { firstTable: { first_table_id: id } },
+      // Delete all existing learning records for this employee
+      await this.fifthTableRepository.delete({
+        firstTable: { first_table_id: id },
       });
 
-      const newLearning = updateUploadDto.learningRecords.filter(
-        (record) =>
-          !existingLearning.some(
-            (existing) =>
-              existing.title_learning_development ===
-                record.title_learning_development &&
-              existing.ld_from === record.ld_from &&
-              existing.ld_to === record.ld_to,
-          ),
-      );
-
-      if (newLearning.length > 0) {
-        const entities = newLearning.map((record) =>
+      // Save the new array (including only remaining rows)
+      if (updateUploadDto.learningRecords.length > 0) {
+        const entities = updateUploadDto.learningRecords.map((record) =>
           this.fifthTableRepository.create({
             ...record,
             firstTable: updatedFirst,

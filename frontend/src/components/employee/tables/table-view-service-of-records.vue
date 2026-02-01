@@ -38,14 +38,34 @@
 
             <!-- Employee Profile -->
             <div class="text-left mt-5 text-sm">
-              <div class="flex gap-[40px] under">
-                <h2>Full Name:</h2>
-                <p class="font-bold">
-                  {{ matchingRecord.first_name }}
-                  {{ matchingRecord.middle_name }}
-                  {{ matchingRecord.last_name }}
-                </p>
+              <div class="flex justify-between">
+                <div class="flex gap-[40px] under">
+                  <h2>Full Name:</h2>
+                  <p class="font-bold">
+                    {{ matchingRecord.first_name }}
+                    {{ matchingRecord.middle_name }}
+                    {{ matchingRecord.last_name }}
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <h2 class="font-semibold">Status:</h2>
+                  <span
+                    class="px-3 py-1 rounded-full text-white text-xs font-bold"
+                    :class="{
+                      'bg-green-500':
+                        matchingRecord.service_status === 'Verified',
+                      'bg-yellow-500':
+                        matchingRecord.service_status === 'Pending',
+                      'bg-red-500':
+                        matchingRecord.service_status === 'Rejected',
+                      'bg-gray-400': !matchingRecord.service_status,
+                    }"
+                  >
+                    {{ matchingRecord.service_status || "Not Yet Verified" }}
+                  </span>
+                </div>
               </div>
+
               <div class="flex gap-[27px] under">
                 <h2>Date of Birth:</h2>
                 <p class="font-bold">
@@ -476,7 +496,7 @@ export default {
       try {
         const response = await axios.get(
           process.env.VUE_APP_API_BASE_URL + "/auth/me",
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         this.user = response.data || null;
@@ -496,7 +516,7 @@ export default {
         .then((res) => {
           const allRecords = res.data || [];
           this.matchingRecord = allRecords.find(
-            (r) => r.employee_id === employeeId
+            (r) => r.employee_id === employeeId,
           );
         })
         .catch((err) => console.error("Error fetching service records:", err));

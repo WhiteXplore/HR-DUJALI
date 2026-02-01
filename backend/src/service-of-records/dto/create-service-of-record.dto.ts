@@ -43,6 +43,11 @@ export class CreateServiceOfRecordDto {
   @MaxLength(155)
   department?: string;
 
+  @IsString()
+  @IsOptional()
+  @MaxLength(155)
+  service_status?: string;
+
   @ValidateNested({ each: true })
   @Type(() => CreateRecordOfAppointmentDto)
   @IsOptional()

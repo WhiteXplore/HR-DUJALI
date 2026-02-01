@@ -69,4 +69,13 @@ export class ServiceOfRecordsController {
   ): Promise<void> {
     await this.serviceOfRecordsService.removeRecord(service_id, record_id);
   }
+
+  @Patch(':id/verify')
+  async verifyService(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ServiceOfRecord> {
+    return this.serviceOfRecordsService.update(id, {
+      service_status: 'Verified',
+    });
+  }
 }

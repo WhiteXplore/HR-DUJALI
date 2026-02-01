@@ -27,6 +27,9 @@ export class ServiceOfRecord {
   @Column({ type: 'varchar', nullable: true })
   department: string | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  service_status: string | null;
+
   @OneToMany(() => RecordOfAppointment, (record) => record.serviceOfRecord, {
     cascade: true,
     onDelete: 'CASCADE',

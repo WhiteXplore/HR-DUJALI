@@ -76,21 +76,16 @@
                 <input v-model="form.birth_place" class="input" />
               </div>
               <!-- Department -->
-              <div class="w-full space-y-1">
+              <div class="w-full">
                 <label class="font-bold">Department</label>
                 <select v-model="form.department" class="input">
                   <option disabled value="">Select Department</option>
-                  <option>Office of the Mayor</option>
-                  <option>Sangguniang Bayan Office</option>
-                  <option>Municipal Planning and Development Office</option>
-                  <option>Municipal Budget Office</option>
-                  <option>Municipal Accounting Office</option>
-                  <option>Municipal Treasury Office</option>
-                  <option>Municipal Assessor’s Office</option>
-                  <option>Municipal Engineering Office</option>
-                  <option>Municipal Health Office</option>
-                  <option>
-                    Municipal Social Welfare and Development Office
+                  <option
+                    v-for="dept in departmentOptions"
+                    :key="dept"
+                    :value="dept"
+                  >
+                    {{ dept }}
                   </option>
                 </select>
               </div>
@@ -245,7 +240,19 @@ export default {
 
   data() {
     return {
-      step: 1,
+      step: 1, // ✅ MASTER DEPARTMENT LIST
+      departments: [
+        "Office of the Mayor",
+        "Sangguniang Bayan Office",
+        "Municipal Planning and Development Office",
+        "Municipal Budget Office",
+        "Municipal Accounting Office",
+        "Municipal Treasury Office",
+        "Municipal Assessor’s Office",
+        "Municipal Engineering Office",
+        "Municipal Health Office",
+        "Municipal Social Welfare and Development Office",
+      ],
       form: {
         generated_service_id: "",
         first_name: this.employeeServiceRecord.first_name || "",
@@ -267,6 +274,17 @@ export default {
   },
 
   computed: {
+    // ✅ AUTO-INJECT UNKNOWN DEPARTMENT
+    departmentOptions() {
+      if (
+        this.form.department &&
+        !this.departments.includes(this.form.department)
+      ) {
+        return [this.form.department, ...this.departments];
+      }
+      return this.departments;
+    },
+
     activeStep() {
       return "bg-green-600 text-white";
     },
