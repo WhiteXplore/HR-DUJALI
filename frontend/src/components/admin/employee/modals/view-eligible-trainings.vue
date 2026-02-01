@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 p-2">
+  <div class="max-h-[90vh] overflow-auto bg-gray-50 p-2">
     <!-- Header -->
     <div class="w-full justify-between flex">
       <div class="mb-4 text-left">
@@ -179,14 +179,15 @@
                     @change="toggleSelectAll"
                   />
                 </th>
-                <th class="px-4 py-3 border-b">Employee ID</th>
-                <th class="px-4 py-3 border-b">Name</th>
-                <th class="px-4 py-3 border-b">Department</th>
-                <th class="px-4 py-3 border-b">Designation</th>
-                <th class="px-4 py-3 border-b">
+                <th class="px-4 py-3 border-b w-[8%]">Employee ID</th>
+                <th class="px-4 py-3 border-b w-[10%]">Name</th>
+                <th class="px-4 py-3 border-b w-[15%]">Department</th>
+                <th class="px-4 py-3 border-b w-[15%]">Designation</th>
+                <th class="px-4 py-3 border-b w-[15%]">
                   Number of Trainings / Seminars
                 </th>
-                <th class="px-4 py-3 border-b">Years of Service</th>
+                <th class="px-4 py-3 border-b w-[15%]">Training Hours</th>
+                <th class="px-4 py-3 border-b w-[15%]">Years of Service</th>
                 <th class="px-4 py-3 border-b">Actions</th>
               </tr>
             </thead>
@@ -215,6 +216,9 @@
                 </td>
                 <td class="px-4 py-3 border-b">
                   {{ emp.total_count_of_learning_development }}
+                </td>
+                <td class="px-4 py-3 border-b">
+                  {{ emp.total_ld_hours_rendered }}
                 </td>
                 <td class="px-4 py-3 border-b">
                   {{ formatExperience(emp.total_years_experience) }}
@@ -491,7 +495,7 @@ export default {
 
     employeeFifthTable(emp) {
       const empLD = this.employee_learning_development.find(
-        (e) => e.first_table_id === emp.first_table_id
+        (e) => e.first_table_id === emp.first_table_id,
       );
       return empLD?.fifthTable || [];
     },
@@ -501,12 +505,12 @@ export default {
       try {
         /* 1️⃣ Get learning & development records */
         const ldRes = await axios.get(
-          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-all`,
         );
 
         /* 2️⃣ Get eligible employees (department & designation) */
         const eligibleRes = await axios.get(
-          `${process.env.VUE_APP_API_BASE_URL}/upload/get-eligible-employees-trainings`
+          `${process.env.VUE_APP_API_BASE_URL}/upload/get-eligible-employees-trainings`,
         );
 
         /* 3️⃣ Map eligible employees by employee_id */
@@ -535,7 +539,7 @@ export default {
       try {
         const id = this.$route.query.id;
         const res = await axios.get(
-          process.env.VUE_APP_API_BASE_URL + `/available-trainings/${id}`
+          process.env.VUE_APP_API_BASE_URL + `/available-trainings/${id}`,
         );
         this.training = res.data || null;
       } catch (error) {
@@ -550,96 +554,148 @@ export default {
       try {
         const res = await axios.get(
           process.env.VUE_APP_API_BASE_URL +
-            "/upload/get-eligible-employees-trainings"
+            "/upload/get-eligible-employees-trainings",
         );
 
         const employees = res.data || [];
 
         /* ------------------ PREP ------------------ */
+
         const exactTitle = this.normalize(this.training.title);
         const baseTitle = this.normalizeBaseTitle(this.training.title);
 
-        const minYears = Number(this.training.experience_year_from ?? 0);
-        const maxYears = Number(this.training.experience_year_to ?? Infinity);
+        // ✅ EXPERIENCE RANGE (YEAR-BASED, INCLUSIVE)
+        const minYears =
+          typeof this.training.experience_year_from === "number"
+            ? this.training.experience_year_from
+            : parseFloat(this.training.experience_year_from) || 0;
+
+        const maxYears =
+          typeof this.training.experience_year_to === "number"
+            ? this.training.experience_year_to
+            : parseFloat(this.training.experience_year_to) || Infinity;
+
+        // ✅ TRAINING HOURS
+        const trainingHours = parseFloat(this.training.training_hours);
 
         const FOUR_YEARS_AGO = new Date();
         FOUR_YEARS_AGO.setFullYear(FOUR_YEARS_AGO.getFullYear() - 4);
 
         const priorityEmployees = [];
-        const lowerPriorityEmployees = [];
 
         /* ------------------ LOOP ------------------ */
         employees.forEach((emp) => {
           const empLD = this.employee_learning_development.find(
-            (e) => e.first_table_id === emp.first_table_id
+            (e) => e.first_table_id === emp.first_table_id,
           );
 
           const fifthTable = empLD?.fifthTable || [];
 
           /* ❌ EXCLUDE: exact same training title */
-          const alreadyAttendedExact = fifthTable.some(
-            (record) =>
-              this.normalize(record.title_learning_development) === exactTitle
-          );
-          if (alreadyAttendedExact) return;
-
-          /* ❌ EXCLUDE: same base training within last 4 years */
-          const attendedWithinLast4Years = fifthTable.some((record) => {
-            if (
-              this.normalizeBaseTitle(record.title_learning_development) !==
-              baseTitle
+          if (
+            fifthTable.some(
+              (r) =>
+                this.normalize(r.title_learning_development) === exactTitle,
             )
-              return false;
+          ) {
+            return;
+          }
 
-            const recordDate = new Date(record.ld_from);
-            return recordDate >= FOUR_YEARS_AGO;
-          });
-          if (attendedWithinLast4Years) return;
+          /* ❌ EXCLUDE: same base title within 4 years */
+          if (
+            fifthTable.some((r) => {
+              if (
+                this.normalizeBaseTitle(r.title_learning_development) !==
+                baseTitle
+              )
+                return false;
 
-          /* ---------------- ELIGIBILITY CHECKS ---------------- */
+              return new Date(r.ld_from) >= FOUR_YEARS_AGO;
+            })
+          ) {
+            return;
+          }
+
+          /* ---------------- ELIGIBILITY ---------------- */
 
           /* Employment Status */
           const matchesStatus =
-            !this.training.employment_status ||
-            this.normalize(emp.current_roa_status) ===
-              this.normalize(this.training.employment_status);
-
-          /* Educational Level */
-          const matchesEducation =
-            !this.training.educational_level ||
-            this.normalize(emp.level) ===
-              this.normalize(this.training.educational_level);
-
-          /* Years of Experience */
-          const years = parseFloat(emp.total_years_experience) || 0;
-          const matchesYears =
-            Math.floor(years) >= minYears && Math.floor(years) <= maxYears;
-
-          /* Position / Designation */
-          const matchesPosition =
-            !this.training.training_positions?.length ||
-            this.training.training_positions.some((pos) =>
-              this.normalize(emp.present_designation).includes(
-                this.normalize(pos.name)
-              )
+            !this.training.employment_statuses?.length ||
+            this.training.employment_statuses.some(
+              (s) =>
+                this.normalize(emp.current_roa_status) ===
+                this.normalize(s.name),
             );
 
-          /* ---------------- FINAL DECISION ---------------- */
+          /* Education */
+          const matchesEducation =
+            !this.training.training_educational_levels?.length ||
+            this.training.training_educational_levels.some(
+              (lvl) => this.normalize(emp.level) === this.normalize(lvl.name),
+            );
+
+          /* ✅ EXPERIENCE (YEAR-BASED, INCLUSIVE) */
+          const rawYears = parseFloat(emp.total_years_experience);
+          const wholeYears = isNaN(rawYears) ? 0 : Math.floor(rawYears);
+
+          const matchesYears = wholeYears >= minYears && wholeYears <= maxYears;
+
+          /* Position */
+          const matchesPosition =
+            !this.training.training_positions?.length ||
+            this.training.training_positions.some(
+              (pos) =>
+                this.normalize(emp.present_designation) ===
+                this.normalize(pos.name),
+            );
+
+          /* LD HOURS (FIT IN RANGE ONLY) */
+          const renderedHours = parseFloat(emp.total_ld_hours_rendered);
+          const matchesHours =
+            isNaN(trainingHours) ||
+            (!isNaN(renderedHours) && renderedHours >= trainingHours);
+
+          /* ---------------- FINAL FILTER ---------------- */
+
           if (
             matchesStatus &&
             matchesEducation &&
             matchesYears &&
-            matchesPosition
+            matchesPosition &&
+            matchesHours
           ) {
             priorityEmployees.push(emp);
           }
         });
 
-        /* ------------------ SORT & SET ------------------ */
-        this.eligibleEmployees = [
-          ...priorityEmployees,
-          ...lowerPriorityEmployees,
-        ];
+        /* ------------------ SORT: MOST FIT FIRST ------------------ */
+
+        const experienceMid = (minYears + maxYears) / 2;
+
+        priorityEmployees.sort((a, b) => {
+          // 1️⃣ Experience closeness to midpoint (use real decimals)
+          const expA = Math.abs(
+            (parseFloat(a.total_years_experience) || 0) - experienceMid,
+          );
+          const expB = Math.abs(
+            (parseFloat(b.total_years_experience) || 0) - experienceMid,
+          );
+          if (expA !== expB) return expA - expB;
+
+          // 2️⃣ Higher LD hours rendered
+          const hoursA = parseFloat(a.total_ld_hours_rendered) || 0;
+          const hoursB = parseFloat(b.total_ld_hours_rendered) || 0;
+          if (hoursA !== hoursB) return hoursB - hoursA;
+
+          // 3️⃣ Fewer trainings attended
+          const countA = parseInt(a.total_count_of_learning_development) || 0;
+          const countB = parseInt(b.total_count_of_learning_development) || 0;
+          return countA - countB;
+        });
+
+        /* ------------------ ASSIGN ------------------ */
+
+        this.eligibleEmployees = priorityEmployees;
       } catch (error) {
         console.error("Error fetching eligible employees:", error);
       }
@@ -678,7 +734,7 @@ export default {
           await axios.patch(
             process.env.VUE_APP_API_BASE_URL +
               `/upload/update-fifth/${emp.first_table_id}`,
-            payload
+            payload,
           );
         }
 
@@ -741,8 +797,8 @@ export default {
             (record) =>
               normalize(record.title_learning_development) === currentTitle &&
               record.ld_from === currentFrom &&
-              record.ld_to === currentTo
-          )
+              record.ld_to === currentTo,
+          ),
       );
 
       this.showTrainingAttendeesModal = true;
