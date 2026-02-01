@@ -86,6 +86,34 @@ export default {
     };
   },
   methods: {
+    sanitizePayload(data) {
+      return data.map((emp) => ({
+        ...emp,
+        first_name: emp.first_name ?? null,
+        middle_name: emp.middle_name ?? null,
+        last_name: emp.last_name ?? null,
+        birthdate: emp.birthdate ?? null,
+        birth_place: emp.birth_place ?? null,
+        employee_id: emp.employee_id ?? null,
+        department: emp.department ?? null,
+        serviceRecords: emp.serviceRecords.map((r) => ({
+          period_from: r.period_from ?? null,
+          period_to: r.period_to ?? null,
+          roa_designation: r.roa_designation ?? null,
+          roa_sg: r.roa_sg ?? null,
+          roa_step: r.roa_step ?? null,
+          roa_status: r.roa_status ?? null,
+          roa_basic_salary: r.roa_basic_salary ?? null,
+          roa_basic_salary_day: r.roa_basic_salary_day ?? "month",
+          office: r.office ?? null,
+          remarks: r.remarks ?? null,
+        })),
+      }));
+    },
+    toNullable(val) {
+      const v = this.cellStr(val);
+      return v === "" ? null : v;
+    },
     triggerFileInput() {
       this.$refs.fileInput.click();
     },
@@ -112,13 +140,41 @@ export default {
       const last_name = parts.length > 1 ? parts[parts.length - 1] : "";
       return { first_name, middle_name, last_name };
     },
-    formatDate(str) {
-      const date = new Date(str);
-      if (isNaN(date)) return "";
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, "0");
-      const dd = String(date.getDate()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd}`;
+    formatDate(value) {
+      if (!value) return null;
+
+      // Excel serial number
+      if (typeof value === "number" && value > 1000) {
+        const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+        const date = new Date(excelEpoch.getTime() + value * 86400000);
+        return date.toISOString().slice(0, 10);
+      }
+
+      if (typeof value === "string") {
+        const v = value.trim();
+
+        // YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+          return v;
+        }
+
+        // MM/DD/YYYY
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v)) {
+          const d = new Date(v);
+          return isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+        }
+
+        // "July 21, 1991" ONLY (strict)
+        if (/^[A-Za-z]+ \d{1,2}, \d{4}$/.test(v)) {
+          const d = new Date(v);
+          return isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+        }
+
+        // ❌ EVERYTHING ELSE IS INVALID
+        return null;
+      }
+
+      return null;
     },
     parseExcel() {
       return new Promise((resolve) => {
@@ -157,10 +213,10 @@ export default {
               first_name,
               middle_name,
               last_name,
-              birthdate: this.formatDate(dobRow?.[2] || ""),
-              birth_place: pobRow?.[2] || "",
-              employee_id: empRow?.[2] || "",
-              department: "",
+              birthdate: this.formatDate(dobRow?.[2]) ?? null,
+              birth_place: this.toNullable(pobRow?.[2]),
+              employee_id: this.toNullable(empRow?.[2]),
+              department: null,
               serviceRecords: [],
             };
 
@@ -183,16 +239,17 @@ export default {
                   break;
 
                 person.serviceRecords.push({
-                  period_from: row[0] || "",
-                  period_to: row[1] || "",
-                  roa_designation: row[2] || "",
-                  roa_sg: row[3] || "",
-                  roa_step: row[4] || "",
-                  roa_status: row[5] || "",
-                  roa_basic_salary: row[6] || "",
-                  roa_basic_salary_day: row[7] || "month",
-                  office: row[8] || "",
-                  remarks: row[9] || "",
+                  period_from: this.toNullable(row[0]),
+                  period_to: this.toNullable(row[1]),
+                  roa_designation: this.toNullable(row[2]),
+                  roa_sg: this.toNullable(row[3]),
+                  roa_step: this.toNullable(row[4]),
+                  roa_status: this.toNullable(row[5]),
+                  roa_basic_salary: this.toNullable(row[6]),
+                  roa_basic_salary_day: this.toNullable(row[7]) ?? "month",
+
+                  office: this.toNullable(row[8]),
+                  remarks: this.toNullable(row[9]),
                 });
               }
 
@@ -217,17 +274,20 @@ export default {
       this.uploading = true;
 
       try {
-        this.payload = await this.parseExcel();
+        const parsed = await this.parseExcel();
+        this.payload = this.sanitizePayload(parsed);
+
         await axios.post(
           process.env.VUE_APP_API_BASE_URL + "/service-of-records/bulk-import",
           this.payload,
         );
+
         toast.success("Employees uploaded successfully!");
         this.closeModal();
         this.$emit("refresh");
       } catch (err) {
-        console.error(err);
-        toast.error("Upload failed!");
+        console.error(err.response?.data || err);
+        toast.error("Upload failed! Check Excel format.");
       } finally {
         this.uploading = false;
       }

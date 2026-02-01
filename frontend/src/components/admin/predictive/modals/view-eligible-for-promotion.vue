@@ -208,13 +208,17 @@ export default {
       if (!this.promotionCriteria || !this.data_promotion.length) return [];
 
       const criteria = this.promotionCriteria;
+
+      // normalize education levels
       const requiredLevels = (criteria.education_requirement || []).map((lvl) =>
         lvl.toLowerCase().trim(),
       );
 
-      const criteriaDepartment = (criteria.department || "")
-        .toLowerCase()
-        .trim();
+      // normalize department (remove spaces & symbols)
+      const normalizeDepartment = (dept) =>
+        (dept || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      const criteriaDepartment = normalizeDepartment(criteria.department);
 
       return this.data_promotion.filter((emp) => {
         const age = Number(emp.age) || 0;
@@ -222,8 +226,9 @@ export default {
         const commCount = Number(emp.total_count_of_learning_development) || 0;
         const commHours = Number(emp.total_ld_hours_rendered) || 0;
         const attendance = Number(emp.total_attendance_hours) || 0;
+
         const level = (emp.level || "").toLowerCase().trim();
-        const empDepartment = (emp.department || "").toLowerCase().trim();
+        const empDepartment = normalizeDepartment(emp.department);
 
         const meetsAge = age >= (Number(criteria.age_requirement) || 0);
         const meetsExperience =
@@ -234,6 +239,7 @@ export default {
           commHours >= (Number(criteria.commendation_hours_requirement) || 0);
         const meetsAttendance =
           attendance >= (Number(criteria.attendance_hours_requirement) || 0);
+
         const meetsEducation =
           !requiredLevels.length || requiredLevels.includes(level);
 
@@ -254,6 +260,10 @@ export default {
   },
 
   methods: {
+    normalizeDepartment(dept) {
+      return (dept || "").toLowerCase().replace(/[^a-z0-9]/g, ""); // removes spaces, symbols, underscores, dashes
+    },
+
     formatExperience(years) {
       if (isNaN(years)) return "-";
       const totalMonths = Math.floor(Number(years) * 12);

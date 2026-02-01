@@ -12,40 +12,42 @@ export class RecordOfAppointment {
   @PrimaryGeneratedColumn('increment')
   record_id: number;
 
-  @Column({ nullable: false })
-  period_from: string;
+  @Column({ type: 'varchar', nullable: true })
+  period_from: string | null;
 
-  @Column({ nullable: false })
-  period_to: string;
+  @Column({ type: 'varchar', nullable: true })
+  period_to: string | null;
 
-  @Column({ nullable: false })
-  roa_designation: string;
+  @Column({ type: 'varchar', nullable: true })
+  roa_designation: string | null;
 
-  @Column({ nullable: false })
-  roa_sg: string;
+  @Column({ type: 'varchar', nullable: true })
+  roa_sg: string | null;
 
-  @Column({ nullable: false })
-  roa_step: string;
+  @Column({ type: 'varchar', nullable: true })
+  roa_step: string | null;
 
-  @Column({ nullable: false })
-  roa_status: string;
+  @Column({ type: 'varchar', nullable: true })
+  roa_status: string | null;
 
-  @Column({ nullable: false })
-  roa_basic_salary: string;
+  @Column({ type: 'varchar', nullable: true })
+  roa_basic_salary: string | null;
 
-  @Column({ nullable: false })
-  roa_basic_salary_day: string;
+  @Column({ type: 'varchar', nullable: true })
+  roa_basic_salary_day: string | null;
 
-  @Column({ nullable: false })
-  office: string;
+  @Column({ type: 'varchar', nullable: true })
+  office: string | null;
 
-  @Column({ nullable: false })
-  remarks: string;
+  @Column({ type: 'varchar', nullable: true })
+  remarks: string | null;
 
-  @ManyToOne(() => ServiceOfRecord, (service) => service.serviceRecords)
-  @JoinColumn({ name: 'service_id' }) // foreign key column name in DB
+  @ManyToOne(() => ServiceOfRecord, (service) => service.serviceRecords, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'service_id' })
   serviceOfRecord: ServiceOfRecord;
 
-  @Column({ nullable: false })
-  service_id: number; // Explicitly define the service_id column
+  @Column({ nullable: true })
+  service_id: number | null;
 }

@@ -5,13 +5,13 @@
       <div class="text-[14px] text-text mt-4">
         Pages / Promotion Eligibility
       </div>
-
-      <button
+      <div
         @click="showAddCriteriaModal = true"
-        class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+        class="cursor-pointer flex gap-2 items-center tracking-wider bg-green-500 text-white hover:text-green-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-green-900 hover:shadow-lg transition-all duration-300"
       >
-        + Add Promotion Criteria
-      </button>
+        <icon :name="'add-account'"></icon>
+        <button>Add Promotion Criteria</button>
+      </div>
     </div>
 
     <!-- Table -->

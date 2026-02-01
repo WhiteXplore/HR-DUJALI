@@ -687,8 +687,9 @@ export default {
         if (!this.data_employee_profile.length)
           await this.fetchEmployeeRecords();
         const { data } = await axios.get(
-          "http://localhost:8000/attendance-record/monthly-attendance-report",
+          `${process.env.VUE_APP_API_BASE_URL}/attendance-record/monthly-attendance-report`,
         );
+
         this.monthlyReport = data
           .map((emp) => {
             const [year, month] = emp.month_year.split("-").map(Number);

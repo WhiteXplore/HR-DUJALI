@@ -221,11 +221,22 @@ export default {
       );
     },
     departmentOptions() {
-      return [
-        ...new Set(
-          this.serviceRecords.map((r) => r.department).filter(Boolean),
-        ),
-      ];
+      const map = new Map();
+
+      // loop from last → first (latest record wins)
+      for (let i = this.serviceRecords.length - 1; i >= 0; i--) {
+        const dept = this.serviceRecords[i]?.department;
+        if (!dept) continue;
+
+        const normalized = this.normalizeDepartment(dept);
+
+        // only store once
+        if (!map.has(normalized)) {
+          map.set(normalized, dept.trim());
+        }
+      }
+
+      return Array.from(map.values());
     },
   },
   watch: {
@@ -243,6 +254,12 @@ export default {
     },
   },
   methods: {
+    normalizeDepartment(name) {
+      return name
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]/g, "") // remove symbols & spaces
+        .trim();
+    },
     async fetchServiceRecords() {
       const res = await axios.get(
         process.env.VUE_APP_API_BASE_URL + "/service-of-records/get-all",

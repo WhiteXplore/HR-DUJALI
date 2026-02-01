@@ -6,29 +6,26 @@ export class ServiceOfRecord {
   @PrimaryGeneratedColumn('increment')
   service_id: number;
 
-  @Column({ nullable: false })
-  first_name: string;
+  @Column({ type: 'varchar', nullable: true })
+  first_name: string | null;
 
-  @Column({ nullable: false })
-  middle_name: string;
+  @Column({ type: 'varchar', nullable: true })
+  middle_name: string | null;
 
-  @Column({ nullable: false })
-  last_name: string;
+  @Column({ type: 'varchar', nullable: true })
+  last_name: string | null;
 
-  @Column({ type: 'date', nullable: false })
-  birthdate: Date;
+  @Column({ type: 'date', nullable: true })
+  birthdate: Date | null;
 
-  @Column({ nullable: false })
-  birth_place: string;
+  @Column({ type: 'varchar', nullable: true })
+  birth_place: string | null;
 
-  @Column({ type: 'varchar', nullable: false })
-  employee_id: string;
+  @Column({ type: 'varchar', nullable: true, unique: true })
+  employee_id: string | null;
 
-  @Column({ type: 'varchar', default: '' })
-  department: string;
-
-  // @Column({ type: 'blob', nullable: true })
-  // pdf_file: Buffer;
+  @Column({ type: 'varchar', nullable: true })
+  department: string | null;
 
   @OneToMany(() => RecordOfAppointment, (record) => record.serviceOfRecord, {
     cascade: true,

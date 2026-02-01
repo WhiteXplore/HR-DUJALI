@@ -58,11 +58,6 @@
             </div>
 
             <div class="flex gap-4">
-              <!-- <div class="w-full">
-                <label class="font-bold">Employee ID</label>
-                <input v-model="form.employee_id" class="input" />
-              </div> -->
-
               <div class="w-full">
                 <label class="font-bold">Date of Birth</label>
                 <input type="date" v-model="form.birthdate" class="input" />
@@ -71,21 +66,18 @@
                 <label class="font-bold">Place of Birth</label>
                 <input v-model="form.birth_place" class="input" />
               </div>
+
+              <!-- ✅ FIXED DEPARTMENT SELECT -->
               <div class="w-full">
                 <label class="font-bold">Department</label>
                 <select v-model="form.department" class="input">
                   <option disabled value="">Select Department</option>
-                  <option>Office of the Mayor</option>
-                  <option>Sangguniang Bayan Office</option>
-                  <option>Municipal Planning and Development Office</option>
-                  <option>Municipal Budget Office</option>
-                  <option>Municipal Accounting Office</option>
-                  <option>Municipal Treasury Office</option>
-                  <option>Municipal Assessor’s Office</option>
-                  <option>Municipal Engineering Office</option>
-                  <option>Municipal Health Office</option>
-                  <option>
-                    Municipal Social Welfare and Development Office
+                  <option
+                    v-for="dept in departmentOptions"
+                    :key="dept"
+                    :value="dept"
+                  >
+                    {{ dept }}
                   </option>
                 </select>
               </div>
@@ -235,17 +227,44 @@ export default {
       step: 1,
       activeStep: "bg-green-600 text-white",
       inactiveStep: "bg-gray-200 text-gray-600",
+
+      // ✅ MASTER DEPARTMENT LIST
+      departments: [
+        "Office of the Mayor",
+        "Sangguniang Bayan Office",
+        "Municipal Planning and Development Office",
+        "Municipal Budget Office",
+        "Municipal Accounting Office",
+        "Municipal Treasury Office",
+        "Municipal Assessor’s Office",
+        "Municipal Engineering Office",
+        "Municipal Health Office",
+        "Municipal Social Welfare and Development Office",
+      ],
+
       form: {
         first_name: "",
         middle_name: "",
         last_name: "",
         birthdate: "",
         birth_place: "",
-        employee_id: "",
         department: "",
         serviceRecords: [],
       },
     };
+  },
+
+  computed: {
+    // ✅ AUTO-INJECT UNKNOWN DEPARTMENT
+    departmentOptions() {
+      if (
+        this.form.department &&
+        !this.departments.includes(this.form.department)
+      ) {
+        return [this.form.department, ...this.departments];
+      }
+      return this.departments;
+    },
   },
 
   methods: {
