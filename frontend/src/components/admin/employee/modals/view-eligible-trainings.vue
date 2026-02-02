@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="w-full justify-between flex">
       <div class="mb-4 text-left">
-        <h1 class="text-md font-bold text-gray-800">Training Detailss</h1>
+        <h1 class="text-md font-bold text-gray-800">Training Details</h1>
         <p class="text-sm text-gray-500 mt-1">
           View training information and eligible employees.
         </p>
