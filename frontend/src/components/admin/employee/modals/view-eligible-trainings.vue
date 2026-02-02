@@ -669,31 +669,27 @@ export default {
         });
 
         /* ------------------ SORT: MOST FIT FIRST ------------------ */
-
         const experienceMid =
           maxYears === Infinity ? minYears : (minYears + maxYears) / 2;
 
         priorityEmployees.sort((a, b) => {
-          /* 1️⃣ MORE TRAINING HOURS = HIGHER PRIORITY */
+          // 1️⃣ Most training hours first
           const hoursA = parseFloat(a.total_ld_hours_rendered) || 0;
           const hoursB = parseFloat(b.total_ld_hours_rendered) || 0;
-
           if (hoursA !== hoursB) return hoursB - hoursA;
 
-          /* 2️⃣ Experience closeness to required range */
+          // 2️⃣ Experience closeness to required range
           const expA = Math.abs(
             (parseFloat(a.total_years_experience) || 0) - experienceMid,
           );
           const expB = Math.abs(
             (parseFloat(b.total_years_experience) || 0) - experienceMid,
           );
-
           if (expA !== expB) return expA - expB;
 
-          /* 3️⃣ FEWER trainings attended */
+          // 3️⃣ Fewer trainings attended
           const countA = parseInt(a.total_count_of_learning_development) || 0;
           const countB = parseInt(b.total_count_of_learning_development) || 0;
-
           return countA - countB;
         });
 
