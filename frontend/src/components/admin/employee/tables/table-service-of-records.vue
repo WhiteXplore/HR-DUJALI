@@ -73,8 +73,11 @@
                   <th class="px-2 py-3 text-left border-b w-[25%]">
                     Designation
                   </th>
+                  <th class="px-2 py-3 text-left border-b w-[15%]">
+                    Edited By
+                  </th>
                   <th class="px-2 py-3 text-center border-b w-[20%]">Status</th>
-                  <th class="px-2 py-3 text-left border-b">Actions</th>
+                  <th class="px-2 py-3 text-center border-b">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,6 +98,9 @@
                   </td>
                   <td class="px-2 py-1 border-b text-left">
                     {{ data_service_records.latestDesignation }}
+                  </td>
+                  <td class="px-2 py-1 border-b text-left">
+                    {{ data_service_records.edited_by }}
                   </td>
 
                   <td class="px-2 py-1 border-b text-center">

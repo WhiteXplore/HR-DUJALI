@@ -75,29 +75,50 @@ export class ServiceOfRecordsService {
 
     return serviceOfRecord;
   }
-
   async update(
     id: number,
     updateDto: UpdateServiceOfRecordDto,
   ): Promise<ServiceOfRecord> {
-    const existing = await this.findOne(id);
+    const existing = await this.serviceOfRecordRepository.findOne({
+      where: { service_id: id },
+      relations: ['serviceRecords'],
+    });
 
     if (!existing) {
       throw new NotFoundException(`ServiceOfRecord with id ${id} not found`);
     }
 
-    // Update basic fields
-    Object.assign(existing, updateDto);
+    // ✅ Separate parent & children
+    const { serviceRecords, ...parentData } = updateDto;
 
-    // If you want to update child appointments (serviceRecords)
-    if (updateDto.serviceRecords && Array.isArray(updateDto.serviceRecords)) {
-      // Replace all existing child records (if that's your business rule)
-      existing.serviceRecords = updateDto.serviceRecords.map((recordDto) =>
-        this.recordOfAppointmentRepository.create(recordDto),
-      );
+    // ✅ Update parent safely
+    Object.assign(existing, parentData);
+    await this.serviceOfRecordRepository.save(existing);
+
+    // ✅ UPSERT child records
+    if (Array.isArray(serviceRecords)) {
+      for (const recordDto of serviceRecords) {
+        // 🔒 Ensure record belongs to this service
+        if (recordDto.record_id) {
+          await this.recordOfAppointmentRepository.update(
+            {
+              record_id: recordDto.record_id,
+              service_id: existing.service_id, // IMPORTANT
+            },
+            recordDto,
+          );
+        } else {
+          const newRecord = this.recordOfAppointmentRepository.create({
+            ...recordDto,
+            service_id: existing.service_id,
+          });
+
+          await this.recordOfAppointmentRepository.save(newRecord);
+        }
+      }
     }
 
-    return this.serviceOfRecordRepository.save(existing);
+    return this.findOne(id);
   }
 
   async remove(service_id: number): Promise<void> {

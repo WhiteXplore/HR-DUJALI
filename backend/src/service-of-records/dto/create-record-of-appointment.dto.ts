@@ -1,6 +1,10 @@
-import { IsString, MaxLength, IsOptional } from 'class-validator';
+import { IsString, MaxLength, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateRecordOfAppointmentDto {
+  @IsOptional()
+  @IsNumber()
+  record_id?: number;
+
   @IsString()
   @IsOptional()
   @MaxLength(155)

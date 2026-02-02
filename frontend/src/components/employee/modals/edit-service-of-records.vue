@@ -41,60 +41,50 @@
           </div>
         </div>
 
-        <!-- STEP 1 : PERSONAL INFORMATION -->
+        <!-- STEP 1 -->
         <div class="p-4 space-y-4" v-if="step === 1">
-          <div class="space-y-4 border-b pb-4">
-            <!-- Row 1 -->
-            <div class="flex gap-4">
-              <div class="w-full space-y-1">
-                <label class="font-bold">First Name</label>
-                <input v-model="form.first_name" class="input" />
-              </div>
-              <div class="w-full space-y-1">
-                <label class="font-bold">Middle Name</label>
-                <input v-model="form.middle_name" class="input" />
-              </div>
-              <div class="w-full space-y-1">
-                <label class="font-bold">Last Name</label>
-                <input v-model="form.last_name" class="input" />
-              </div>
+          <div class="flex gap-4">
+            <div class="w-full">
+              <label class="font-bold">First Name</label>
+              <input v-model="form.first_name" class="input" />
             </div>
+            <div class="w-full">
+              <label class="font-bold">Middle Name</label>
+              <input v-model="form.middle_name" class="input" />
+            </div>
+            <div class="w-full">
+              <label class="font-bold">Last Name</label>
+              <input v-model="form.last_name" class="input" />
+            </div>
+          </div>
 
-            <!-- Row 2 -->
-            <div class="flex gap-4">
-              <!-- <div class="w-full space-y-1">
-                <label class="font-bold">Employee ID</label>
-                <input v-model="form.employee_id" class="input" />
-              </div> -->
-
-              <div class="w-full space-y-1">
-                <label class="font-bold">Date of Birth</label>
-                <input type="date" v-model="form.birthdate" class="input" />
-              </div>
-              <div class="w-full space-y-1">
-                <label class="font-bold">Place of Birth</label>
-                <input v-model="form.birth_place" class="input" />
-              </div>
-              <!-- Department -->
-              <div class="w-full">
-                <label class="font-bold">Department</label>
-                <select v-model="form.department" class="input">
-                  <option disabled value="">Select Department</option>
-                  <option
-                    v-for="dept in departmentOptions"
-                    :key="dept"
-                    :value="dept"
-                  >
-                    {{ dept }}
-                  </option>
-                </select>
-              </div>
+          <div class="flex gap-4">
+            <div class="w-full">
+              <label class="font-bold">Date of Birth</label>
+              <input type="date" v-model="form.birthdate" class="input" />
+            </div>
+            <div class="w-full">
+              <label class="font-bold">Place of Birth</label>
+              <input v-model="form.birth_place" class="input" />
+            </div>
+            <div class="w-full">
+              <label class="font-bold">Department</label>
+              <select v-model="form.department" class="input">
+                <option disabled value="">Select Department</option>
+                <option
+                  v-for="dept in departmentOptions"
+                  :key="dept"
+                  :value="dept"
+                >
+                  {{ dept }}
+                </option>
+              </select>
             </div>
           </div>
         </div>
 
-        <!-- STEP 2 : RECORD OF APPOINTMENT -->
-        <div class="p-4 space-y-4" v-if="step === 2 && form.serviceRecords">
+        <!-- STEP 2 -->
+        <div class="p-4 space-y-4" v-if="step === 2">
           <div class="overflow-x-auto max-h-96 border">
             <table class="min-w-full text-[14px]">
               <thead class="bg-gray-100 sticky top-0">
@@ -116,11 +106,11 @@
                   <th class="th">DAILY RATE</th>
                 </tr>
               </thead>
+
               <tbody>
                 <tr
                   v-for="(record, index) in form.serviceRecords"
                   :key="record.record_id || index"
-                  class="hover:bg-gray-50"
                 >
                   <td class="td">
                     <input v-model="record.period_from" class="table-input" />
@@ -163,8 +153,8 @@
                   </td>
                   <td class="td">
                     <button
+                      class="text-red-500 text-xs"
                       @click="removeRow(index)"
-                      class="text-red-500 hover:text-red-700 text-xs"
                     >
                       Remove
                     </button>
@@ -175,14 +165,14 @@
           </div>
 
           <button
-            class="mt-2 bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1 rounded"
+            class="mt-2 bg-green-500 text-white text-xs px-3 py-1 rounded"
             @click="addRow"
           >
             Add Row
           </button>
         </div>
 
-        <!-- Footer Buttons -->
+        <!-- Footer -->
         <div class="flex justify-between p-4 border-t">
           <button
             v-if="step === 2"
@@ -232,15 +222,13 @@ export default {
   components: { icon },
 
   props: {
-    employeeServiceRecord: {
-      type: Object,
-      required: true,
-    },
+    employeeServiceRecord: Object,
+    authenticatedUser: Object, // <-- new prop
   },
 
   data() {
     return {
-      step: 1, // ✅ MASTER DEPARTMENT LIST
+      step: 1,
       departments: [
         "Office of the Mayor",
         "Sangguniang Bayan Office",
@@ -254,108 +242,90 @@ export default {
         "Municipal Social Welfare and Development Office",
       ],
       form: {
-        generated_service_id: "",
-        first_name: this.employeeServiceRecord.first_name || "",
-        middle_name: this.employeeServiceRecord.middle_name || "",
-        last_name: this.employeeServiceRecord.last_name || "",
-        birthdate: this.employeeServiceRecord.birthdate || "",
-        birth_place: this.employeeServiceRecord.birth_place || "",
-        employee_id: this.employeeServiceRecord.employee_id || "",
-        department: this.employeeServiceRecord.department || "",
-
-        // ✅ PRESERVE DATA
-        serviceRecords: (this.employeeServiceRecord.serviceRecords || []).map(
-          (r) => ({
-            ...r, // keep record_id
-          }),
-        ),
+        first_name: this.employeeServiceRecord.first_name,
+        middle_name: this.employeeServiceRecord.middle_name,
+        last_name: this.employeeServiceRecord.last_name,
+        birthdate: this.employeeServiceRecord.birthdate,
+        birth_place: this.employeeServiceRecord.birth_place,
+        department: this.employeeServiceRecord.department,
+        serviceRecords: [...this.employeeServiceRecord.serviceRecords],
       },
     };
   },
 
   computed: {
-    // ✅ AUTO-INJECT UNKNOWN DEPARTMENT
     departmentOptions() {
-      if (
-        this.form.department &&
-        !this.departments.includes(this.form.department)
-      ) {
-        return [this.form.department, ...this.departments];
-      }
-      return this.departments;
+      return this.departments.includes(this.form.department)
+        ? this.departments
+        : [this.form.department, ...this.departments];
     },
-
     activeStep() {
       return "bg-green-600 text-white";
     },
     inactiveStep() {
       return "bg-gray-200 text-gray-600";
     },
+    editorName() {
+      const user = this.authenticatedUser; // replace with the reactive user object
+      if (!user) return "System";
+      const middle = user.middle_name?.trim()
+        ? ` ${user.middle_name.trim()}`
+        : "";
+      return `${user.first_name}${middle} ${user.last_name}`;
+    },
   },
 
   methods: {
+    fetchUsers() {
+      axios
+        .get(process.env.VUE_APP_API_BASE_URL + "/user")
+        .then((res) => (this.users = res.data))
+        .catch((err) => console.error("Failed to fetch users:", err));
+    },
     addRow() {
-      this.form.serviceRecords.push({
-        period_from: "",
-        period_to: "",
-        roa_designation: "",
-        roa_sg: "",
-        roa_step: "",
-        roa_status: "",
-        roa_basic_salary: "",
-        roa_basic_salary_day: "",
-        office: "",
-        remarks: "",
-      });
+      this.form.serviceRecords.push({});
     },
 
     removeRow(index) {
       const record = this.form.serviceRecords[index];
+      if (!confirm("Delete this record?")) return;
 
-      if (!confirm("Are you sure you want to delete this record?")) return;
-
-      // ✅ delete from backend ONLY if existing
       if (record.record_id) {
-        axios
-          .delete(
-            `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.employeeServiceRecord.service_id}/record/${record.record_id}`,
-          )
-          .then(() => {
-            this.form.serviceRecords.splice(index, 1);
-            toast.success("Record deleted", { autoClose: 2000 });
-          })
-          .catch(() => {
-            toast.error("Delete failed", { autoClose: 2000 });
-          });
-      } else {
-        this.form.serviceRecords.splice(index, 1);
+        axios.delete(
+          `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.employeeServiceRecord.service_id}/record/${record.record_id}`,
+        );
       }
+
+      this.form.serviceRecords.splice(index, 1);
     },
 
     submitData() {
+      const middle = this.authenticatedUser?.middle_name?.trim()
+        ? ` ${this.authenticatedUser.middle_name.trim()}`
+        : "";
+
       const payload = {
         ...this.form,
-        serviceRecords: this.form.serviceRecords.map((r) => ({
-          record_id: r.record_id,
-          period_from: r.period_from || "",
-          period_to: r.period_to || "",
-          roa_designation: r.roa_designation || "",
-          roa_sg: r.roa_sg || "",
-          roa_step: r.roa_step || "",
-          roa_status: r.roa_status || "",
-          roa_basic_salary: r.roa_basic_salary || "",
-          roa_basic_salary_day: r.roa_basic_salary_day || "",
-          office: r.office || "",
-          remarks: r.remarks || "",
-          service_id: Number(this.employeeServiceRecord.service_id),
-        })),
+        edited_by: this.authenticatedUser
+          ? `${this.authenticatedUser.first_name}${middle} ${this.authenticatedUser.last_name}`
+          : "System",
       };
 
-      this.$emit("employee-updated", payload);
-      toast.success("Record updated successfully!", { autoClose: 2000 });
-      this.closeModal();
-    },
+      axios
+        .patch(
+          `${process.env.VUE_APP_API_BASE_URL}/service-of-records/${this.employeeServiceRecord.service_id}`,
+          payload,
+        )
+        .then((res) => {
+          toast.success("Service record updated!");
 
+          // 🔥 SEND UPDATED RECORD TO PARENT
+          this.$emit("employee-updated", res.data);
+
+          this.closeModal();
+        })
+        .catch(() => toast.error("Failed to save changes"));
+    },
     closeModal() {
       this.$emit("close");
     },

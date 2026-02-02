@@ -30,6 +30,9 @@ export class ServiceOfRecord {
   @Column({ type: 'varchar', nullable: true })
   service_status: string | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  edited_by: string | null;
+
   @OneToMany(() => RecordOfAppointment, (record) => record.serviceOfRecord, {
     cascade: true,
     onDelete: 'CASCADE',

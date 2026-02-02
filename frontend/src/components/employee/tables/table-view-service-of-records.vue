@@ -207,6 +207,7 @@
   <editServiceOfRecords
     v-if="isEditServiceOFREcords"
     :employeeServiceRecord="selectedEmployeeServiceRecord"
+    :authenticated-user="user"
     @close="closeEdit"
     @employee-updated="onEmployeeUpdated"
   />
