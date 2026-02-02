@@ -552,19 +552,17 @@ export default {
       if (!this.training || !this.employee_learning_development.length) return;
 
       try {
-        const res = await axios.get(
+        const employeesRes = await axios.get(
           process.env.VUE_APP_API_BASE_URL +
             "/upload/get-eligible-employees-trainings",
         );
 
-        const employees = res.data || [];
+        const employees = employeesRes.data || [];
 
-        /* ------------------ PREP ------------------ */
-
+        // ------------------ PREP ------------------
         const exactTitle = this.normalize(this.training.title);
         const baseTitle = this.normalizeBaseTitle(this.training.title);
 
-        // ✅ EXPERIENCE RANGE (YEAR-BASED, INCLUSIVE)
         const minYears =
           typeof this.training.experience_year_from === "number"
             ? this.training.experience_year_from
@@ -575,15 +573,14 @@ export default {
             ? this.training.experience_year_to
             : parseFloat(this.training.experience_year_to) || Infinity;
 
-        // ✅ TRAINING HOURS
-        const trainingHours = parseFloat(this.training.training_hours);
+        const trainingHours = parseFloat(this.training.training_hours) || 0;
 
         const FOUR_YEARS_AGO = new Date();
         FOUR_YEARS_AGO.setFullYear(FOUR_YEARS_AGO.getFullYear() - 4);
 
         const priorityEmployees = [];
 
-        /* ------------------ LOOP ------------------ */
+        // ------------------ LOOP ------------------
         employees.forEach((emp) => {
           const empLD = this.employee_learning_development.find(
             (e) => e.first_table_id === emp.first_table_id,
@@ -591,17 +588,16 @@ export default {
 
           const fifthTable = empLD?.fifthTable || [];
 
-          /* ❌ EXCLUDE: exact same training title */
+          // ❌ EXCLUDE: exact same training title
           if (
             fifthTable.some(
               (r) =>
                 this.normalize(r.title_learning_development) === exactTitle,
             )
-          ) {
+          )
             return;
-          }
 
-          /* ❌ EXCLUDE: same base title within 4 years */
+          // ❌ EXCLUDE: same base title within 4 years
           if (
             fifthTable.some((r) => {
               if (
@@ -609,16 +605,14 @@ export default {
                 baseTitle
               )
                 return false;
-
               return new Date(r.ld_from) >= FOUR_YEARS_AGO;
             })
-          ) {
+          )
             return;
-          }
 
-          /* ---------------- ELIGIBILITY ---------------- */
+          // ---------------- ELIGIBILITY ----------------
 
-          /* Employment Status */
+          // Employment Status
           const matchesStatus =
             !this.training.employment_statuses?.length ||
             this.training.employment_statuses.some(
@@ -627,20 +621,19 @@ export default {
                 this.normalize(s.name),
             );
 
-          /* Education */
+          // Education
           const matchesEducation =
             !this.training.training_educational_levels?.length ||
             this.training.training_educational_levels.some(
               (lvl) => this.normalize(emp.level) === this.normalize(lvl.name),
             );
 
-          /* ✅ EXPERIENCE (YEAR-BASED, INCLUSIVE) */
+          // Experience (year-based)
           const rawYears = parseFloat(emp.total_years_experience);
           const wholeYears = isNaN(rawYears) ? 0 : Math.floor(rawYears);
-
           const matchesYears = wholeYears >= minYears && wholeYears <= maxYears;
 
-          /* Position */
+          // Position
           const matchesPosition =
             !this.training.training_positions?.length ||
             this.training.training_positions.some(
@@ -649,14 +642,13 @@ export default {
                 this.normalize(pos.name),
             );
 
-          /* LD HOURS (FIT IN RANGE ONLY) */
+          // Training Hours
           const renderedHours = parseFloat(emp.total_ld_hours_rendered);
-          const matchesHours =
-            isNaN(trainingHours) ||
-            (!isNaN(renderedHours) && renderedHours >= trainingHours);
+          const matchesHours = isNaN(renderedHours)
+            ? false
+            : renderedHours >= trainingHours;
 
-          /* ---------------- FINAL FILTER ---------------- */
-
+          // ---------------- FINAL FILTER ----------------
           if (
             matchesStatus &&
             matchesEducation &&
@@ -668,7 +660,7 @@ export default {
           }
         });
 
-        /* ------------------ SORT: MOST FIT FIRST ------------------ */
+        // ------------------ SORT: Most fit first ------------------
         const experienceMid =
           maxYears === Infinity ? minYears : (minYears + maxYears) / 2;
 
@@ -678,7 +670,7 @@ export default {
           const hoursB = parseFloat(b.total_ld_hours_rendered) || 0;
           if (hoursA !== hoursB) return hoursB - hoursA;
 
-          // 2️⃣ Experience closeness to required range
+          // 2️⃣ Experience closeness to midpoint
           const expA = Math.abs(
             (parseFloat(a.total_years_experience) || 0) - experienceMid,
           );
@@ -693,11 +685,11 @@ export default {
           return countA - countB;
         });
 
-        /* ------------------ ASSIGN ------------------ */
-
+        // ------------------ ASSIGN ------------------
         this.eligibleEmployees = priorityEmployees;
       } catch (error) {
         console.error("Error fetching eligible employees:", error);
+        toast.error("Failed to load eligible employees.");
       }
     },
     /* -------------------- ACTIONS -------------------- */
