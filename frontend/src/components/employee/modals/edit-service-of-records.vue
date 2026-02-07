@@ -241,6 +241,7 @@ export default {
         "Municipal Health Office",
         "Municipal Social Welfare and Development Office",
       ],
+      originalForm: null,
       form: {
         first_name: this.employeeServiceRecord.first_name,
         middle_name: this.employeeServiceRecord.middle_name,
@@ -276,6 +277,9 @@ export default {
   },
 
   methods: {
+    hasChanges() {
+      return JSON.stringify(this.form) !== JSON.stringify(this.originalForm);
+    },
     fetchUsers() {
       axios
         .get(process.env.VUE_APP_API_BASE_URL + "/user")
@@ -304,8 +308,13 @@ export default {
         ? ` ${this.authenticatedUser.middle_name.trim()}`
         : "";
 
+      const isChanged = this.hasChanges();
+
       const payload = {
         ...this.form,
+        service_status: isChanged
+          ? null
+          : this.employeeServiceRecord.service_status,
         edited_by: this.authenticatedUser
           ? `${this.authenticatedUser.first_name}${middle} ${this.authenticatedUser.last_name}`
           : "System",
@@ -317,18 +326,24 @@ export default {
           payload,
         )
         .then((res) => {
-          toast.success("Service record updated!");
+          toast.success(
+            isChanged
+              ? "Service record updated (status reset)."
+              : "No changes detected.",
+          );
 
-          // 🔥 SEND UPDATED RECORD TO PARENT
           this.$emit("employee-updated", res.data);
-
           this.closeModal();
         })
         .catch(() => toast.error("Failed to save changes"));
     },
+
     closeModal() {
       this.$emit("close");
     },
+  },
+  mounted() {
+    this.originalForm = JSON.parse(JSON.stringify(this.form));
   },
 };
 </script>
