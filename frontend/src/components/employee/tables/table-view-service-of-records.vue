@@ -2,13 +2,13 @@
   <div class="mt-4 overflow-x-auto border p-2 rounded-xl" v-if="isOpenView">
     <div class="p-2">
       <!-- Back & Action Buttons -->
-      <div class="flex justify-between">
-        <div
+      <div class="flex justify-end">
+        <!-- <div
           @click="toggleEdit"
           class="cursor-pointer flex gap-2 items-center tracking-wider bg-green-500 text-white text-sm hover:text-green-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-green-900 hover:shadow-lg transition-all duration-300"
         >
           Edit
-        </div>
+        </div> -->
         <div class="flex gap-2">
           <button
             @click="previewPDF"
@@ -47,7 +47,7 @@
                     {{ matchingRecord.last_name }}
                   </p>
                 </div>
-                <div class="flex items-center gap-2">
+                <!-- <div class="flex items-center gap-2">
                   <h2 class="font-semibold">Status:</h2>
                   <span
                     class="px-3 py-1 rounded-full text-white text-xs font-bold"
@@ -63,7 +63,7 @@
                   >
                     {{ matchingRecord.service_status || "Not Yet Verified" }}
                   </span>
-                </div>
+                </div> -->
               </div>
 
               <div class="flex gap-[27px] under">

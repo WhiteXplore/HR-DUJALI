@@ -164,4 +164,10 @@ export class FirstTable {
 
   @Column({ name: 'employee_id', type: 'varchar', default: '' })
   employee_id: string;
+
+  @Column({ name: 'employee_type', type: 'varchar', default: '' })
+  employment_type: string;
+
+  @Column({ name: 'image_filename', type: 'varchar', default: '' })
+  image_filename: string;
 }

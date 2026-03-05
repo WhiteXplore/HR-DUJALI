@@ -41,12 +41,24 @@
             <span class="ml-2">Per page</span>
           </div>
 
-          <!-- Search -->
-          <div class="flex items-center">
+          <!-- Search + Filter -->
+          <div class="flex items-center gap-2">
+            <!-- Employment Type Filter -->
+            <select
+              v-model="employmentTypeFilter"
+              class="px-3 py-3 border rounded-md bg-white"
+              @change="changePage(1)"
+            >
+              <option value="">All Types</option>
+              <option value="JO">JO</option>
+              <option value="Regular">Regular</option>
+            </select>
+
+            <!-- Search -->
             <input
               v-model="searchQuery"
               type="text"
-              class="px-3 w-[300px] py-3 border rounded-md"
+              class="px-3 w-[250px] py-3 border rounded-md"
               placeholder="Search..."
               @input="changePage(1)"
             />
@@ -63,13 +75,20 @@
                 class="bg-Green text-gray-700 tracking-wider font-regular sticky top-0 z-10"
               >
                 <tr>
-                  <th class="w-[50px] px-5 py-3 text-center border-b">ID</th>
-                  <th class="px-2 py-3 text-left border-b">Employment ID</th>
+                  <!-- <th class="w-[50px] px-5 py-3 text-center border-b">ID</th> -->
+                  <th class="px-2 py-3 text-left border-b w-[8%]">
+                    Employment ID
+                  </th>
                   <th class="px-2 py-3 text-left border-b">Full Name</th>
-                  <th class="px-2 py-3 text-left border-b">
+                  <th class="px-2 py-3 text-center border-b">
                     Employement Status
                   </th>
-                  <th class="px-2 py-3 text-left border-b">Actions</th>
+                  <th class="px-2 py-3 text-center border-b">
+                    Employement Type
+                  </th>
+                  <th class="px-2 py-3 text-center border-b w-[20%]">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -78,18 +97,18 @@
                   :key="data_employee_profile.first_table_id"
                   :class="{ 'bg-blue-50 border-b': (index + 1) % 2 === 0 }"
                 >
-                  <td class="px-2 py-1 border-b">{{ startIndex + index }}</td>
+                  <!-- <td class="px-2 py-1 border-b">{{ startIndex + index }}</td> -->
 
-                  <td class="px-2 py-1 border-b text-left">
+                  <td class="px-7 py-1 border-b text-left">
                     {{ data_employee_profile.employee_id }}
                   </td>
                   <td class="px-2 py-1 border-b text-left">
+                    {{ data_employee_profile.last_name }},
                     {{ data_employee_profile.first_name }}
                     {{ data_employee_profile.middle_name }}
-                    {{ data_employee_profile.last_name }}
                   </td>
 
-                  <td class="px-10 py-1 border-b text-left">
+                  <td class="px-10 py-1 border-b text-center">
                     <span
                       class="px-2 py-1 text-xs font-semibold rounded-full border"
                       :class="{
@@ -106,9 +125,12 @@
                       {{ data_employee_profile.employment_status }}
                     </span>
                   </td>
+                  <td class="px-2 py-1 border-b text-center">
+                    {{ data_employee_profile.employment_type }},
+                  </td>
 
                   <td class="px-2 py-2 border-b">
-                    <div class="flex gap-1">
+                    <div class="flex justify-center gap-2">
                       <router-link
                         to="/employement-records/view-employee-profile"
                         class="p-2 py-1 h-8 border-2 border-blue-200 hover:bg-blue-300 text-blue-700 rounded-lg flex gap-1"
@@ -288,19 +310,37 @@ export default {
       showDeleteModal: false,
       isUploadData: false,
       recordToDelete: null,
+      employmentTypeFilter: "",
     };
   },
   computed: {
     filteredData() {
       if (!this.data_employee_profile) return [];
-      if (!this.searchQuery.trim()) return this.data_employee_profile;
-      const query = this.searchQuery.toLowerCase();
-      return this.data_employee_profile.filter(
-        (item) =>
-          item.student_id?.toLowerCase().includes(query) ||
-          item.first_name?.toLowerCase().includes(query) ||
-          item.last_name?.toLowerCase().includes(query) ||
-          item.program_course?.toLowerCase().includes(query),
+
+      let data = this.data_employee_profile;
+
+      // 🔍 Search filter
+      if (this.searchQuery.trim()) {
+        const query = this.searchQuery.toLowerCase();
+        data = data.filter(
+          (item) =>
+            item.employee_id?.toLowerCase().includes(query) ||
+            item.first_name?.toLowerCase().includes(query) ||
+            item.last_name?.toLowerCase().includes(query) ||
+            item.employment_status?.toLowerCase().includes(query),
+        );
+      }
+
+      // ✅ Employment Type Filter
+      if (this.employmentTypeFilter) {
+        data = data.filter(
+          (item) => item.employment_type === this.employmentTypeFilter,
+        );
+      }
+
+      // ✅ Sort alphabetically by LAST NAME
+      return [...data].sort((a, b) =>
+        (a.last_name || "").localeCompare(b.last_name || ""),
       );
     },
     totalPages() {
@@ -320,7 +360,19 @@ export default {
       return end > this.filteredData.length ? this.filteredData.length : end;
     },
     pageNumbers() {
-      return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+      const maxVisible = 3;
+
+      let start = this.currentPage - 1;
+      if (start < 1) start = 1;
+
+      let end = start + maxVisible - 1;
+
+      if (end > this.totalPages) {
+        end = this.totalPages;
+        start = Math.max(1, end - maxVisible + 1);
+      }
+
+      return Array.from({ length: end - start + 1 }, (_, i) => start + i);
     },
   },
   methods: {

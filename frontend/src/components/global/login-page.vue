@@ -12,7 +12,7 @@
     <!-- Form Container -->
     <div class="flex items-center justify-center min-h-screen relative z-20">
       <div
-        class="w-[43vw] h-auto bg-white rounded-xl shadow-lg flex overflow-hidden p-2"
+        class="w-[43vw] h-auto bg-white rounded-2xl shadow-lg flex overflow-hidden p-2"
       >
         <!-- Left Panel -->
         <div
@@ -35,18 +35,17 @@
 
         <!-- Right Panel -->
         <div
-          class="w-full md:w-1/2 bg-white text-gray-900 flex items-start justify-center px-5 py-10"
+          class="w-full md:w-1/2 bg-white text-gray-900 flex items-start justify-center px-5 py-5"
         >
           <div class="w-full max-w-[400px] space-y-6">
             <!-- Logo and Title -->
-            <div class="flex flex-col items-center">
+            <div class="flex flex-col gap-4 items-center">
               <img
                 src="../../assets/img/dujali-logo.png"
                 alt="Logo"
-                class="w-[90px] mb-2"
+                class="w-[120px]"
               />
               <h1 class="text-center text-lg font-bold leading-tight">
-                Municipality of Braulio E. Dujali<br />
                 Human Resource Management System
               </h1>
             </div>
@@ -275,7 +274,7 @@ export default {
             email: this.email,
             password: this.password,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         // Get role from response.user.role if needed
@@ -309,7 +308,7 @@ export default {
             position: this.position,
             office: this.office,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         toast.success("Registration successful! You may now log in.");

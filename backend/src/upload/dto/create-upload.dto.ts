@@ -277,6 +277,14 @@ export class CreateUploadDto {
   @IsString()
   employee_id?: string;
 
+  @IsOptional()
+  @IsString()
+  employment_type?: string;
+
+  @IsOptional()
+  @IsString()
+  image_filename?: string;
+
   // Nested arrays (optional, but must be arrays if present)
   @IsOptional()
   @IsArray()

@@ -330,18 +330,21 @@ import axios from "axios";
 export default {
   name: "AddAvailableTrainingModal",
   components: { icon },
+
   props: {
     editData: { type: Object, default: null },
   },
+
   data() {
     return {
+      isInitializing: true,
+
       form: {
         title: "",
         title_description: "",
         date_from: "",
         date_to: "",
         category: "",
-        target_group: "",
         employment_status: [],
         educational_level: [],
         experience_year_from: "",
@@ -350,38 +353,49 @@ export default {
         type_of_ld: "",
         training_position: [],
       },
+
       service_positions: [],
+
       employmentStatuses: [
         { name: "Permanent" },
         { name: "Contractual" },
         { name: "Job Order" },
       ],
+
       educationalLevels: [
         { name: "College" },
         { name: "Secondary" },
         { name: "Vocational/Trade Course" },
         { name: "Elementary" },
       ],
-      target_groups: [],
+
       currentStep: 1,
       totalSteps: 2,
+
       selectedEmploymentStatus: "",
       selectedPosition: "",
+      selectedEducation: "",
     };
   },
 
   watch: {
     "form.category"(newVal) {
+      // 🚫 Prevent watcher from running during edit initialization
+      if (this.isInitializing) return;
+
       if (newVal === "General") {
-        // Keep as object array
+        // Auto-select all
         this.form.training_position = this.service_positions.map((p) => ({
           name: p.name,
         }));
+
         this.form.educational_level = this.educationalLevels.map((e) => e.name);
+
         this.form.employment_status = this.employmentStatuses.map(
           (e) => e.name,
         );
       } else if (newVal === "Specialized") {
+        // Clear for manual selection
         this.form.training_position = [];
         this.form.educational_level = [];
         this.form.employment_status = [];
@@ -389,22 +403,59 @@ export default {
     },
   },
 
-  mounted() {
+  async mounted() {
+    await this.fetchService();
+
     if (this.editData) {
       this.form = {
         ...this.form,
         ...this.editData,
-        type_of_ld: this.editData.type_of_ld || "",
-        training_position: this.editData.training_positions || [],
-        employment_status: this.editData.employment_statuses || [],
-        educational_level: this.editData.educational_levels || [],
+
+        training_position: this.editData.training_positions
+          ? this.editData.training_positions.map((p) => ({ name: p.name }))
+          : [],
+
+        employment_status: this.editData.employment_statuses
+          ? this.editData.employment_statuses.map((s) => s.name)
+          : [],
+
+        educational_level: this.editData.training_educational_levels
+          ? this.editData.training_educational_levels.map((e) => e.name)
+          : [],
       };
     }
 
-    this.fetchService();
+    // ✅ Allow watcher after initialization
+    this.$nextTick(() => {
+      this.isInitializing = false;
+    });
   },
 
   methods: {
+    async fetchService() {
+      try {
+        const response = await axios.get(
+          process.env.VUE_APP_API_BASE_URL + "/service-of-records/get-all",
+        );
+
+        const allRecords = response.data.flatMap((emp) => emp.serviceRecords);
+
+        const uniquePositions = [
+          ...new Set(
+            allRecords
+              .map((r) => r.roa_designation?.trim())
+              .filter((r) => r && r !== "N/A"),
+          ),
+        ];
+
+        this.service_positions = uniquePositions.map((pos) => ({
+          name: pos,
+        }));
+      } catch (error) {
+        console.error("Error fetching service positions:", error);
+      }
+    },
+
     addPosition() {
       if (
         this.selectedPosition &&
@@ -416,11 +467,13 @@ export default {
       }
       this.selectedPosition = "";
     },
+
     removePosition(pos) {
       this.form.training_position = this.form.training_position.filter(
         (p) => p.name !== pos.name,
       );
     },
+
     addEmploymentStatus() {
       if (
         this.selectedEmploymentStatus &&
@@ -430,6 +483,7 @@ export default {
       }
       this.selectedEmploymentStatus = "";
     },
+
     removeEmploymentStatus(status) {
       this.form.employment_status = this.form.employment_status.filter(
         (s) => s !== status,
@@ -445,66 +499,16 @@ export default {
       }
       this.selectedEducation = "";
     },
+
     removeEducation(level) {
       this.form.educational_level = this.form.educational_level.filter(
         (l) => l !== level,
       );
     },
-    fetchService() {
-      axios
-        .get(process.env.VUE_APP_API_BASE_URL + "/service-of-records/get-all")
-        .then((response) => {
-          const allRecords = response.data.flatMap((emp) => emp.serviceRecords);
-          const uniquePositions = [
-            ...new Set(
-              allRecords
-                .map((r) => r.roa_designation?.trim())
-                .filter((r) => r && r !== "N/A"),
-            ),
-          ];
-          this.service_positions = uniquePositions.map((pos) => ({
-            name: pos,
-          }));
 
-          if (this.editData) {
-            // ✅ Preserve existing values
-            this.form.type_of_ld = this.editData.type_of_ld || "";
-
-            this.form.training_position = this.editData.training_positions
-              ? this.editData.training_positions.map((p) => {
-                  return (
-                    this.service_positions.find((sp) => sp.name === p.name) || {
-                      name: p.name,
-                    }
-                  );
-                })
-              : [];
-
-            if (this.editData.employment_status) {
-              const selectedStatuses = this.editData.employment_status
-                .split(",")
-                .map((s) => s.trim());
-              this.form.employment_status = this.employmentStatuses.filter(
-                (e) => selectedStatuses.includes(e.name),
-              );
-            }
-
-            if (this.editData.educational_level) {
-              const selectedLevels = this.editData.educational_level
-                .split(",")
-                .map((s) => s.trim());
-              this.form.educational_level = this.educationalLevels.filter((e) =>
-                selectedLevels.includes(e.name),
-              );
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching service positions:", error);
-        });
-    },
     async saveTraining() {
       const formEl = this.$refs.trainingForm;
+
       if (!formEl.checkValidity()) {
         formEl.reportValidity();
         return;
@@ -522,14 +526,11 @@ export default {
           experience_year_from: this.form.experience_year_from,
           experience_year_to: this.form.experience_year_to,
           training_position: this.form.training_position.map((p) => p.name),
-
-          employment_status: this.form.employment_status, // strings
-          training_educational_level: this.form.educational_level, // strings
+          employment_status: this.form.employment_status,
+          training_educational_level: this.form.educational_level,
         };
 
-        console.log("Final Payload:", payload);
-
-        if (this.editData && this.editData.training_id) {
+        if (this.editData?.training_id) {
           await axios.patch(
             `${process.env.VUE_APP_API_BASE_URL}/available-trainings/update-training/${this.editData.training_id}`,
             payload,
@@ -553,6 +554,7 @@ export default {
     nextStep() {
       if (this.currentStep < this.totalSteps) this.currentStep++;
     },
+
     prevStep() {
       if (this.currentStep > 1) this.currentStep--;
     },

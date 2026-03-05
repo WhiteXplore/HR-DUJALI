@@ -64,6 +64,7 @@ export class UploadService {
       agency,
       employment_status,
       employee_id,
+      employment_type,
 
       // New address fields
       house_number,
@@ -114,6 +115,7 @@ export class UploadService {
       agency,
       employment_status,
       employee_id,
+      employment_type,
 
       // Include new address fields
       house_number,
@@ -209,6 +211,20 @@ export class UploadService {
       message: 'Upload created successfully',
       id: savedFirst.first_table_id,
     };
+  }
+
+  async findByEmployeeId(employeeId: string) {
+    const record = await this.firstTableRepository.findOne({
+      where: { employee_id: employeeId },
+    });
+
+    if (!record) {
+      throw new NotFoundException(
+        `Record with Employee ID ${employeeId} not found`,
+      );
+    }
+
+    return record;
   }
 
   async findAll() {
@@ -312,6 +328,21 @@ export class UploadService {
 `,
     );
     return rawData;
+  }
+
+  async updateImage(id: number, filename: string) {
+    // Find the existing record
+    const record = await this.firstTableRepository.findOne({
+      where: { first_table_id: id },
+    });
+    if (!record) {
+      throw new Error('Record not found');
+    }
+
+    // Update only the image_filename
+    record.image_filename = filename;
+
+    return this.firstTableRepository.save(record);
   }
 
   // Inside UploadService

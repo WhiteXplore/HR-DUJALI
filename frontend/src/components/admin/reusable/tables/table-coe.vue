@@ -138,7 +138,7 @@
   </div>
   <viewCoe
     v-if="isRecordVisible"
-    :serviceId="selectedServiceRecord?.service_id"
+    :recordData="selectedServiceRecord"
     @back-to-table-coe="handleBackToTable"
   />
 </template>
@@ -264,13 +264,26 @@ export default {
     },
 
     toggleViewOpen(serviceRecord) {
-      // Set the selected service record to show in viewServiceRecords
-      this.selectedServiceRecord = serviceRecord;
-      this.isRecordVisible = true;
-      console.log("Selected Service ID:", serviceRecord.service_id); // Log the service_id to console
-      this.isTable = false;
-    },
+      // Find matching employee profile
+      const employee = this.data_employee_profile.find(
+        (emp) => emp.employee_id === serviceRecord.employee_id,
+      );
 
+      // Merge gender safely
+      this.selectedServiceRecord = {
+        ...serviceRecord,
+        gender: employee ? employee.gender : null,
+      };
+
+      this.isRecordVisible = true;
+      this.isTable = false;
+
+      console.log(
+        "Selected Service ID:",
+        this.selectedServiceRecord.service_id,
+      );
+      console.log("Gender:", this.selectedServiceRecord.gender);
+    },
     toggleLogHistory(item) {
       this.$emit("history-student", item);
     },

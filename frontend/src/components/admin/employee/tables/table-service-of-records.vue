@@ -63,7 +63,7 @@
                 class="bg-Green text-gray-700 tracking-wider font-regular sticky top-0 z-10"
               >
                 <tr>
-                  <th class="w-[50px] px-5 py-3 text-center border-b">ID</th>
+                  <!-- <th class="w-[50px] px-5 py-3 text-center border-b">ID</th> -->
                   <th class="px-2 py-3 text-left border-b w-[20%]">
                     Full Name
                   </th>
@@ -73,11 +73,13 @@
                   <th class="px-2 py-3 text-left border-b w-[25%]">
                     Designation
                   </th>
-                  <th class="px-2 py-3 text-left border-b w-[15%]">
+                  <!-- <th class="px-2 py-3 text-left border-b w-[15%]">
                     Edited By
+                  </th> -->
+                  <!-- <th class="px-2 py-3 text-center border-b w-[20%]">Status</th> -->
+                  <th class="px-2 py-3 text-center border-b w-[10%]">
+                    Actions
                   </th>
-                  <th class="px-2 py-3 text-center border-b w-[20%]">Status</th>
-                  <th class="px-2 py-3 text-center border-b">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -86,7 +88,7 @@
                   :key="data_service_records.service_id"
                   :class="{ 'bg-blue-50 border-b': (index + 1) % 2 === 0 }"
                 >
-                  <td class="px-2 py-1 border-b">{{ startIndex + index }}</td>
+                  <!-- <td class="px-2 py-1 border-b">{{ startIndex + index }}</td> -->
 
                   <td class="px-2 py-1 border-b text-left uppercase">
                     {{ data_service_records.first_name }}
@@ -99,11 +101,11 @@
                   <td class="px-2 py-1 border-b text-left">
                     {{ data_service_records.latestDesignation }}
                   </td>
-                  <td class="px-2 py-1 border-b text-left">
+                  <!-- <td class="px-2 py-1 border-b text-left">
                     {{ data_service_records.edited_by }}
-                  </td>
+                  </td> -->
 
-                  <td class="px-2 py-1 border-b text-center">
+                  <!-- <td class="px-2 py-1 border-b text-center">
                     <span
                       :class="[
                         'px-2 py-1 rounded-full text-white text-xs font-semibold',
@@ -121,7 +123,7 @@
                         "Not Yet Verified"
                       }}
                     </span>
-                  </td>
+                  </td> -->
 
                   <td class="px-2 py-2 border-b">
                     <div class="flex gap-1">
@@ -137,13 +139,14 @@
                         class="p-2 py-1 h-8 border-2 border-green-200 hover:bg-green-300 text-green-700 rounded-lg flex gap-1"
                         @click="toggleEdit(data_service_records)"
                       >
-                        <icon name="edit" /> Edit</button
-                      ><button
+                        <icon name="edit" /> Edit
+                      </button>
+                      <!-- <button
                         class="p-2 py-1 h-8 border-2 border-yellow-300 hover:bg-yellow-300 text-yellow-700 rounded-lg flex gap-1"
                         @click="verifyRecord(data_service_records)"
                       >
                         <icon name="check-circle" /> Verified
-                      </button>
+                      </button> -->
 
                       <button
                         class="p-2 py-1 h-8 border-2 border-red-200 hover:bg-red-300 text-red-700 rounded-lg flex gap-1"

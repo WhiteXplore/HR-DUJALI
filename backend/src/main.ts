@@ -3,10 +3,12 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
+import { NestExpressApplication } from '@nestjs/platform-express'; // ✅
+import { join } from 'path'; // ✅
 
 async function bootstrap() {
   try {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule); // ✅
 
     // Enable global validation
     app.useGlobalPipes(new ValidationPipe());
@@ -14,13 +16,17 @@ async function bootstrap() {
     // Use cookie parser
     app.use(cookieParser());
 
+    // Serve static files
+    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+      prefix: '/uploads/',
+    });
+
     // Increase request payload size
-    app.use(bodyParser.json({ limit: '5mb' })); // adjust as needed
+    app.use(bodyParser.json({ limit: '5mb' }));
     app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
+    // CORS
     const curdate = new Date();
-
-    // CORS configuration
     const whiteList = ['http://localhost:8080', 'http://localhost:5173'];
     app.enableCors({
       origin: (origin, callback) => {
@@ -42,7 +48,6 @@ async function bootstrap() {
       credentials: true,
     });
 
-    // Listen on environment port or fallback to 8000
     const port = process.env.PORT || 8000;
     await app.listen(port);
 

@@ -8,11 +8,17 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
 import { CreateUploadDto } from './dto/create-upload.dto';
 import { UpdateLearningDto } from './dto/update-leadning.dto';
 import { FifthTable } from './entities/fifthTable.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { Express } from 'express';
 
 @Controller('upload')
 export class UploadController {
@@ -50,6 +56,10 @@ export class UploadController {
   async getEligibleEmployeesForTrainings() {
     return await this.uploadService.getEligibleEmployeesFromView();
   }
+  @Get('employee/:employeeId')
+  async findByEmployeeId(@Param('employeeId') employeeId: string) {
+    return await this.uploadService.findByEmployeeId(employeeId);
+  }
 
   @Get(':id')
   async findById(@Param('id') id: number) {
@@ -59,6 +69,37 @@ export class UploadController {
   // ===============================
   // UPDATE DATA
   // ===============================
+
+  // ✅ Upload / Update only employee image
+
+  @Patch('upload-image/:id')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          cb(null, `image-${uniqueSuffix}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          cb(new Error('Only image files are allowed!'), false);
+        } else {
+          cb(null, true);
+        }
+      },
+    }),
+  )
+  async uploadImage(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) throw new Error('No file uploaded');
+    return this.uploadService.updateImage(id, file.filename);
+  }
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(

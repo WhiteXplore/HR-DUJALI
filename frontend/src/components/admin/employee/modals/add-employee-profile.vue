@@ -250,16 +250,18 @@
                   />
                 </div>
               </div>
-              <div class="flex gap-x-4">
+              <div class="flex flex-grow gap-x-4">
                 <div class="flex flex-col space-y-2 w-full">
                   <label class="font-semibold text-xs">Employment Id:</label>
                   <input
                     v-model="form.employee_id"
                     type="text"
-                    class="px-3 py-3 border w-[300px] border-gray-300 rounded-md text-gray-700"
+                    class="px-3 py-3 border w-full border-gray-300 rounded-md text-gray-700"
                     placeholder="Enter employee id ..."
                   />
                 </div>
+              </div>
+              <div class="flex gap-x-4">
                 <div class="flex flex-col space-y-2 w-full">
                   <label class="font-semibold text-xs"
                     >Employment Status:</label
@@ -268,9 +270,20 @@
                     v-model="form.employment_status"
                     class="px-3 py-3 border w-full border-gray-300 rounded-md text-gray-700"
                   >
-                    <option disabled value="">Select Status</option>
+                    <option disabled value="">Select Option</option>
                     <option value="Active">Active</option>
                     <option value="InActive">InActive</option>
+                  </select>
+                </div>
+                <div class="flex flex-col space-y-2 w-full">
+                  <label class="font-semibold text-xs">Employment Type:</label>
+                  <select
+                    v-model="form.employment_type"
+                    class="px-3 py-3 border w-full border-gray-300 rounded-md text-gray-700"
+                  >
+                    <option disabled value="">Select Option</option>
+                    <option value="Regular">Regular</option>
+                    <option value="JO">Job Order</option>
                   </select>
                 </div>
               </div>
@@ -1148,6 +1161,7 @@ export default {
         same_zip_code: "",
         employment_status: "",
         employee_id: "",
+        employment_type: "",
       },
       validationErrors: [],
       showValidationModal: false,

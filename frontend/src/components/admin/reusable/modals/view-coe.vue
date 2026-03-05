@@ -1,8 +1,9 @@
 <template>
-  <div class="mt-4 overflow-x-auto p-2 rounded-xl bg-gray-50" v-if="isOpenView">
+  <div class="mt-4 overflow-x-auto p-2 rounded-xl bg-gray-50">
     <!-- Header -->
     <div class="p-2">
       <div class="flex justify-between items-start w-full">
+        <!-- Back Button -->
         <div
           @click="toggleBack"
           class="cursor-pointer flex gap-2 items-center tracking-wider bg-red-500 text-white text-sm hover:text-red-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-red-900 hover:shadow-lg transition-all duration-300"
@@ -10,26 +11,29 @@
           Back
         </div>
 
-        <div class="flex gap-2">
-          <!-- Download COE -->
-          <div
-            class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-500 text-white text-sm hover:text-blue-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-blue-900 hover:shadow-lg transition-all duration-300"
-          >
-            <icon name="download1" />
-            <button @click="showDownloadAlert">Download PDF</button>
-          </div>
+        <!-- Download Button -->
+        <div
+          class="cursor-pointer flex gap-2 items-center tracking-wider bg-blue-500 text-white text-sm hover:text-blue-700 p-3 py-2 rounded-xl hover:bg-white border hover:border-blue-900 hover:shadow-lg transition-all duration-300"
+          @click="showDownloadAlert"
+        >
+          <icon name="download1" />
+          Download PDF
         </div>
       </div>
 
-      <h2 class="text-lg font-semibold">Certification of Employment Preview</h2>
+      <h2 class="text-lg font-semibold mt-4">
+        Certification of Employment Preview
+      </h2>
 
-      <div class="w-full h-[740px] overflow-auto" v-if="matchingRecord">
+      <!-- Certificate Preview -->
+      <div class="w-full h-[740px] overflow-auto" v-if="recordData">
         <div class="flex justify-center w-full mt-2">
           <div class="bg-gray-200 p-4 border shadow flex justify-center">
             <div
               ref="certificate"
               class="bg-white w-[210mm] h-[297mm] p-[70px] box-border shadow-md text-gray-900 relative"
             >
+              <!-- Logo -->
               <img
                 src="../../../../assets/img/dujali-logo.png"
                 alt="Logo"
@@ -38,9 +42,8 @@
 
               <!-- Header -->
               <div
-                class="absolute top-2 left-1/2 transform -translate-x-1/2 mt-5 flex flex-col items-center gap-1 font-bold text-[16px] font-sans"
+                class="absolute top-2 left-1/2 transform -translate-x-1/2 mt-5 flex flex-col items-center gap-1 font-bold text-[16px]"
               >
-                .
                 <h1>Republic of the Philippines</h1>
                 <h1>Province of Davao del Norte</h1>
                 <h1>Municipality of Braulio E. Dujali</h1>
@@ -52,22 +55,20 @@
               </div>
 
               <!-- Body -->
-              <div class="text-[16px] mt-10 font-sans">
+              <div class="text-[16px] mt-10">
                 <p class="text-justify mb-6">
-                  <span class="font-bold">THIS IS TO CERTIFY</span>&nbsp;that
-                  <span class="ml-1 uppercase font-bold">
-                    {{ matchingRecord.first_name }}</span
+                  <span class="font-bold">THIS IS TO CERTIFY</span>
+                  that
+                  <span class="uppercase font-bold">
+                    {{ recordData.first_name }}
+                    {{ recordData.last_name }} </span
                   >, a Job Order under the Information and Communication
                   Technology of Municipal Mayor’s Office, this local government
                   unit since
-                  <span class="ml-1 uppercase font-bold">
+                  <span class="uppercase font-bold">
                     {{
-                      matchingRecord.serviceRecords.length > 0
-                        ? formatDate(
-                            matchingRecord.serviceRecords[
-                              matchingRecord.serviceRecords.length - 1
-                            ].period_from,
-                          )
+                      latestRecord.period_from
+                        ? formatDate(latestRecord.period_from)
                         : "N/A"
                     }}
                   </span>
@@ -75,109 +76,115 @@
                 </p>
 
                 <p class="text-justify mb-6">
-                  Below is the summary of the salary history of Mr.
-                  <span class="uppercase font-bold">{{
-                    matchingRecord.last_name
-                  }}</span>
-                  throughout his employment with this local government unit.
+                  Below is the summary of the salary history of
+                  <span v-if="genderPrefix">{{ genderPrefix }}</span>
+                  <span class="uppercase font-bold">
+                    {{ recordData.first_name }}
+                    {{ recordData.last_name }}
+                  </span>
+                  throughout {{ genderPronoun }} employment with this local
+                  government unit.
                 </p>
 
                 <!-- Salary Table -->
-                <div class="mt-4">
-                  <table class="w-full text-[12px] border border-gray-400">
-                    <thead class="bg-gray-100">
-                      <tr>
-                        <th class="border p-1">Period</th>
-                        <th class="border p-1">Designation</th>
-                        <th class="border p-1">Status</th>
-                        <th class="border p-1">Salary</th>
-                        <th class="border p-1">Per</th>
-                      </tr>
-                    </thead>
-                    <tbody v-if="matchingRecord.serviceRecords.length">
-                      <tr :key="latestRecord.record_id">
-                        <td class="border p-1">
-                          {{ latestRecord.period_from }} -
-                          {{ latestRecord.period_to }}
-                        </td>
-                        <td class="border p-1">
-                          {{ latestRecord.roa_designation }}
-                        </td>
-                        <td class="border p-1">
-                          {{ latestRecord.roa_status }}
-                        </td>
-                        <td class="border p-1">
-                          {{ latestRecord.roa_basic_salary }}
-                        </td>
-                        <td class="border p-1">
-                          {{ latestRecord.roa_basic_salary_day }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <table class="w-full text-[12px] border border-gray-400">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="border p-1">Period</th>
+                      <th class="border p-1">Designation</th>
+                      <th class="border p-1">Status</th>
+                      <th class="border p-1">Salary</th>
+                      <th class="border p-1">Per</th>
+                    </tr>
+                  </thead>
+
+                  <tbody v-if="latestRecord.record_id">
+                    <tr>
+                      <td class="border p-1 break-words whitespace-normal">
+                        {{ formatDate(latestRecord.period_from) }} - Present
+                        {{
+                          latestRecord.period_to
+                            ? formatDate(latestRecord.period_to)
+                            : "Present"
+                        }}
+                      </td>
+
+                      <td class="border p-1 break-words whitespace-normal">
+                        {{ latestRecord.roa_designation || "N/A" }}
+                      </td>
+
+                      <td class="border p-1 break-words whitespace-normal">
+                        {{ latestRecord.roa_status || "N/A" }}
+                      </td>
+
+                      <td class="border p-1 break-words whitespace-normal">
+                        PHP
+                        {{ formatSalary(latestRecord.roa_basic_salary) }}
+                      </td>
+
+                      <td class="border p-1 break-words whitespace-normal">
+                        {{ latestRecord.roa_basic_salary_day || "N/A" }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
 
                 <!-- Closing -->
                 <p class="text-justify mt-6">
-                  Issued this&nbsp;<span class="ml-1 uppercase font-bold">
-                    {{ day }} </span
-                  >&nbsp; day of
-                  <span class="ml-1 uppercase font-bold"> {{ month }} </span>,
-                  <span class="ml-1 uppercase font-bold"> {{ year }} </span>
+                  Issued this
+                  <span class="uppercase font-bold">{{ day }}</span>
+                  day of
+                  <span class="uppercase font-bold">{{ month }}</span
+                  >,
+                  <span class="uppercase font-bold">{{ year }}</span>
                   at Braulio E. Dujali, Davao del Norte, Philippines.
                 </p>
               </div>
 
-              <!-- Signatories -->
+              <!-- Signatory -->
               <div class="mt-[440px] flex flex-col items-end font-bold">
                 <div class="text-center space-y-1">
-                  <p class="text-[16px]">ERMALYN C. BONSO-GANOTISE, MPA</p>
-                  <p class="text-[14px]">Administrative Officer IV</p>
                   <p class="text-[14px]">
+                    ERMALYN BONSO-GANOTISE, MPA MGDH I (MHRMO)
+                  </p>
+                  <p class="text-[12px]">Administrative Officer IV</p>
+                  <p class="text-[12px]">
                     (Human Resource Management Officer II)
                   </p>
                 </div>
               </div>
-
-              <!-- Optional Department Head Signature -->
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Alert Dialog -->
+    <!-- Download Modal -->
     <div
       v-if="isDownloadAlertOpen"
       class="fixed inset-0 bg-gray-800 bg-opacity-30 flex justify-center items-center z-50"
     >
       <div
-        class="rounded-xl shadow-lg w-[300px] md:w-[400px] bg-white py-6 px-4 flex flex-col items-center"
+        class="rounded-xl shadow-lg w-[350px] bg-white py-6 px-4 flex flex-col items-center"
       >
-        <div
-          class="rounded-full w-16 h-16 md:w-20 md:h-20 flex justify-center items-center bg-red-300 animate-pulse"
-        >
-          <icon name="question" class="text-white" />
-        </div>
-        <h1 class="text-[14px] md:text-[16px] font-semibold mt-4">
-          Download PDF?
-        </h1>
-        <p class="mt-2 text-[12px] md:text-[14px]">
+        <h1 class="text-[16px] font-semibold">Download PDF?</h1>
+        <p class="mt-2 text-[14px]">
           Are you sure you want to download the certificate?
         </p>
-        <div class="w-full h-[1px] rounded-md bg-gray-200 mt-4"></div>
-        <div class="tracking-wide flex gap-2 mt-4">
+
+        <div class="flex gap-3 mt-6">
           <button
-            class="bg-red-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-red-800 hover:text-red-800 hover:shadow-md"
+            class="bg-red-400 px-4 py-2 rounded-md text-white"
             @click="cancelDownload"
           >
-            No, Cancel
+            Cancel
           </button>
+
           <button
-            class="bg-green-400 p-2 px-3 text-[11px] md:text-[14px] rounded-md text-white hover:bg-white border hover:border-green-800 hover:text-green-800 hover:shadow-md"
+            class="bg-green-500 px-4 py-2 rounded-md text-white"
             @click="confirmDownload"
           >
-            Yes, Download
+            Download
           </button>
         </div>
       </div>
@@ -187,29 +194,48 @@
 
 <script>
 import icon from "@/assets/icon.vue";
-import axios from "axios";
 import { jsPDF } from "jspdf";
 
 export default {
   name: "ViewCOERecords",
   components: { icon },
+
   props: {
-    serviceId: { type: String, required: true },
+    recordData: {
+      type: Object,
+      required: true,
+    },
   },
+
   data() {
     return {
       isDownloadAlertOpen: false,
-      isOpenView: true,
-      matchingRecord: null,
       day: "",
       month: "",
       year: "",
     };
   },
+
   computed: {
     latestRecord() {
-      const records = this.matchingRecord?.serviceRecords || [];
+      const records = this.recordData?.serviceRecords || [];
       return records.length ? records[records.length - 1] : {};
+    },
+
+    normalizedGender() {
+      return this.recordData?.gender?.toLowerCase()?.trim() || "";
+    },
+
+    genderPrefix() {
+      if (["male", "m"].includes(this.normalizedGender)) return "Mr.";
+      if (["female", "f"].includes(this.normalizedGender)) return "Ms.";
+      return "";
+    },
+
+    genderPronoun() {
+      if (["male", "m"].includes(this.normalizedGender)) return "his";
+      if (["female", "f"].includes(this.normalizedGender)) return "her";
+      return "their";
     },
   },
 
@@ -217,41 +243,42 @@ export default {
     toggleBack() {
       this.$emit("back-to-table-coe");
     },
-    fetchServiceRecords() {
-      axios
-        .get(
-          process.env.VUE_APP_API_BASE_URL +
-            `/service-of-records/${this.serviceId}`,
-        )
-        .then((response) => {
-          this.matchingRecord = response.data || null;
-        })
-        .catch((error) => {
-          console.error("Error fetching service record:", error);
-        });
-    },
+
     formatDate(date) {
-      const options = { year: "numeric", month: "long", day: "2-digit" };
-      return new Date(date).toLocaleDateString("en-US", options);
-    },
-    formatSalary(value) {
-      const num = parseFloat(value?.replace(/[^\d.-]/g, "")) || 0;
-      return num.toLocaleString("en-PH", {
-        minimumFractionDigits: 2,
+      if (!date) return "";
+      const d = new Date(date);
+      if (isNaN(d)) return "";
+      return d.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "2-digit",
       });
     },
-    setCurrentDate() {
-      const currentDate = new Date();
-      this.day = currentDate.getDate();
-      this.month = currentDate.toLocaleString("default", { month: "long" });
-      this.year = currentDate.getFullYear();
+
+    formatSalary(value) {
+      const num = parseFloat(value);
+      if (isNaN(num)) return "0.00";
+      return num.toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     },
+
+    setCurrentDate() {
+      const d = new Date();
+      this.day = d.getDate();
+      this.month = d.toLocaleString("default", { month: "long" });
+      this.year = d.getFullYear();
+    },
+
     showDownloadAlert() {
       this.isDownloadAlertOpen = true;
     },
+
     cancelDownload() {
       this.isDownloadAlertOpen = false;
     },
+
     confirmDownload() {
       const certificateElement = this.$refs.certificate;
       const images = certificateElement.querySelectorAll("img");
@@ -267,7 +294,7 @@ export default {
         const doc = new jsPDF({ unit: "mm", format: "a4" });
         doc.html(certificateElement, {
           callback: () => {
-            const fileName = `Certificate_of_Employment_of_${this.matchingRecord.first_name}_${this.matchingRecord.last_name}.pdf`;
+            const fileName = `Certificate_of_Employment_${this.recordData.first_name}_${this.recordData.last_name}.pdf`;
             doc.save(fileName);
             this.isDownloadAlertOpen = false;
           },
@@ -279,30 +306,9 @@ export default {
       });
     },
   },
+
   mounted() {
-    this.fetchServiceRecords();
     this.setCurrentDate();
   },
 };
 </script>
-
-<style scoped>
-table {
-  border-collapse: collapse;
-  width: 100%;
-  font-family: Arial, sans-serif;
-}
-
-th,
-td {
-  border: 1px solid #999;
-  padding: 6px;
-  font-size: 12px;
-  text-align: left;
-}
-
-thead {
-  background-color: #f0f0f0;
-  font-weight: bold;
-}
-</style>

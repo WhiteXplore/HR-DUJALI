@@ -191,7 +191,7 @@ export default {
                   role: ["Admin"],
                 },
                 {
-                  name: "Employee Profile",
+                  name: "My PDS",
                   route: "/vw-employee-profile",
                   role: ["Employee"],
                 },

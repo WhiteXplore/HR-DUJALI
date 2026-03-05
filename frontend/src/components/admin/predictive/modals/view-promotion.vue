@@ -43,7 +43,10 @@
             class="flex gap-6 border rounded-lg p-4 bg-white shadow-sm w-1/2"
           >
             <img
-              src="@/assets/img/employee_picture.png"
+              :src="
+                getProfileImage() ||
+                require('@/assets/img/employee_picture.png')
+              "
               alt="Employee"
               class="w-[180px] h-[180px] object-cover rounded-md bg-gray-100"
             />
@@ -440,6 +443,28 @@ export default {
 
   /* ===================== METHODS ===================== */
   methods: {
+    async fetchEmployeeDetails(employeeId) {
+      try {
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}/upload/employee/${employeeId}`,
+          { withCredentials: true },
+        );
+
+        // Suppose the API returns { image_filename: "file.png" }
+        if (response.data && response.data.image_filename) {
+          this.employeeData.image_filename = response.data.image_filename;
+        }
+      } catch (error) {
+        console.error("Employee fetch failed:", error);
+      }
+    },
+    getProfileImage() {
+      if (!this.employeeData) return null;
+      if (this.employeeData.image_filename) {
+        return `${process.env.VUE_APP_API_BASE_URL}/uploads/${this.employeeData.image_filename}`;
+      }
+      return null;
+    },
     formatDate(date) {
       if (!date) return "";
 
@@ -516,6 +541,7 @@ export default {
           `${process.env.VUE_APP_API_BASE_URL}/predictive/fetch-promotion`,
         );
 
+        // Find the employee by first_name, last_name, OR directly by employee_id if available
         const matched = res.data.find(
           (emp) =>
             emp.first_name === this.selectedFirstName &&
@@ -524,7 +550,14 @@ export default {
 
         if (!matched) return;
 
+        // Assign matched employee
         this.employeeData = matched;
+
+        // ✅ Fetch the image if employee_id exists
+        if (this.employeeData.employee_id) {
+          await this.fetchEmployeeDetails(this.employeeData.employee_id);
+        }
+
         await this.fetchLearningRecords();
       } catch (err) {
         console.error("Failed to fetch promotion data:", err);
@@ -532,7 +565,6 @@ export default {
         setTimeout(() => (this.loading = false), 500);
       }
     },
-
     async fetchLearningRecords() {
       try {
         const ldRes = await axios.get(

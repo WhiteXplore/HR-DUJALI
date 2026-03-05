@@ -319,18 +319,17 @@
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(learning, index) in matchingRecord.fifthTable"
+                    v-for="(learning, index) in sortedLearningRecords"
                     :key="index"
                   >
                     <td class="border px-2 py-2">
                       {{ learning.title_learning_development }}
                     </td>
                     <td class="border px-2 py-2">
-                      {{ learning.ld_from }}
+                      {{ formatDate(learning.ld_from) }}
                     </td>
-
                     <td class="border px-2 py-2">
-                      {{ learning.ld_to }}
+                      {{ formatDate(learning.ld_to) }}
                     </td>
 
                     <td class="border px-2 py-2">
@@ -511,7 +510,15 @@ export default {
       },
     };
   },
+  computed: {
+    sortedLearningRecords() {
+      if (!this.matchingRecord?.fifthTable) return [];
 
+      return [...this.matchingRecord.fifthTable].sort((a, b) => {
+        return new Date(b.ld_from) - new Date(a.ld_from);
+      });
+    },
+  },
   methods: {
     toggleBack() {
       this.$emit("back-to-table-employee");
@@ -602,10 +609,9 @@ export default {
     },
     formatDate(date) {
       if (!date) return "--";
-      const options = { year: "numeric", month: "long", day: "2-digit" };
-      return new Date(date).toLocaleDateString("en-US", options);
+      const d = new Date(date);
+      return d.toLocaleDateString("en-US");
     },
-
     // 🔥 OPEN EDIT MODAL + SEND DATA
     toggleEdit(employeeRecord) {
       this.selectedEmployeeRecord = employeeRecord;

@@ -17,7 +17,9 @@
         <button @click="showDownloadAlert">Download PDF</button>
       </div>
     </div>
-    <h2 class="text-lg font-semibold">Certification of Employment Preview</h2>
+    <h2 class="text-lg font-semibold">
+      Certification of Employment Previewssss
+    </h2>
 
     <div class="w-full h-[700px] overflow-auto">
       <div class="flex justify-center w-full mt-2">
@@ -73,7 +75,8 @@
               </p>
 
               <p class="text-justify mb-6">
-                This Certification is being issued upon the request of Mr.
+                This Certification is being issued upon the request of
+                {{ honorific }}
                 <span
                   contenteditable="true"
                   dir="ltr"
@@ -172,7 +175,16 @@ import icon from "@/assets/icon.vue";
 
 export default {
   name: "EmploymentCertificates",
+
   components: { icon },
+
+  props: {
+    gender: {
+      type: String,
+      default: "",
+    },
+  },
+
   data() {
     return {
       isDownloadAlertOpen: false,
@@ -185,8 +197,21 @@ export default {
       isOpenAddCoe: true,
     };
   },
+
+  computed: {
+    honorific() {
+      if (!this.gender) return "";
+
+      const g = this.gender.toLowerCase().trim();
+
+      if (g === "female") return "Ms.";
+      if (g === "male") return "Mr.";
+
+      return "";
+    },
+  },
+
   mounted() {
-    // Initialize contenteditable spans with data values on mount
     this.$refs.employeeName.innerText = this.employeeName;
     this.$refs.employeeDate.innerText = this.employeeDate;
     this.$refs.employeeLastName.innerText = this.employeeLastName;
@@ -194,19 +219,24 @@ export default {
     this.$refs.employeeMonth.innerText = this.employeeMonth;
     this.$refs.employeeYear.innerText = this.employeeYear;
   },
+
   methods: {
     toggleBack() {
       this.$emit("close");
     },
+
     showDownloadAlert() {
       this.isDownloadAlertOpen = true;
     },
+
     cancelDownload() {
       this.isDownloadAlertOpen = false;
     },
+
     confirmDownload() {
       const certificateElement = this.$refs.certificate;
       const images = certificateElement.querySelectorAll("img");
+
       const promises = Array.from(images).map((img) => {
         return new Promise((resolve) => {
           if (img.complete) resolve();
@@ -217,6 +247,7 @@ export default {
       Promise.all(promises)
         .then(() => {
           const doc = new jsPDF({ unit: "mm", format: "a4" });
+
           doc.html(certificateElement, {
             callback: () => {
               doc.save("certificate.pdf");
