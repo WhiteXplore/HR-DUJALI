@@ -141,6 +141,7 @@
           >
             <option value="" disabled>Select Role</option>
             <option value="Admin">Admin</option>
+             <option value="Staff">Staff</option>
             <option value="Employee">Employee</option>
           </select>
         </div>

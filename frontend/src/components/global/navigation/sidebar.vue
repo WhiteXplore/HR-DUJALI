@@ -177,18 +177,18 @@ export default {
 
         {
           name: "Records",
-          role: ["Admin", "Employee"],
+          role: ["Admin", "Employee" , "Staff"],
           items: [
             {
               name: "Employee Records",
               icon: "users",
               route: "/employement-records",
-              role: ["Admin", "Employee"],
+              role: ["Admin", "Employee" , "Staff"],
               children: [
                 {
                   name: "Employee Profile",
                   route: "/employement-records",
-                  role: ["Admin"],
+                  role: ["Admin","Staff"],
                 },
                 {
                   name: "My PDS",
@@ -199,7 +199,7 @@ export default {
                 {
                   name: "Service Record",
                   route: "/service-of-records",
-                  role: ["Admin"],
+                  role: ["Admin" , "Staff"],
                 },
                 {
                   name: "Service Record",
@@ -209,7 +209,7 @@ export default {
                 {
                   name: "Attendance Record",
                   route: "/attendance-records",
-                  role: ["Admin"],
+                  role: ["Admin" , "Staff"],
                 },
                 {
                   name: "Attendance Record",
@@ -222,38 +222,38 @@ export default {
               name: "Available Trainings",
               icon: "general",
               route: "/available-trainings",
-              role: ["Admin"],
+              role: ["Admin", "Staff"],
             },
           ],
         },
 
         {
           name: "Utilities",
-          role: ["Admin"],
+          role: ["Admin", "Staff"],
           items: [
             {
               name: "HR Templates",
               icon: "utilities",
               route: "/certificate-of-employment",
-              role: ["Admin"],
+              role: ["Admin", "Staff"],
             },
           ],
         },
 
         {
           name: "Analysis",
-          role: ["Admin"],
+          role: ["Admin", "Staff"],
           items: [
             {
               name: "Predictive Analysis",
               icon: "graph",
               route: "/predictive-analysis",
-              role: ["Admin"],
+              role: ["Admin", "Staff"],
               children: [
                 {
                   name: "Promotion",
                   route: "/promotion-page",
-                  role: ["Admin"],
+                  role: ["Admin", "Staff"],
                 },
               ],
             },
@@ -275,22 +275,22 @@ export default {
 
         {
           name: "Report",
-          role: ["Admin"],
+          role: ["Admin", "Staff"],
           items: [
             {
               name: "Monthly Report",
               icon: "general",
-              role: ["Admin", "Employee"],
+              role: ["Admin", "Employee" , "Staff"],
               children: [
                 {
                   name: "Attendance",
                   route: "/attendance-report",
-                  role: ["Admin"],
+                  role: ["Admin", "Staff"],
                 },
                 {
                   name: "Client Feedback",
                   route: "/client-feedback-report",
-                  role: ["Admin"],
+                  role: ["Admin", "Staff"],
                 },
               ],
             },

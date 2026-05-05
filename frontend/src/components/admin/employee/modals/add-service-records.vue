@@ -73,21 +73,35 @@
             </div>
 
             <div>
-              <label class="font-bold text-xs">Department</label>
-              <select v-model="form.department" class="input">
-                <option disabled value="">Select Department</option>
-                <option>Office of the Mayor</option>
-                <option>Sangguniang Bayan Office</option>
-                <option>Municipal Planning and Development Office</option>
-                <option>Municipal Budget Office</option>
-                <option>Municipal Accounting Office</option>
-                <option>Municipal Treasury Office</option>
-                <option>Municipal Assessor’s Office</option>
-                <option>Municipal Engineering Office</option>
-                <option>Municipal Health Office</option>
-                <option>Municipal Social Welfare and Development Office</option>
-              </select>
-            </div>
+  <label class="font-bold text-xs">Department</label>
+  <select v-model="form.department" class="input">
+    <option disabled value="">Select Department</option>
+
+    <option>Office of the Mayor</option>
+    <option>Sangguniang Bayan Office</option>
+
+    <option>General Services Office</option>
+    <option>Human Resource Management Office</option>
+
+    <option>Municipal Administrator’s Office</option>
+    <option>Municipal Agriculture Office</option>
+    <option>Municipal Anti-Drug Abuse Council</option>
+    <option>Municipal Assessor’s Office</option>
+    <option>Municipal Budget Office</option>
+    <option>Municipal Civil Registrar’s Office</option>
+    <option>Municipal Disaster Risk Reduction and Management Office</option>
+    <option>Municipal Economic Enterprise Development Office</option>
+    <option>Municipal Engineering Office</option>
+    <option>Municipal Environment and Natural Resources Office</option>
+    <option>Municipal Health Office</option>
+    <option>Municipal Information Office</option>
+    <option>Municipal Planning and Development Office</option>
+    <option>Municipal Social Welfare and Development Office</option>
+    <option>Municipal Tourism Office</option>
+    <option>Municipal Treasury Office</option>
+
+  </select>
+</div>
           </div>
         </div>
 

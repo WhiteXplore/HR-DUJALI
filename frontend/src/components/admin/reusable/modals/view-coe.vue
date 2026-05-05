@@ -144,10 +144,8 @@
               <!-- Signatory -->
               <div class="mt-[440px] flex flex-col items-end font-bold">
                 <div class="text-center space-y-1">
-                  <p class="text-[14px]">
-                    ERMALYN BONSO-GANOTISE, MPA MGDH I (MHRMO)
-                  </p>
-                  <p class="text-[12px]">Administrative Officer IV</p>
+                  <p class="text-[14px]">ERMALYN BONSO-GANOTISE, MPA</p>
+                  <p class="text-[12px]">MGDH I (MHRMO)</p>
                   <p class="text-[12px]">
                     (Human Resource Management Officer II)
                   </p>

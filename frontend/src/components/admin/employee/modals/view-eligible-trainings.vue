@@ -661,29 +661,25 @@ export default {
         });
 
         // ------------------ SORT: Most fit first ------------------
-        const experienceMid =
-          maxYears === Infinity ? minYears : (minYears + maxYears) / 2;
+        // const experienceMid =
+        //   maxYears === Infinity ? minYears : (minYears + maxYears) / 2;
 
-        priorityEmployees.sort((a, b) => {
-          // 1️⃣ Most training hours first
-          const hoursA = parseFloat(a.total_ld_hours_rendered) || 0;
-          const hoursB = parseFloat(b.total_ld_hours_rendered) || 0;
-          if (hoursA !== hoursB) return hoursB - hoursA;
+    priorityEmployees.sort((a, b) => {
+  // 1️⃣ FEWEST training hours FIRST ✅
+  const hoursA = parseFloat(a.total_ld_hours_rendered) || 0;
+  const hoursB = parseFloat(b.total_ld_hours_rendered) || 0;
+  if (hoursA !== hoursB) return hoursA - hoursB;
 
-          // 2️⃣ Experience closeness to midpoint
-          const expA = Math.abs(
-            (parseFloat(a.total_years_experience) || 0) - experienceMid,
-          );
-          const expB = Math.abs(
-            (parseFloat(b.total_years_experience) || 0) - experienceMid,
-          );
-          if (expA !== expB) return expA - expB;
+  // 2️⃣ FEWEST trainings attended FIRST ✅
+  const countA = parseInt(a.total_count_of_learning_development) || 0;
+  const countB = parseInt(b.total_count_of_learning_development) || 0;
+  if (countA !== countB) return countA - countB;
 
-          // 3️⃣ Fewer trainings attended
-          const countA = parseInt(a.total_count_of_learning_development) || 0;
-          const countB = parseInt(b.total_count_of_learning_development) || 0;
-          return countA - countB;
-        });
+  // 3️⃣ Experience (optional fallback)
+  const expA = parseFloat(a.total_years_experience) || 0;
+  const expB = parseFloat(b.total_years_experience) || 0;
+  return expA - expB;
+});
 
         // ------------------ ASSIGN ------------------
         this.eligibleEmployees = priorityEmployees;
