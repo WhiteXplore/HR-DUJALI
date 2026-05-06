@@ -3,5 +3,6 @@
   "editor.fontFamily": "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
   "editor.codeLensFontFamily": "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
   "editor.inlayHints.fontFamily": "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
-  "terminal.integrated.fontFamily": "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace"
+  "terminal.integrated.fontFamily": "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
+  "vue3snippets.enable-compile-vue-file-on-did-save-code": true
 }

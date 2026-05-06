@@ -24,7 +24,7 @@
               <h1>Republic of the Philippines</h1>
               <h1>Province of Davao del Norte</h1>
               <h1>Municipality of Braulio E. Dujali</h1>
-              <h1 class="mt-5 font-bold text-lg">Attendance Record</h1>
+              <h1 class="mt-5 font-bold text-lg">Attendance Records</h1>
             </div>
 
             <!-- Employee Profile -->
@@ -41,9 +41,9 @@
 
             <!-- Sub Header -->
             <div class="text-justify mt-5 text-sm">
-              This certifies that the employee named above has rendered attendance as
-              recorded below. Each entry corresponds to the actual time the employee
-              checked in and out during the period of service.
+              This certifies that the employee named above has rendered
+              attendance as recorded below. Each entry corresponds to the actual
+              time the employee checked in and out during the period of service.
             </div>
 
             <!-- Legend -->
@@ -106,12 +106,15 @@
                       <td class="border px-2 py-2">
                         {{
                           record.in_am || record.in_pm
-                            ? displayZeroAsEmpty(getRawHoursFormatted(record), true)
+                            ? displayZeroAsEmpty(
+                                getRawHoursFormatted(record),
+                                true,
+                              )
                             : ""
                         }}
                       </td>
                       <td class="border px-2 py-2">
-                        {{ getOfficialHours(record) }}
+                        <span v-if="record.in_am || record.in_pm">8.00</span>
                       </td>
                       <td class="border px-2 py-2">
                         <span v-if="getRawHours(record) > 8">{{
@@ -119,7 +122,11 @@
                         }}</span>
                       </td>
                       <td class="border px-2 py-2">
-                        {{ record.in_am || record.in_pm ? getLateness(record) : "" }}
+                        {{
+                          record.in_am || record.in_pm
+                            ? getLateness(record)
+                            : ""
+                        }}
                       </td>
                       <td class="border px-2 py-2">
                         <span v-if="record.in_am || record.in_pm">{{
@@ -127,7 +134,11 @@
                         }}</span>
                       </td>
                       <td class="border px-2 py-2">
-                        {{ record.in_am || record.in_pm ? getStatusForDay(record) : "" }}
+                        {{
+                          record.in_am || record.in_pm
+                            ? getStatusForDay(record)
+                            : ""
+                        }}
                       </td>
                     </tr>
                   </template>
@@ -138,7 +149,9 @@
                     v-for="employee in matchingRecord"
                     :key="employee.employee_id + '-summary'"
                   >
-                    <tr class="bg-gray-50 font-semibold text-sm text-center border">
+                    <tr
+                      class="bg-gray-50 font-semibold text-sm text-center border"
+                    >
                       <td colspan="13" class="border px-2 py-1">Gross</td>
                     </tr>
                     <tr class="text-[13px] text-center border">
@@ -147,12 +160,13 @@
                       </td>
                       <td colspan="2" class="border px-2 py-1">
                         {{
-                          getMonthlySummary(employee)?.total_actual_work_hours ?? "0.00"
+                          getMonthlySummary(employee)
+                            ?.total_actual_work_hours ?? "0.00"
                         }}
                       </td>
                       <td colspan="2" class="border px-2 py-1">Late (LT):</td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ getUiTotalLate(employee) }}
+                        {{ getMonthlySummary(employee)?.total_late_days ?? 0 }}
                       </td>
                       <td colspan="3" class="border px-2 py-1"></td>
                     </tr>
@@ -161,26 +175,45 @@
                         Official Hours Worked (OHW):
                       </td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ getUiTotalOfficialHours(employee) }}
+                        {{
+                          getMonthlySummary(employee)
+                            ?.official_work_hours_per_month ?? "0.00"
+                        }}
                       </td>
-                      <td colspan="2" class="border px-2 py-1">Undertime (UT):</td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ getUiTotalUndertime(employee) }}
+                        Undertime (UT):
+                      </td>
+                      <td colspan="2" class="border px-2 py-1">
+                        {{
+                          getMonthlySummary(employee)?.total_undertime_hours ??
+                          "0.00"
+                        }}
                       </td>
                       <td colspan="3" class="border px-2 py-1"></td>
                     </tr>
                     <tr class="text-[13px] text-center border">
-                      <td colspan="4" class="border px-2 py-1">Overtime (OT):</td>
-                      <td colspan="2" class="border px-2 py-1">
-                        {{ getMonthlySummary(employee)?.total_overtime_hours ?? "0.00" }}
+                      <td colspan="4" class="border px-2 py-1">
+                        Overtime (OT):
                       </td>
-                      <td colspan="2" class="border px-2 py-1">Days Present (DP):</td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ getMonthlySummary(employee)?.total_days_present ?? 0 }}
+                        {{
+                          getMonthlySummary(employee)?.total_overtime_hours ??
+                          "0.00"
+                        }}
+                      </td>
+                      <td colspan="2" class="border px-2 py-1">
+                        Days Present (DP):
+                      </td>
+                      <td colspan="2" class="border px-2 py-1">
+                        {{
+                          getMonthlySummary(employee)?.total_days_present ?? 0
+                        }}
                       </td>
                       <td colspan="3" class="border px-2 py-1"></td>
                     </tr>
-                    <tr class="bg-gray-50 font-semibold text-sm text-center border">
+                    <tr
+                      class="bg-gray-50 font-semibold text-sm text-center border"
+                    >
                       <td colspan="13" class="border px-2 py-1">Net</td>
                     </tr>
                     <tr class="text-[13px] text-center font-semibold border">
@@ -191,11 +224,20 @@
                         {{
                           (
                             parseFloat(
-                              getMonthlySummary(employee)?.total_days_present_final ?? 0
+                              getMonthlySummary(employee)
+                                ?.total_days_present_final ?? 0,
                             ) *
                               8 +
-                            parseFloat(
-                              getMonthlySummary(employee)?.total_overtime_hours ?? 0
+                            Math.max(
+                              0,
+                              parseFloat(
+                                getMonthlySummary(employee)
+                                  ?.total_actual_work_hours ?? 0,
+                              ) -
+                                parseFloat(
+                                  getMonthlySummary(employee)
+                                    ?.official_work_hours_per_month ?? 0,
+                                ),
                             )
                           ).toFixed(2)
                         }}
@@ -204,11 +246,24 @@
                         Total Deductions (LT + UT)
                       </td>
                       <td colspan="2" class="border px-2 py-1">
-                        {{ getUiTotalDeductions(employee) }}
+                        {{
+                          (
+                            parseFloat(
+                              getMonthlySummary(employee)?.total_late_days ?? 0,
+                            ) +
+                            parseFloat(
+                              getMonthlySummary(employee)
+                                ?.total_undertime_hours ?? 0,
+                            )
+                          ).toFixed(2)
+                        }}
                       </td>
                       <td colspan="3" class="border px-2 py-1">
                         Total Days Present:
-                        {{ getMonthlySummary(employee)?.total_days_present_final ?? 0 }}
+                        {{
+                          getMonthlySummary(employee)
+                            ?.total_days_present_final ?? 0
+                        }}
                       </td>
                     </tr>
                   </template>
@@ -249,61 +304,6 @@ export default {
     "$route.params.date": "fetchData",
   },
   methods: {
-    getUiTotalOfficialHours(employee) {
-      const records = this.getFullMonthRecords(employee);
-
-      return records
-        .reduce((total, record) => {
-          const ohw = parseFloat(this.getOfficialHours(record) || 0);
-          return total + ohw;
-        }, 0)
-        .toFixed(2);
-    },
-    hasCompleteLogs(record) {
-      return record.in_am && record.out_am && record.in_pm && record.out_pm;
-    },
-
-    getOfficialHours(record) {
-      const hasAM = record.in_am && record.out_am;
-      const hasPM = record.in_pm && record.out_pm;
-
-      if (hasAM && hasPM) {
-        return "8.00"; // complete day
-      }
-
-      if (hasAM || hasPM) {
-        return "4.00"; // half day (missing AM or PM)
-      }
-
-      return ""; // no work
-    },
-    getUiTotalLate(employee) {
-      const records = this.getFullMonthRecords(employee);
-
-      return records
-        .filter((record) => record.in_am || record.in_pm)
-        .reduce((total, record) => {
-          return total + parseFloat(this.getLateness(record) || 0);
-        }, 0)
-        .toFixed(2);
-    },
-
-    getUiTotalDeductions(employee) {
-      return (
-        parseFloat(this.getUiTotalLate(employee)) +
-        parseFloat(this.getUiTotalUndertime(employee))
-      ).toFixed(2);
-    },
-    getUiTotalUndertime(employee) {
-      const records = this.getFullMonthRecords(employee);
-
-      return records
-        .filter((record) => record.in_am || record.in_pm)
-        .reduce((total, record) => {
-          return total + parseFloat(this.getUndertime(record) || 0);
-        }, 0)
-        .toFixed(2);
-    },
     fetchData() {
       this.fetchAttendanceRecords();
       this.fetchMonthlyAttendanceReport();
@@ -314,14 +314,17 @@ export default {
       if (!this.attendanceId) return;
 
       axios
-        .get(`${process.env.VUE_APP_API_BASE_URL}/attendance-record/${this.attendanceId}`)
+        .get(
+          `${process.env.VUE_APP_API_BASE_URL}/attendance-record/${this.attendanceId}`,
+        )
         .then((res) => {
           let data = Array.isArray(res.data) ? res.data : [res.data];
 
           this.matchingRecord = data.map((emp) => {
             const recordsByMonth = {};
             emp.records.forEach((rec) => {
-              if (!recordsByMonth[rec.month_year]) recordsByMonth[rec.month_year] = [];
+              if (!recordsByMonth[rec.month_year])
+                recordsByMonth[rec.month_year] = [];
               recordsByMonth[rec.month_year].push(rec);
             });
             return { ...emp, recordsByMonth };
@@ -344,7 +347,7 @@ export default {
           `${process.env.VUE_APP_API_BASE_URL}/attendance-record/monthly-attendance-report`,
           {
             params: { employee_id: this.attendanceId, year, month },
-          }
+          },
         )
         .then((res) => {
           this.monthlyReport = Array.isArray(res.data) ? res.data : [res.data];
@@ -358,7 +361,8 @@ export default {
       const selectedMonthYear = this.$route.params.date;
       return this.monthlyReport.find(
         (rec) =>
-          rec.employee_id === employee.employee_id && rec.month_year === selectedMonthYear
+          rec.employee_id === employee.employee_id &&
+          rec.month_year === selectedMonthYear,
       );
     },
 
@@ -512,22 +516,15 @@ export default {
       // --- Employee Attendance Rows (Full Month) ---
       const allRecords = this.getFullMonthRecords(employee);
       allRecords.forEach((rec) => {
-        const dateObj = rec.date instanceof Date ? rec.date : new Date(rec.date);
+        const dateObj =
+          rec.date instanceof Date ? rec.date : new Date(rec.date);
         const hasData = rec.in_am || rec.out_pm || rec.in_pm || rec.out_am;
 
         const rawHours = hasData ? this.getRawHours(rec) : 0;
         const ahw = hasData
           ? this.displayZeroAsEmpty(this.getRawHoursFormatted(rec), true)
           : "";
-        const hasAM = rec.in_am && rec.out_am;
-        const hasPM = rec.in_pm && rec.out_pm;
-
-        let ohw = "";
-        if (hasAM && hasPM) {
-          ohw = "8.00";
-        } else if (hasAM || hasPM) {
-          ohw = "4.00";
-        }
+        const ohw = hasData && rawHours > 0 ? "8.00" : "";
         const ot = hasData && rawHours > 8 ? this.getOvertime(rec) : "";
         const lt = hasData ? this.getLateness(rec) : "";
         const ut = hasData && rawHours > 0 ? this.getUndertime(rec) : "";
@@ -555,7 +552,8 @@ export default {
         cells.forEach((cell) => {
           if (cell.colSpan && cell.colSpan > 1) {
             row.push(cell);
-            for (let i = 1; i < cell.colSpan; i++) row.push({ text: "", _span: true });
+            for (let i = 1; i < cell.colSpan; i++)
+              row.push({ text: "", _span: true });
           } else {
             row.push(cell || { text: "" });
           }
@@ -571,43 +569,39 @@ export default {
       addSummaryRow([
         { text: "Actual Hours Worked (AHW)", colSpan: 4 },
         { text: monthlySummary?.total_actual_work_hours ?? "0.00", colSpan: 2 },
-        { text: "Late (LT)", colSpan: 3 },
-        { text: this.getUiTotalLate(employee), colSpan: 2 },
+        { text: "Late (LT)", colSpan: 2 },
+        { text: monthlySummary?.total_late_days ?? "0", colSpan: 2 },
         { text: "" },
       ]);
       addSummaryRow([
         { text: "Official Hours Worked (OHW)", colSpan: 4 },
         {
-          text: this.getUiTotalOfficialHours(employee),
+          text: monthlySummary?.official_work_hours_per_month ?? "0.00",
           colSpan: 2,
         },
-        { text: "Undertime (UT)", colSpan: 3 },
-        { text: this.getUiTotalUndertime(employee), colSpan: 2 },
+        { text: "Undertime (UT)", colSpan: 2 },
+        { text: monthlySummary?.total_undertime_hours ?? "0.00", colSpan: 2 },
         { text: "" },
       ]);
       addSummaryRow([
         { text: "Overtime (OT)", colSpan: 4 },
         { text: monthlySummary?.total_overtime_hours ?? "0.00", colSpan: 2 },
-        { text: "Days Present (DP)", colSpan: 3 },
+        { text: "Days Present (DP)", colSpan: 2 },
         { text: monthlySummary?.total_days_present ?? "0", colSpan: 2 },
         { text: "" },
       ]);
-      addSummaryRow([{ text: "Net", colSpan: numCols, alignment: "center", bold: true }]);
+      addSummaryRow([
+        { text: "Net", colSpan: numCols, alignment: "center", bold: true },
+      ]);
       addSummaryRow([
         { text: "Total Hours Worked [(DP×8) + OT]", colSpan: 4 },
-        {
-          text: (
-            parseFloat(monthlySummary?.total_days_present_final ?? 0) * 8 +
-            parseFloat(monthlySummary?.total_overtime_hours ?? 0)
-          ).toFixed(2),
-          colSpan: 2,
-        },
+        { text: monthlySummary?.total_hours_worked ?? "0.00", colSpan: 2 },
         { text: "Total Deductions (LT + UT)", colSpan: 2 },
+        { text: monthlySummary?.total_deductions ?? "0.00", colSpan: 2 },
         {
-          text: this.getUiTotalDeductions(employee),
-        },
-        {
-          text: `Total Days Present: ${monthlySummary?.total_days_present_final ?? 0}`,
+          text: `Total Days Present: ${
+            monthlySummary?.total_days_present_final ?? 0
+          }`,
           colSpan: 2,
         },
       ]);
@@ -625,7 +619,10 @@ export default {
           {
             columns: [
               {
-                text: [{ text: "Full Name: " }, { text: employee.name, bold: true }],
+                text: [
+                  { text: "Full Name: " },
+                  { text: employee.name, bold: true },
+                ],
                 alignment: "left",
                 margin: [0, 5, 0, 5],
               },
@@ -640,8 +637,7 @@ export default {
             ],
           },
           {
-            text:
-              "This certifies that the employee named above has rendered attendance as recorded below.",
+            text: "This certifies that the employee named above has rendered attendance as recorded below.",
             margin: [0, 0, 0, 15],
             fontSize: 9,
           },
@@ -677,7 +673,9 @@ export default {
         defaultStyle: { fontSize: 9 },
       };
 
-      pdfMake.createPdf(docDefinition).download(`${employee.name}-Attendance.pdf`);
+      pdfMake
+        .createPdf(docDefinition)
+        .download(`${employee.name}-Attendance.pdf`);
     },
   },
 
