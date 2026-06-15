@@ -45,9 +45,9 @@ class EducationDto {
 }
 
 class CivilServiceDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  career_service: string;
+  career_service?: string;
 
   @IsOptional()
   @IsString()

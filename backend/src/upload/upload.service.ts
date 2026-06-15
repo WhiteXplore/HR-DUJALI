@@ -147,20 +147,21 @@ export class UploadService {
       await this.secondTableRepository.save(educationEntities);
     }
 
-    if (civilRecords?.length) {
-      const civilEntities = civilRecords.map((record) =>
-        this.fourthTableRepository.create({
-          career_service: record.career_service,
-          rating: record.rating,
-          date_of_exam: record.date_of_exam,
-          place_of_exam: record.place_of_exam,
-          license_number: record.license_number,
-          license_validity: record.license_validity,
-          firstTable: savedFirst,
-        }),
-      );
-      await this.fourthTableRepository.save(civilEntities);
-    }
+if (civilRecords?.length) {
+  const civilEntities = civilRecords.map((record) =>
+    this.fourthTableRepository.create({
+      career_service: record.career_service || 'N/A',
+      rating: record.rating || 'N/A',
+      date_of_exam: record.date_of_exam || 'N/A',
+      place_of_exam: record.place_of_exam || 'N/A',
+      license_number: record.license_number || 'N/A',
+      license_validity: record.license_validity || 'N/A',
+      firstTable: savedFirst,
+    }),
+  );
+
+  await this.fourthTableRepository.save(civilEntities);
+}
 
     if (learningRecords?.length) {
       const learningEntities = learningRecords.map((record) =>

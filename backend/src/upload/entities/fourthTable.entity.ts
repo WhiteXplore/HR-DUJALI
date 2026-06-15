@@ -12,22 +12,22 @@ export class FourthTable {
   @PrimaryGeneratedColumn()
   fourth_table_id: number;
 
-  @Column()
+  @Column({ nullable: true })
   career_service: string;
 
-  @Column()
+  @Column({ nullable: true })
   rating: string;
 
-  @Column()
+  @Column({ nullable: true })
   date_of_exam: string;
 
-  @Column()
+  @Column({ nullable: true })
   place_of_exam: string;
 
-  @Column()
+  @Column({ nullable: true })
   license_number: string;
 
-  @Column()
+  @Column({ nullable: true })
   license_validity: string;
 
   @ManyToOne(() => FirstTable, (firstTable) => firstTable.fourthTable, {

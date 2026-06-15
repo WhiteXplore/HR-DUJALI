@@ -10,9 +10,7 @@
       <div class="flex flex-col w-full">
         <!-- Title -->
         <div class="flex justify-start">
-          <h1 class="font-semibold text-lg text-gray-800">
-            Upload Employee CSV
-          </h1>
+          <h1 class="font-semibold text-lg text-gray-800">Upload Employee CSV</h1>
         </div>
 
         <!-- Drag & Drop File Upload -->
@@ -120,7 +118,7 @@ export default {
           try {
             // 1. Fetch existing employees from backend
             const existingRes = await axios.get(
-              process.env.VUE_APP_API_BASE_URL + "/upload/get-all",
+              process.env.VUE_APP_API_BASE_URL + "/upload/get-all"
             );
             const existingEmployees = existingRes.data || [];
 
@@ -130,8 +128,8 @@ export default {
                 (e) =>
                   `${e.first_name.toLowerCase()}_${e.last_name.toLowerCase()}_${
                     e.birthdate || "N/A"
-                  }`,
-              ),
+                  }`
+              )
             );
 
             // 3. Filter out employees that already exist
@@ -151,7 +149,7 @@ export default {
             const uploadRes = await axios.post(
               process.env.VUE_APP_API_BASE_URL + "/upload/upload-data",
               newEmployees,
-              { headers: { "Content-Type": "application/json" } },
+              { headers: { "Content-Type": "application/json" } }
             );
 
             toast.success("New employee profiles uploaded successfully!");
@@ -176,11 +174,7 @@ export default {
       this.$refs.fileInput.value = null;
     },
     sanitize(value) {
-      if (
-        value === null ||
-        value === undefined ||
-        value.toString().trim() === ""
-      ) {
+      if (value === null || value === undefined || value.toString().trim() === "") {
         return "N/A";
       }
       return value;
@@ -197,13 +191,11 @@ export default {
       let currentEmployee = null;
 
       for (const row of rows) {
-        const hasName =
-          row["First Name"] || row["Middle Name"] || row["Last Name"];
+        const hasName = row["First Name"] || row["Middle Name"] || row["Last Name"];
         const special_skills = row["Special Skills"];
         const level = row["Level"];
         const career_service = row["Carrer Service/ RA 1080"];
-        const title_learning_development =
-          row["Title of Learning and Development"];
+        const title_learning_development = row["Title of Learning and Development"];
         const non_academic = row["Non-Academic Extinction"];
         const membership = row["Membership in association"];
 
@@ -215,9 +207,7 @@ export default {
             middle_name: this.sanitize(row["Middle Name"]),
             last_name: this.sanitize(row["Last Name"]),
             suffix: this.sanitize(row["Suffix"]),
-            birthdate: this.formatBirthdate(
-              this.sanitize(row["Date of Birth"]),
-            ),
+            birthdate: this.formatBirthdate(this.sanitize(row["Date of Birth"])),
             place_of_birth: this.sanitize(row["Place of Birth"]),
             gender: this.sanitize(row["Sex"]),
             civil_status: this.sanitize(row["Civil Status"]),
@@ -273,9 +263,7 @@ export default {
           currentEmployee.educationalRecords.push({
             level: this.sanitize(level),
             name_of_school: this.sanitize(row["Name of School"]),
-            basic_education: this.sanitize(
-              row["Basic Education/Degree Course"],
-            ),
+            basic_education: this.sanitize(row["Basic Education/Degree Course"]),
             educ_from: this.sanitize(row["Educ From"]),
             educ_to: this.sanitize(row["Educ To"]),
             highest_level: this.sanitize(row["Highest Level / Units Earned"]),
@@ -295,9 +283,7 @@ export default {
         }
         if (title_learning_development && currentEmployee) {
           currentEmployee.learningRecords.push({
-            title_learning_development: this.sanitize(
-              title_learning_development,
-            ),
+            title_learning_development: this.sanitize(title_learning_development),
             ld_from: this.sanitize(row["Ld From"]),
             ld_to: this.sanitize(row["Ld To"]),
             ld_number_of_hours: this.sanitize(row["Ld Number of Hours"]),

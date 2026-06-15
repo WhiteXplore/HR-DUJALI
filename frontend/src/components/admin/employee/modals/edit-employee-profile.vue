@@ -9,16 +9,10 @@
         >
           <div class="flex gap-1 items-center">
             <icon :name="'add-students'" />
-            <h1 class="font-bold tracking-wide text-lg">
-              Edit Employee Profile
-            </h1>
+            <h1 class="font-bold tracking-wide text-lg">Edit Employee Profile</h1>
           </div>
 
-          <icon
-            :name="'circle-close3'"
-            @click="closeAdd"
-            class="cursor-pointer"
-          />
+          <icon :name="'circle-close3'" @click="closeAdd" class="cursor-pointer" />
         </div>
 
         <div class="flex gap-5 p-5 text-gray-700 font-semibold">
@@ -176,9 +170,7 @@
                   <option value="Divorced">Divorced</option>
                   <option value="Separated">Separated</option>
                   <option value="Annulled">Annulled</option>
-                  <option value="Domestic Partnership">
-                    Domestic Partnership
-                  </option>
+                  <option value="Domestic Partnership">Domestic Partnership</option>
                 </select>
               </div>
             </div>
@@ -260,9 +252,7 @@
               </div>
               <div class="flex gap-x-4">
                 <div class="flex flex-col space-y-2 w-full">
-                  <label class="font-semibold text-xs"
-                    >Employment Status:</label
-                  >
+                  <label class="font-semibold text-xs">Employment Status:</label>
                   <select
                     v-model="form.employment_status"
                     class="px-3 py-3 border w-full border-gray-300 rounded-md text-gray-700"
@@ -453,11 +443,7 @@
             <h1 class="font-bold">Permanent Address</h1>
             <div class="flex gap-2">
               <p>Same Address</p>
-              <input
-                type="checkbox"
-                v-model="sameAddress"
-                @change="handleSameAddress"
-              />
+              <input type="checkbox" v-model="sameAddress" @change="handleSameAddress" />
             </div>
           </div>
 
@@ -540,16 +526,12 @@
           v-if="activeSection === 'education'"
           class="overflow-y-auto max-h-[700px] pl-5 pr-5 space-y-3 text-center"
         >
-          <div
-            class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
-          >
+          <div class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2">
             <div class="overflow-x-auto mt-5 rounded-t-xl">
               <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
-                    <th class="border px-2 py-2" rowspan="2">
-                      EDUCATIONAL LEVEL
-                    </th>
+                    <th class="border px-2 py-2" rowspan="2">EDUCATIONAL LEVEL</th>
                     <th class="border px-2 py-2" rowspan="2">
                       NAME OF SCHOOL (Write in full)
                     </th>
@@ -573,10 +555,7 @@
                 </thead>
 
                 <tbody>
-                  <tr
-                    v-for="(record, index) in form.educationalRecords"
-                    :key="index"
-                  >
+                  <tr v-for="(record, index) in form.educationalRecords" :key="index">
                     <td class="border px-2 py-3">
                       <input
                         type="text"
@@ -661,22 +640,16 @@
           v-if="activeSection === 'civil'"
           class="overflow-y-auto max-h-[700px] pl-5 pr-5 space-y-3 text-center"
         >
-          <div
-            class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
-          >
+          <div class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2">
             <div class="overflow-x-auto mt-5 rounded-t-xl">
-              <table
-                class="min-w-full text-[14px] border border-gray-300 rounded-t-xl"
-              >
+              <table class="min-w-full text-[14px] border border-gray-300 rounded-t-xl">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
-                      CARREER SERVICE/ RA 1080 (BOARD/BAR) UNDER SPECIAL LAWS/
-                      CES/ CSEE/ BARANGAY ELIGIBILITY/ DRIVERS LISCENNSE
+                      CARREER SERVICE/ RA 1080 (BOARD/BAR) UNDER SPECIAL LAWS/ CES/ CSEE/
+                      BARANGAY ELIGIBILITY/ DRIVERS LISCENNSE
                     </th>
-                    <th class="border px-2 py-2" rowspan="2">
-                      RATING (If Applicable)
-                    </th>
+                    <th class="border px-2 py-2" rowspan="2">RATING (If Applicable)</th>
 
                     <th class="border px-2 py-2" rowspan="2">
                       DATE OF EXAMINATION/ CONFERMENT
@@ -684,9 +657,7 @@
                     <th class="border px-2 py-2" rowspan="2">
                       PLACE OF EXAMINATION / CONDERMENT
                     </th>
-                    <th class="border px-2 py-2" colspan="2">
-                      LISCENSE (If applicable)
-                    </th>
+                    <th class="border px-2 py-2" colspan="2">LISCENSE (If applicable)</th>
                     <th class="border px-2 py-2" rowspan="2">Action</th>
                   </tr>
                   <tr>
@@ -766,23 +737,19 @@
           v-if="activeSection === 'learning'"
           class="overflow-y-auto max-h-[700px] pl-5 pr-5 space-y-3 text-center"
         >
-          <div
-            class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
-          >
+          <div class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2">
             <div class="overflow-x-auto mt-5 rounded-t-xl">
               <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
                   <tr>
                     <th class="border px-2 py-2" rowspan="2">
-                      TITLE OF LEARNING AND DEVELOPMENT INTERVENTIONS PROGRAMS
-                      (Write in full)
+                      TITLE OF LEARNING AND DEVELOPMENT INTERVENTIONS PROGRAMS (Write in
+                      full)
                     </th>
                     <th class="border px-2 py-2" colspan="2">
                       INCLUSIVE DATES OF ATTENDANCE (mm/dd/yyyy)
                     </th>
-                    <th class="border px-2 py-2" rowspan="2">
-                      NUMBER OF HOURS
-                    </th>
+                    <th class="border px-2 py-2" rowspan="2">NUMBER OF HOURS</th>
 
                     <th class="border px-2 py-2" rowspan="2">
                       Type of LD (Mangerial/Supervisory/Technical/etc)
@@ -800,10 +767,7 @@
                 </thead>
 
                 <tbody>
-                  <tr
-                    v-for="(record, index) in form.learningRecords"
-                    :key="index"
-                  >
+                  <tr v-for="(record, index) in form.learningRecords" :key="index">
                     <td class="border px-2 py-3">
                       <input
                         type="text"
@@ -877,9 +841,7 @@
           class="overflow-y-auto max-h-[700px] pl-5 pr-5 space-y-3 text-center"
         >
           <!-- Special Skills and Hobbies Table -->
-          <div
-            class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
-          >
+          <div class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2">
             <div class="overflow-x-auto mt-5 rounded-t-xl">
               <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
@@ -891,10 +853,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(record, index) in form.specialSkillsRecords"
-                    :key="index"
-                  >
+                  <tr v-for="(record, index) in form.specialSkillsRecords" :key="index">
                     <td class="border px-2 py-3">
                       <input
                         type="text"
@@ -923,9 +882,7 @@
           </div>
 
           <!-- Non-Academic Distinction Table -->
-          <div
-            class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
-          >
+          <div class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2">
             <div class="overflow-x-auto mt-5 rounded-t-xl">
               <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
@@ -937,10 +894,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(record, index) in form.nonAcadRecords"
-                    :key="index"
-                  >
+                  <tr v-for="(record, index) in form.nonAcadRecords" :key="index">
                     <td class="border px-2 py-3">
                       <input
                         type="text"
@@ -969,9 +923,7 @@
           </div>
 
           <!-- Membership in Association  -->
-          <div
-            class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2"
-          >
+          <div class="text-gray-900 witespace-y-4 border w-[1300px] rounded-md p-2">
             <div class="overflow-x-auto mt-5 rounded-t-xl">
               <table class="min-w-full text-[14px] border border-gray-300">
                 <thead class="bg-blue-500 text-white">
@@ -983,10 +935,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(record, index) in form.membershipRecords"
-                    :key="index"
-                  >
+                  <tr v-for="(record, index) in form.membershipRecords" :key="index">
                     <td class="border px-2 py-3">
                       <input
                         type="text"
@@ -1060,10 +1009,8 @@
         <p class="text-sm text-gray-600 italic text-left">
           Please correct the following errors before submitting the form.
           <br />
-          <span class="font-semibold text-red-600">Note:</span> If a field does
-          not apply, enter
-          <span class="font-monotext-gray-900 px-1 rounded font-bold">N/A</span
-          >.
+          <span class="font-semibold text-red-600">Note:</span> If a field does not apply,
+          enter <span class="font-monotext-gray-900 px-1 rounded font-bold">N/A</span>.
         </p>
 
         <ul
@@ -1204,15 +1151,12 @@ export default {
       formData.nonAcadRecords = formData.nonAcadRecords || [];
       formData.membershipRecords = formData.membershipRecords || [];
 
-      console.log(
-        "🟦 PAYLOAD SENT TO BACKEND:",
-        JSON.parse(JSON.stringify(formData)),
-      );
+      console.log("🟦 PAYLOAD SENT TO BACKEND:", JSON.parse(JSON.stringify(formData)));
 
       try {
         const response = await axios.patch(
           `${process.env.VUE_APP_API_BASE_URL}/upload/${this.employeeId}`,
-          formData,
+          formData
         );
 
         console.log("🟩 BACKEND RESPONSE:", response.data);
@@ -1226,10 +1170,7 @@ export default {
 
         this.isOpen = false;
       } catch (error) {
-        console.error(
-          "❌ Error during form submission:",
-          error.response || error,
-        );
+        console.error("❌ Error during form submission:", error.response || error);
         if (error.response?.data?.message) {
           alert("Server Error: " + error.response.data.message);
         } else {
@@ -1255,12 +1196,9 @@ export default {
       else if (type === "title_learning_development")
         this.form.learningRecords.splice(index, 1);
       else if (type === "others") this.form.otherRecords.splice(index, 1);
-      else if (type === "special_skills")
-        this.form.specialSkillsRecords.splice(index, 1);
-      else if (type === "non_academic")
-        this.form.nonAcadRecords.splice(index, 1);
-      else if (type === "membership")
-        this.form.membershipRecords.splice(index, 1);
+      else if (type === "special_skills") this.form.specialSkillsRecords.splice(index, 1);
+      else if (type === "non_academic") this.form.nonAcadRecords.splice(index, 1);
+      else if (type === "membership") this.form.membershipRecords.splice(index, 1);
     },
 
     addRowEducation() {
@@ -1328,14 +1266,14 @@ export default {
     async fetchEmployeeRecords() {
       try {
         const response = await axios.get(
-          process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`,
+          process.env.VUE_APP_API_BASE_URL + `/upload/${this.employeeId}`
         );
         if (response.data) {
           this.form = {
             ...this.form,
             ...response.data,
             educationalRecords: response.data.secondTable || [],
-            civilRecords: response.data.forthTable || [],
+            civilRecords: response.data.fourthTable || [],
             learningRecords: response.data.fifthTable || [],
             specialSkillsRecords: response.data.thirdTable || [],
             nonAcadRecords: response.data.sixthTable || [],
